@@ -7,6 +7,8 @@ import axios from 'axios';
 
 import UserList from './UserList';
 import Chat from './Chat';
+import Memo from './Memo';
+import Info from './Info';
 import Setting from './Setting';
 import '../css/style.css';
 import '../js/global.js'
@@ -31,6 +33,7 @@ function Main(props) {
   const [screenState, setScreenState] = React.useState(0);
   const [tabState, setTabState] = React.useState(0);
   const key = props.userToken;
+  const isLoading = props.isLoading;
 
   if (!firebase.apps.length) {
     firebase.initializeApp(FirebaseConfig);
@@ -139,7 +142,7 @@ function Main(props) {
                 users={state.users}
                 tabState={tabState}
                 setTabState={setTabState}
-                selectUser={selectedUser}
+                selectedUser={selectedUser}
                 setSelectedUser={setSelectedUser}/>
             </div>
             <div className="chat-body">
@@ -149,13 +152,26 @@ function Main(props) {
                   userid={selectedUser}
                   database={database}
                   databaseRef={databaseMessageRef}
-                  setTabState={setTabState}/>
+                  tabState={tabState}
+                  setTabState={setTabState}
+                  users={state.users}
+                  isLoading={isLoading}/>
               )}
             </div>
             <div className="chat-options">
             </div>
           </div>
-          <div className="container-right card">
+          <div className="container-right">
+            <Memo
+              users={state.users}
+              keycode={key}
+              userid={selectedUser}
+              database={database}/>
+            <Info
+              users={state.users}
+              keycode={key}
+              userid={selectedUser}
+              database={database}/>
           </div>
         </div>
 

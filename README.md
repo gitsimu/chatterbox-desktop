@@ -72,3 +72,11 @@ This section has moved here: https://facebook.github.io/create-react-app/docs/tr
 https://kyuhyuk.kr/article/electron/2020/02/14/Electron-React
 https://gist.github.com/hymm/b621cf64a781cadb92db9312c0956e31
 https://finbits.io/blog/electron-create-react-app-electron-builder/
+
+## electron packaging
+https://github.com/electron-userland/electron-builder#cli-usage
+https://suwoni-codelab.com/electron/2017/04/17/Electron-distribution/
+https://github.com/electron-userland/electron-builder/issues/2030 <- [ERROR] Application entry file "build/electron.js" in th...
+https://stackoverflow.com/questions/54591664/reactjs-neterr-file-not-found <- [ERROR] blank screen issue
+
+## react-app-rewired

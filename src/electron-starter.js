@@ -7,6 +7,8 @@ function createWindow () {
   const win = new BrowserWindow({
     width: 1024,
     height: 600,
+    minWidth: 1024,
+    minHeight: 600,
     webPreferences: {
       nodeIntegration: true,
       // nodeIntegrationInWorker: true
@@ -16,6 +18,7 @@ function createWindow () {
   // React를 빌드할 경우 결과물은 build 폴더에 생성되기 때문에 loadURL 부분을 아래와 같이 작성합니다.
   const startUrl = process.env.ELECTRON_START_URL || url.format({
     pathname: path.join(__dirname, '/../build/index.html'),
+    // pathname: path.join(__dirname, "index.html"),
     protocol: 'file:',
     slashes: true
   });

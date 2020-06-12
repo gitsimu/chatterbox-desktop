@@ -2,7 +2,7 @@
   "name": "chatterbox-desktop",
   "version": "0.1.0",
   "private": true,
-  "dependencies": {    
+  "dependencies": {
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
@@ -21,7 +21,64 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "electron": "electron .",
-    "start": "nf start"
+    "start": "nf start",
+
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder",
+    "build:osx": "electron-builder --mac",
+    "build:linux": "npm run build:linux32 && npm run build:linux64",
+    "build:linux32": "electron-builder --linux --ia32",
+    "build:linux64": "electron-builder --linux --x64",
+    "build:win": "npm run build:win32 && npm run build:win64",
+    "build:win32": "electron-builder --win --ia32",
+    "build:win64": "electron-builder --win --x64"
+  },
+  "homepage": ".",
+  "build": {
+    "productName": "HelloElectron",
+    "appId": "com.electron.hello",
+    "asar": true,
+    "extends": null,
+    "protocols" : {
+        "name" : "helloElectron",
+        "schemes" : ["helloelectron"]
+    },
+    "mac": {
+      "target": [
+        "default"
+      ]
+
+    },
+    "dmg": {
+      "title": "HelloElectron"
+
+    },
+    "win": {
+      "target": [
+        "zip",
+        "nsis"
+      ]
+
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb",
+        "rpm",
+        "zip",
+        "tar.gz"
+      ]
+
+    },
+    "nsis":{
+      "oneClick" : false,
+      "allowToChangeInstallationDirectory" :true
+    },
+    "directories": {
+      "buildResources": "resources/installer/",
+      "output": "dist/",
+      "app": "."
+    }
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -40,6 +97,7 @@
   },
   "devDependencies": {
     "electron": "^9.0.3",
+    "electron-builder": "^22.7.0",
     "react-app-rewired": "^2.1.6"
   }
 }

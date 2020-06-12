@@ -14,6 +14,7 @@ function App() {
   //
   let id, pw
   const [userToken, setUserToken] = React.useState(null);
+  const [loading, isLoading] = React.useState(false);
 
   React.useEffect(() => {
     // simpleline icons
@@ -74,9 +75,14 @@ function App() {
         </div>
       </div>
     ) : (
-      <Main userToken={userToken}/>
+      <Main
+        userToken={userToken}
+        isLoading={isLoading}/>
     )}
 
+    { loading && (
+      <div id="loading"><div></div></div>
+    )}
     </>
   );
 }

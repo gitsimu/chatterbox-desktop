@@ -60,7 +60,7 @@ const UserList = (props) => {
           <User
             key={m.key}
             data={m}
-            active={m.key === props.selectUser}
+            active={m.key === props.selectedUser}
             clickEvent={props.setSelectedUser}/>
         ))}
       </div>

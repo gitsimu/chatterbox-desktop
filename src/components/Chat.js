@@ -23,8 +23,13 @@ const Chat = (props) => {
   const userid = props.userid;
   const database = props.database;
   const databaseRef = props.databaseRef + '/' + userid;
+  const tabState = props.tabState;
   const setTabState = props.setTabState;
+  const users = props.users;
+  const isLoading = props.isLoading;
   const [state, dispatch] = React.useReducer(reducer, initialState);
+  const [optionDialog, showOptionDialog] = React.useState(false);
+  const [infoDialog, showInfoDialog] = React.useState(false);
   const body = React.useRef(null)
   let input
 
@@ -50,6 +55,15 @@ const Chat = (props) => {
       }, 100)
     })
 
+    // info dialog
+    const target = users.filter((f) => { return f.key === userid })[0];
+    if (target && target.key === userid && target.value.state === 2) {
+      showInfoDialog(true);
+    }
+    else {
+      showInfoDialog(false);
+    }
+
     // 구독해제
     return () => {
       chat.off();
@@ -71,6 +85,7 @@ const Chat = (props) => {
       timestamp: new Date().getTime()
     })
     setTabState(1)
+    showInfoDialog(false);
   }
 
   const handleFileInput = (e) => {
@@ -79,12 +94,12 @@ const Chat = (props) => {
     formData.append('file', e.target.files[0]);
     formData.append('key', key);
 
-    // dispatch({ type: 'LOADING', isLoading: true });
+    isLoading(true);
 
-    return axios.post('/api/upload', formData, config)
+    return axios.post(global.serverAddress + '/api/upload', formData, config)
       .then(res => {
         console.log('upload-success', res);
-        // dispatch({ type: 'LOADING', isLoading: false });
+        isLoading(false);
 
         if (res.data.result === 'success') {
           sendMessage(key, userid, JSON.stringify(res.data.file), 2, database);
@@ -92,7 +107,7 @@ const Chat = (props) => {
       })
       .catch(err => {
         console.log('upload-failure', err);
-        // dispatch({ type: 'LOADING', isLoading: false });
+        isLoading(false);
       })
   }
   const handleEmojiContainer = (e) => {
@@ -130,11 +145,47 @@ const Chat = (props) => {
                 onClick={e => handleEmojiContainer(e)}></i>
             </label>
           </div>
-          <input className="message-input" ref={node => input = node} />
+          <input className="message-input" ref={node => input = node} placeholder="메세지를 입력해주세요."/>
           <button className="message-button-send" type="submit">
             <i className="icon-paper-plane"></i>
           </button>
+          <div className="message-button-more"
+            onClick={() => {
+              showOptionDialog(!optionDialog);
+            }}>
+            <i className="icon-options-vertical"></i>
+          </div>
         </form>
+
+        <div className={optionDialog ? "message-option-dialog" : "message-option-dialog hide"}>
+          <div className="message-option-complete"
+            onClick={() => {
+              database.ref('/' + key + '/users/' + userid).update({ state: 2 })
+              setTabState(2)
+              showOptionDialog(false)
+              showInfoDialog(true)
+              alert('이 대화가 종료처리 되었습니다.')
+            }}>
+            <i className="icon-power"></i>대화 종료하기
+          </div>
+          <div className="message-option-delete"
+            onClick={() => {}}>
+            <i className="icon-trash"></i>대화 삭제하기
+          </div>
+        </div>
+
+        { infoDialog && (
+          <div className="dialog info">
+            <div className="dialog-header">
+              <i className="icon-exclamation"></i>
+              <span>Infomation</span>
+            </div>
+            <div className="dialog-body">
+              <div>이 대화는 이미 종료된 대화입니다.</div>
+              <div>메세지를 보내면 다시 활성화됩니다.</div>
+            </div>
+          </div>
+        )}
       </div>
     </>
   )
