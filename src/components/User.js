@@ -7,7 +7,11 @@ const User = (props) => {
   const lastMessage = (userInfo && userInfo.lastMessage) ? userInfo.lastMessage : '';
   const dateTime = (userInfo && userInfo.timestamp) ? userInfo.timestamp : null;
 
-  console.log('user', props.data)
+  const code = script.guestCodeGenerator(props.data.key);
+  const nickname = (userInfo && userInfo.nickname) ? userInfo.nickname : code.guestCode;
+  const color = code.colorCode;
+
+  // console.log('user', props.data)
 
   return (
     <div
@@ -17,10 +21,12 @@ const User = (props) => {
       }}>
 
       <div className="chat-user-icon">
-        <div><i className="icon-user" style={{ paddingBottom: 2 }}></i></div>
+        <div style={{ backgroundColor: color }}>
+          <div className="bubble"></div>
+        </div>
       </div>
       <div className="chat-user-info">
-        <div className="chat-user-name">{ props.data.key }</div>
+        <div className="chat-user-name">{ nickname }</div>
         <div className="chat-user-detail">
           <div className="chat-user-message">{ lastMessage }</div>
           { dateTime && (

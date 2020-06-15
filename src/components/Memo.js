@@ -5,7 +5,7 @@ const Memo = (props) => {
   const key = props.keycode;
   const userid = props.userid;
   const database = props.database;
-  const userInfo = users.filter((f) => { return f.key == userid });
+  const userInfo = users.filter((f) => { return f.key === userid });
 
   const m = (userInfo.length > 0 &&
             userInfo[0].value &&
@@ -14,7 +14,7 @@ const Memo = (props) => {
   const [memo, setMemo] = React.useState(m);
 
   React.useEffect(() => {
-    setMemo(m);
+    setMemo(m);    
   }, [props]);
 
   return (

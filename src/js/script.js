@@ -192,3 +192,26 @@ export const getNiceTime = (fromDate, toDate, levels, prefix) => {
     }
     return returnString;
 }
+
+export const guestCodeGenerator = (uid) => {
+  const name1 = ['다홍', '주황', '노랑', '연두', '초록', '백록', '진초록', '청죽', '청록', '연청', '하늘', '벽청', '분홍', '자주', '연보라', '남보라'];
+  const name2 = ['쿠키', '파스타', '파이', '치즈', '어니언', '요거트', '크림', '애플', '바나나', '망고', '키위', '라임', '민트', '초콜릿', '코코넛', '케이크', '머랭', '버터', '아이스티', '커피', '마카롱', '마들렌', '감자', '엉겅퀴', '갈릭', '카모마일', '에이드', '샐러드', '크루아상', '타르트', '에일', '라거', '와인', '오렌지', '딸기', '자두', '복숭아', '호박', '자몽', '살구', '해바라기', '자동차', '비행기', '자전거', '창문', '튤립', '수선화', '장미', '안개', '야자수', '선인장', '단풍', '안경', '나무', '유리', '튜브', '액자', '양초', '보드', '네온', '필름', '달팽이', '오두막', '퍼퓸'];
+  const color1 = ['#fbafaf', '#ffbc98', '#ffd993', '#ebef96', '#b8d579', '#d0e4c8', '#a9d19f', '#9debe3', '#81d7e6', '#9de2fb', '#71daf4', '#9fc9f1', '#f5d1e7', '#d8acce', '#d8c2eb', '#aaa1da'];
+
+  const uid32 = parseInt(uid, 16).toString(32);
+  const code1 = parseInt(uid.slice(uid.length - 2, uid.length - 1), 32); // 16
+  const code2 = parseInt(uid32.slice(uid32.length - 3, uid32.length - 2), 32); // 32
+  const code3 = parseInt(uid32.slice(uid32.length - 4, uid32.length - 3), 32); // 32
+  const code4 = parseInt(uid.slice(0, 2), 32);
+
+  const obj = new Object();
+  if (name1[code1] && name2[code2 + code3]) {
+    obj.guestCode = name1[code1] + ' ' + name2[code2 + code3] + ' ' + code4;
+    obj.colorCode = color1[code1];
+  }
+  else {
+    obj.guestCode = '알수없는 사용자';
+    obj.colorCode = '#00aaff';
+  }
+  return obj;
+}

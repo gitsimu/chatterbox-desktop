@@ -79,4 +79,8 @@ https://suwoni-codelab.com/electron/2017/04/17/Electron-distribution/
 https://github.com/electron-userland/electron-builder/issues/2030 <- [ERROR] Application entry file "build/electron.js" in th...
 https://stackoverflow.com/questions/54591664/reactjs-neterr-file-not-found <- [ERROR] blank screen issue
 
+npm run build:win
+npm run dist
+...
+
 ## react-app-rewired

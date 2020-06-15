@@ -1,5 +1,6 @@
 import React from 'react';
 import ChatMessage from './ChatMessage';
+import EmojiContainer from './EmojiContainer';
 import axios from 'axios';
 
 const initialState = {messages: []};
@@ -26,11 +27,14 @@ const Chat = (props) => {
   const tabState = props.tabState;
   const setTabState = props.setTabState;
   const users = props.users;
+  const target = users.filter((f) => { return f.key === userid })[0];
   const isLoading = props.isLoading;
   const [state, dispatch] = React.useReducer(reducer, initialState);
   const [optionDialog, showOptionDialog] = React.useState(false);
   const [infoDialog, showInfoDialog] = React.useState(false);
-  const body = React.useRef(null)
+  const [emojiContainer, showEmojiContainer] = React.useState(false);
+  const [selectedEmoji, selectEmoji] = React.useState(null);
+  const body = React.useRef(null);
   let input
 
   React.useEffect(() => {
@@ -47,6 +51,7 @@ const Chat = (props) => {
         messages: snapshot.val(),
         userid: userid
       })
+      console.log('addMessage', snapshot.val());
 
       setTimeout(() => {
         if (body && body.current) {
@@ -56,7 +61,6 @@ const Chat = (props) => {
     })
 
     // info dialog
-    const target = users.filter((f) => { return f.key === userid })[0];
     if (target && target.key === userid && target.value.state === 2) {
       showInfoDialog(true);
     }
@@ -64,15 +68,20 @@ const Chat = (props) => {
       showInfoDialog(false);
     }
 
+    showOptionDialog(false);
+
     // 구독해제
     return () => {
       chat.off();
     }
   }, [userid])
 
-  // useEffect(() => {
-  //   return () => setLoading(false); // cleanup
-  // }, []);
+  React.useEffect(() => {
+    console.log(selectedEmoji);
+    if (input && selectedEmoji) {
+      input.value = input.value + selectedEmoji.emoji;
+    }
+  }, [selectedEmoji]);
 
   const sendMessage = (key, id, message, type, database) => {
     const messageId = Math.random().toString(36).substr(2, 9)
@@ -111,7 +120,7 @@ const Chat = (props) => {
       })
   }
   const handleEmojiContainer = (e) => {
-
+    showEmojiContainer(!emojiContainer)
   }
 
   return (
@@ -121,6 +130,7 @@ const Chat = (props) => {
           (state.messages.map((m, i) => (
           <ChatMessage
             opponent={userid}
+            target={target}
             key={m.id}
             prev={state.messages[i - 1]}
             {...m}
@@ -128,6 +138,10 @@ const Chat = (props) => {
         ))) }
       </div>
       <div className="message-form">
+        <EmojiContainer
+          getState={emojiContainer}
+          setState={showEmojiContainer}
+          selectEmoji={selectEmoji}/>
         <form onSubmit={e => {
           e.preventDefault()
           if (!input.value.trim()) return

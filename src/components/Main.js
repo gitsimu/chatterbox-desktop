@@ -51,6 +51,8 @@ function Main(props) {
     simmplelineLink.type = "text/css";
     document.querySelector('body').appendChild(simmplelineLink);
 
+    isLoading(true);
+
     // firebase
     getFirebaseAuthToken(key)
       .then(res => {
@@ -58,6 +60,8 @@ function Main(props) {
         if (data.result === 'success') {
           firebase.auth().signInWithCustomToken(data.token)
             .then(success => {
+              isLoading(false);
+
               const chat = database.ref(databaseUserRef).orderByChild('timestamp');
               chat.on('value', function(snapshot) {
                 dispatch({ type: 'clearUser' })
@@ -105,11 +109,13 @@ function Main(props) {
               })
             })
             .catch(error => {
+              isLoading(false);
               alert('인증에 실패하였습니다.');
             });
         }
       })
       .catch(error => {
+        isLoading(false);
         alert('인증 서버가 동작하지 않습니다.');
       })
   }, [])
@@ -122,16 +128,23 @@ function Main(props) {
             className={screenState === 0 ? "chat-lnb-item active" : "chat-lnb-item"}
             onClick={() => { setScreenState(0); }}>
             <i className="icon-bubble"></i>
+            <tooltip>채팅 목록</tooltip>
           </div>
           <div
             className={screenState === 1 ? "chat-lnb-item active" : "chat-lnb-item"}
             onClick={() => { setScreenState(1); }}>
             <i className="icon-user"></i>
+            <tooltip>유저 목록</tooltip>
           </div>
           <div
             className={screenState === 2 ? "chat-lnb-item active" : "chat-lnb-item"}
             onClick={() => { setScreenState(2); }}>
             <i className="icon-settings"></i>
+            <tooltip>설정</tooltip>
+          </div>
+          <div className="chat-lnb-item sign-out">
+            <i className="icon-power"></i>
+            <tooltip>로그아웃</tooltip>
           </div>
         </div>
 

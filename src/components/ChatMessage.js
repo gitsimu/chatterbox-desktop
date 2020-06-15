@@ -4,7 +4,13 @@ import * as script from '../js/script.js';
 const ChatMessage = (props) => {
   const isMyself = props.opponent !== props.userId;
   const isSameUser = (props.prev && (props.prev.userId === props.userId));
-  const nickname = 'Opponent';
+  const target = props.target.value;
+
+  const code = script.guestCodeGenerator(props.opponent);
+  const nickname = (target && target.nickname) ? target.nickname : code.guestCode;
+  const color = code.colorCode;
+
+  console.log('tt', target);
 
   const skipDate = () => {
     if (!props.prev) return false;
@@ -71,7 +77,10 @@ const ChatMessage = (props) => {
         <div className="message opponent">
           <div className="message-profile">
             { !isSameUser && (
-              <div className="message-profile-icon">{ nickname.substring(0, 1) }</div>
+              <div className="message-profile-icon"
+                style={{ backgroundColor: color }}>
+                <div className="bubble"></div>
+              </div>
             )}
           </div>
           <div className="message-body">

@@ -1,6 +1,5 @@
 import React from 'react';
 import User from './User'
-import * as script from '../js/script.js';
 
 const UserList = (props) => {
   const users = props.users;
