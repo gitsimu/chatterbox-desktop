@@ -57,7 +57,7 @@ const Setting = ({ settings, ...props }) => {
                 nickname={nickname}
                 firstMessage={firstMessage}/>
             </div>
-            <div style={{ flex: 1, marginLeft: 20 }}>
+            <div style={{ flex: 1, marginLeft: 50 }}>
               <div className="setting-input-item">
                 <span>제목</span>
                 <input value={title} onChange={(e) => { setTitle(e.target.value) }}/>

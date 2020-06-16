@@ -1,5 +1,6 @@
-div {
+div, input, textarea {
   box-sizing: border-box;
+  font-family: "Avenir", "Noto Sans Japanese", "Hiragino Kaku Gothic ProN", "YuGothic", "Yu Gothic", "メイリオ", "Apple SD Gothic Neo", "Nanum Barun Gothic", "Helvetica", "Arial", "Malgun Gothic", "맑은 고딕", "돋움", "Dotum", "sans-serif";
 }
 /* width */
 ::-webkit-scrollbar {
@@ -22,7 +23,8 @@ div {
   background: #333;
 }
 
-
+/* color1: rgb(141, 152, 177) */
+/* color2: rgba(117, 124, 140, 1) */
 .main {
   /* background-color: #282c34; */
   /* background: rgba(25, 28, 43, 1); */
@@ -90,7 +92,7 @@ div {
   border-radius: 5px;
   transition: 0.2s ease all;
   /* background: rgba(41, 45, 55, 1); */
-  color: rgba(117, 124, 140, 1);
+  color: rgb(141, 152, 177);
 }
 .chat-lnb-item.active,
 .chat-lnb-item:hover {
@@ -103,14 +105,17 @@ div {
   color: #FF5722;
 }
 .chat-list {
+  display: flex;
+  flex-direction: column;
   width: 250px;
+  max-height: calc(100vh - 10px);
   margin-right: 5px;
   overflow: auto;
   padding: 0 !important;
 }
 .chat-list-tab {
   display: flex;
-  border-bottom: 1px solid rgba(24, 26, 31, 1);
+  border-bottom: 1px solid rgb(35, 38, 45);
 }
 .chat-list-tab > div {
   transition: 0.2s ease all;
@@ -130,9 +135,13 @@ div {
   font-size: 12px;
   cursor: pointer;
   border-top: 3px solid transparent;
-  color: rgba(117, 124, 140, 1);
+  color: rgb(141, 152, 177);
 }
 
+.chat-users {
+  flex: 1;
+  overflow: auto;
+}
 .chat-user {
   display: flex;
   padding: 10px;
@@ -172,16 +181,24 @@ div {
   color: #eeeeee;
 }
 .chat-user-detail {
+  position: relative;
   display: flex;
 }
 .chat-user-message,
 .chat-user-datetime {
   color: #999;
   font-size: 12px;
-  max-width: 170px;
+  max-width: 120px;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+}
+.chat-user-message {
+  color: #84d6ff;
+}
+.chat-user-datetime {
+  position: absolute;
+  right: 5px;
 }
 
 .chat-body {
@@ -219,7 +236,7 @@ div {
   font-weight: bold;
   padding: 12px 15px;
   user-select: none;
-  color: rgba(117, 124, 140, 1)
+  color: rgb(141, 152, 177)
 }
 .chat-memo-body {
   font-size: 0;
@@ -268,7 +285,7 @@ div {
   font-weight: bold;
   padding: 12px 15px;
   user-select: none;
-  color: rgba(117, 124, 140, 1)
+  color: rgb(141, 152, 177)
 }
 .chat-info-body {
   background: rgba(0,0,0,0.1);
@@ -278,14 +295,16 @@ div {
 }
 .chat-info-item {
   padding: 2px 10px;
+  margin-bottom: 3px;
 }
 .chat-info-item span {
   font-size: 13px;
-  color: rgba(117, 124, 140, 1);
+  /* color: rgba(117, 124, 140, 1); */
+  color: rgb(141, 152, 177);
   user-select: none;
 }
 .chat-info-item input {
-  padding: 5px;
+  padding: 5px 7px;
   width: 100%;
   outline: none;
   border: none;
@@ -303,11 +322,12 @@ div {
   background: rgba(27, 29, 35, 1);
 }
 .chat-info-item > div.chat-info-item-text {
-  padding: 5px;
+  padding: 5px 7px;
   font-size: 13px;
   color: #eee;
 }
 .chat-info-item > div.chat-info-item-input {
+  position: relative;
   display: flex;
   align-items: center;
 }
@@ -320,6 +340,12 @@ div {
   transition: 0.3s ease all;
   font-size: 12px;
   white-space: pre;
+  position: absolute;
+  top: -16px;
+  right: 3px;
+}
+.chat-info-item > div.chat-info-item-input div.chat-info-item-save:hover {
+  text-decoration: underline;
 }
 .chat-info-item input:focus ~ div.chat-info-item-save {
   opacity: 1;
@@ -336,6 +362,9 @@ div {
 /* .messages::-webkit-scrollbar {
   display: none;
 } */
+.messages > div {
+  animation: fadein .2s ease-in-out;
+}
 
 .message-form {
   position: relative;
@@ -364,7 +393,7 @@ div {
   display: flex;
 }
 .message-addon i {
-  color: rgba(117, 124, 140, 1);
+  color: rgb(141, 152, 177);
   padding: 7px;
   margin-right: 3px;
   cursor: pointer;
@@ -377,26 +406,32 @@ div {
   display: none;
 }
 .message-input {
-  padding: 10px 15px;
+  padding: 12px 15px;
   width: 100%;
   outline: none;
   border: none;
   font-size: 14px;
   background: rgba(27, 29, 35, 1);
   color: #fff;
+  resize: none;
+  overflow: auto;
 }
 .message-button-send {
   width: 80px;
   background: rgba(34, 37, 43, 1);
-  color: rgba(117, 124, 140, 1);
+  color: rgb(141, 152, 177);
   border: none;
   outline: none;
   cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .message-button-more {
   width: 80px;
   background: rgba(34, 37, 43, 1);
-  color: rgba(117, 124, 140, 1);
+  color: rgb(141, 152, 177);
   border: none;
   font-size: 14px;
   display: flex;
@@ -525,7 +560,7 @@ div {
   color: #eee;
 }
 .message.opponent .message-top {
-  margin: 2px 0 4px 2px;
+  margin: 2px 0 6px 2px;
 }
 .message.opponent .message-name {
   font-size: 13px;
@@ -911,6 +946,14 @@ div {
   to { -webkit-transform: rotate(360deg); }
 }
 
+@keyframes fadein {
+  0% {opacity:0}
+	100% {opacity:1}
+}
+@-webkit-keyframes fadein {
+  0% {opacity:0}
+  100% {opacity:1}
+}
 
 tooltip {
   display: none;

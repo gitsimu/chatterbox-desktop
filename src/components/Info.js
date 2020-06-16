@@ -39,6 +39,11 @@ const Info = ({ users, settings, ...props }) => {
               <input type="text" placeholder="데이터가 없습니다" value={nickname} onChange={(e) => { setNickname(e.target.value); }}/>
               <div className="chat-info-item-save"
                 onClick={() => {
+                  if (nickname.length > 30) {
+                    alert('닉네임 30자를 넘길 수 없습니다.');
+                    return;
+                  }
+
                   database.ref('/' + key + '/users/' + userid).update({ nickname: nickname })
                   alert('닉네임을 저장하였습니다.');
                 }}>저장
@@ -46,15 +51,16 @@ const Info = ({ users, settings, ...props }) => {
             </div>
           </div>
           <div className="chat-info-item">
-            <span>사용자 고유 ID</span>
-            <div className="chat-info-item-text">{info.key}</div>
-          </div>
-          <div className="chat-info-item">
             <span>연락처</span>
             <div className="chat-info-item-input">
               <input type="text" placeholder="데이터가 없습니다" value={mobile} onChange={(e) => { setMobile(e.target.value); }}/>
               <div className="chat-info-item-save"
                 onClick={() => {
+                  if (mobile.length > 30) {
+                    alert('연락5 30자를 넘길 수 없습니다.');
+                    return;
+                  }
+
                   database.ref('/' + key + '/users/' + userid).update({ mobile: mobile })
                   alert('연락처를 저장하였습니다.');
                 }}>저장
@@ -67,11 +73,20 @@ const Info = ({ users, settings, ...props }) => {
               <input type="text" placeholder="데이터가 없습니다" value={email} onChange={(e) => setEmail(e.target.value)}/>
               <div className="chat-info-item-save"
                 onClick={() => {
+                  if (email.length > 50) {
+                    alert('닉네임 50자를 넘길 수 없습니다.');
+                    return;
+                  }
+
                   database.ref('/' + key + '/users/' + userid).update({ email: email })
                   alert('이메일을 저장하였습니다.');
                 }}>저장
               </div>
             </div>
+          </div>
+          <div className="chat-info-item">
+            <span>사용자 고유 ID</span>
+            <div className="chat-info-item-text">{info.key}</div>
           </div>
           </>
         )}

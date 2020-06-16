@@ -12,7 +12,7 @@ const Memo = ({ users, settings, ...props }) => {
   const [memo, setMemo] = React.useState(m);
 
   React.useEffect(() => {
-    setMemo(m);    
+    setMemo(m);
   }, [settings.selectedUser]);
 
   return (
@@ -30,6 +30,11 @@ const Memo = ({ users, settings, ...props }) => {
         {(userid && userid !== '') && (
           <div
             onClick={() => {
+              if (memo.length > 200) {
+                alert('메모는 200자를 넘길 수 없습니다.');
+                return;
+              }
+
               database.ref('/' + key + '/users/' + userid).update({ memo: memo })
               alert('메모를 저장하였습니다.');
             }}>메모 저장하기</div>

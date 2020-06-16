@@ -1,14 +1,11 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import * as script from '../js/script.js';
 
-const ChatMessage = (props) => {
+const ChatMessage = ({ users, settings, ...props }) => {
   const isMyself = props.opponent !== props.userId;
   const isSameUser = (props.prev && (props.prev.userId === props.userId));
   const target = props.target.value;
-
-  const code = script.guestCodeGenerator(props.opponent);
-  const nickname = (target && target.nickname) ? target.nickname : code.guestCode;
-  const color = code.colorCode;
 
   const skipDate = () => {
     if (!props.prev) return false;
@@ -76,7 +73,7 @@ const ChatMessage = (props) => {
           <div className="message-profile">
             { !isSameUser && (
               <div className="message-profile-icon"
-                style={{ backgroundColor: color }}>
+                style={{ backgroundColor: settings.selectedUser.colorCode }}>
                 <div className="bubble"></div>
               </div>
             )}
@@ -84,7 +81,7 @@ const ChatMessage = (props) => {
           <div className="message-body">
             { !isSameUser && (
               <div className="message-top">
-                <div className="message-name">{ nickname }</div>
+                <div className="message-name">{ settings.selectedUser.guestCode }</div>
               </div>
             )}
             <div className="message-bottom">
@@ -98,4 +95,10 @@ const ChatMessage = (props) => {
   )
 }
 
-export default ChatMessage
+const mapStateToProps = state => ({
+  users: state.users,
+  settings: state.settings,
+})
+
+// export default ChatMessage;
+export default connect(mapStateToProps)(ChatMessage);

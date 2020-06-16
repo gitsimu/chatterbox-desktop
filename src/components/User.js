@@ -48,8 +48,7 @@ const User = ({ messages, settings, addMessages, selectedUser, ...props }) => {
         <div className="chat-user-detail">
           <div className="chat-user-message">{ lastMessage }</div>
           { dateTime && (
-            <>
-            <div style={{marginLeft: 5, marginRight: 5, color: '#999'}}>·</div>
+            <>            
             <div className="chat-user-datetime">{ script.getNiceTime(dateTime, new Date(), 1, true) }</div>
             </>
           )}
