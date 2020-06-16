@@ -416,6 +416,9 @@ div, input, textarea {
   resize: none;
   overflow: auto;
 }
+.message-input::-webkit-scrollbar {
+  display: none;
+}
 .message-button-send {
   width: 80px;
   background: rgba(34, 37, 43, 1);

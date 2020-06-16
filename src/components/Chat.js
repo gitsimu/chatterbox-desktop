@@ -5,20 +5,20 @@ import axios from 'axios';
 import { connect } from 'react-redux';
 import { addMessages } from '../actions'
 
-const initialState = {messages: []};
-function reducer(state, action) {
-    switch (action.type) {
-      case 'addMessage':
-        return {
-          messages: [...state.messages, action.messages],
-          userid: action.userid,
-        }
-      case 'clearMessage':
-        return {messages: []}
-      default:
-        throw new Error();
-    }
-}
+// const initialState = {messages: []};
+// function reducer(state, action) {
+//     switch (action.type) {
+//       case 'addMessage':
+//         return {
+//           messages: [...state.messages, action.messages],
+//           userid: action.userid,
+//         }
+//       case 'clearMessage':
+//         return {messages: []}
+//       default:
+//         throw new Error();
+//     }
+// }
 
 const Chat = ({ users, messages, settings, addMessages, ...props }) => {
   const key = settings.key;
@@ -30,7 +30,7 @@ const Chat = ({ users, messages, settings, addMessages, ...props }) => {
   const target = settings.selectedUser;
   const isLoading = props.isLoading;
 
-  const [state, dispatch] = React.useReducer(reducer, initialState);
+  // const [state, dispatch] = React.useReducer(reducer, initialState);
   const [optionDialog, showOptionDialog] = React.useState(false);
   const [infoDialog, showInfoDialog] = React.useState(false);
   const [emojiContainer, showEmojiContainer] = React.useState(false);
@@ -94,12 +94,13 @@ const Chat = ({ users, messages, settings, addMessages, ...props }) => {
   }, [userid])
 
   const firebaseConnect = (userid) => {
+    // 최초 1회만 연결
     if (userid && !messages[userid]) {
       const database = props.database;
       const databaseRef = '/' + settings.key + '/messages/' + userid;
-      console.log('firebase connect', databaseRef);
+      // console.log('firebase connect', databaseRef);
 
-      const chat = database.ref(databaseRef).orderByChild('timestamp');
+      const chat = database.ref(databaseRef).orderByChild('timestamp').limitToLast(100);
       chat.on('child_added', function(snapshot) {
         addMessages({ key: userid, value: snapshot.val() });
         refresh(snapshot.val().id);
@@ -161,7 +162,6 @@ const Chat = ({ users, messages, settings, addMessages, ...props }) => {
   return (
     <>
       <div className="messages card" ref={body}>
-        { console.log('msg', state.userid === userid, messages[userid]) }
         { (messages[userid]) &&  // 중복호출 예외처리
            (messages[userid].map((m, i) => (
            <ChatMessage

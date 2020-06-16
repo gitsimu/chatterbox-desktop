@@ -36,7 +36,10 @@ const Info = ({ users, settings, ...props }) => {
           <div className="chat-info-item">
             <span>사용자 닉네임</span>
             <div className="chat-info-item-input">
-              <input type="text" placeholder="데이터가 없습니다" value={nickname} onChange={(e) => { setNickname(e.target.value); }}/>
+              <input type="text" placeholder="데이터가 없습니다"
+                value={nickname}
+                // onBlur={(e) => { setNickname(initNickname) }}
+                onChange={(e) => { setNickname(e.target.value) }}/>
               <div className="chat-info-item-save"
                 onClick={() => {
                   if (nickname.length > 30) {
@@ -53,7 +56,9 @@ const Info = ({ users, settings, ...props }) => {
           <div className="chat-info-item">
             <span>연락처</span>
             <div className="chat-info-item-input">
-              <input type="text" placeholder="데이터가 없습니다" value={mobile} onChange={(e) => { setMobile(e.target.value); }}/>
+              <input type="text" placeholder="데이터가 없습니다"
+                value={mobile}
+                onChange={(e) => { setMobile(e.target.value) }}/>
               <div className="chat-info-item-save"
                 onClick={() => {
                   if (mobile.length > 30) {
@@ -70,7 +75,9 @@ const Info = ({ users, settings, ...props }) => {
           <div className="chat-info-item">
             <span>이메일</span>
             <div className="chat-info-item-input">
-              <input type="text" placeholder="데이터가 없습니다" value={email} onChange={(e) => setEmail(e.target.value)}/>
+              <input type="text" placeholder="데이터가 없습니다"
+                value={email}
+                onChange={(e) => { setEmail(e.target.value) }}/>
               <div className="chat-info-item-save"
                 onClick={() => {
                   if (email.length > 50) {
