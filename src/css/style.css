@@ -502,11 +502,11 @@ div {
   white-space: nowrap;
 }
 .message .message-profile {
-  width: 30px;
+  width: 35px;
 }
 .message .message-profile-icon {
-  width: 25px;
-  height: 25px;
+  width: 28px;
+  height: 28px;
   background: #00aaff;
   display: flex;
   align-items: center;

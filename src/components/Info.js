@@ -1,20 +1,17 @@
 import React from 'react';
+import { connect } from 'react-redux';
 
-const Info = (props) => {
-  const users = props.users;
-  const key = props.keycode;
-  const userid = props.userid;
+const Info = ({ users, settings, ...props }) => {
+  const key = settings.key;
   const database = props.database;
-  const userInfo = users.filter((f) => { return f.key === userid });
+  const userid = settings.selectedUser.key;
 
-  const i = (userInfo.length > 0 &&
-            userInfo[0]) ?
-            userInfo[0] : '';
+  const i = settings.selectedUser;
   const [info, setInfo] = React.useState(i);
 
-  const initNickname = (i && i.value.nickname) ? i.value.nickname : '';
-  const initMobile = (i && i.value.mobile) ? i.value.mobile : '';
-  const initEmail = (i && i.value.email) ? i.value.email : '';
+  const initNickname = (i.value && i.value.nickname) ? i.value.nickname : '';
+  const initMobile = (i.value && i.value.mobile) ? i.value.mobile : '';
+  const initEmail = (i.value && i.value.email) ? i.value.email : '';
 
   const [nickname, setNickname] = React.useState(initNickname);
   const [mobile, setMobile] = React.useState(initMobile);
@@ -25,9 +22,9 @@ const Info = (props) => {
   }, [props]);
 
   React.useEffect(() => {
-    setNickname((i && i.value.nickname) ? i.value.nickname : '');
-    setMobile((i && i.value.mobile) ? i.value.mobile : '');
-    setEmail((i && i.value.email) ? i.value.email : '');
+    setNickname((i.value && i.value.nickname) ? i.value.nickname : '');
+    setMobile((i.value && i.value.mobile) ? i.value.mobile : '');
+    setEmail((i.value && i.value.email) ? i.value.email : '');
   }, [i]);
 
   return (
@@ -83,4 +80,10 @@ const Info = (props) => {
   )
 }
 
-export default Info;
+const mapStateToProps = state => ({
+  users: state.users,
+  settings: state.settings,
+})
+
+// export default Info;
+export default connect(mapStateToProps)(Info);

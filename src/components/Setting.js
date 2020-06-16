@@ -1,10 +1,10 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import Mockup from './Mockup';
 
-
-const Setting = (props) => {
+const Setting = ({ settings, ...props }) => {
   const database = props.database;
-  const databaseRef = '/' + props.keycode + '/' + 'config';
+  const databaseRef = '/' + settings.key + '/' + 'config';
   const info = database.ref(databaseRef);
 
   const [title, setTitle] = React.useState('');
@@ -106,4 +106,10 @@ const Setting = (props) => {
   )
 }
 
-export default Setting
+const mapStateToProps = state => ({
+  users: state.users,
+  settings: state.settings,
+})
+
+// export default Setting;
+export default connect(mapStateToProps)(Setting);

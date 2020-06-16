@@ -10,8 +10,6 @@ const ChatMessage = (props) => {
   const nickname = (target && target.nickname) ? target.nickname : code.guestCode;
   const color = code.colorCode;
 
-  console.log('tt', target);
-
   const skipDate = () => {
     if (!props.prev) return false;
     else {

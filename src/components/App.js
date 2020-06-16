@@ -1,6 +1,9 @@
 import React from 'react';
 import axios from 'axios';
 
+import { connect } from 'react-redux'
+import { initSettings } from '../actions'
+
 import Main from './Main';
 import '../css/App.css';
 
@@ -10,7 +13,7 @@ import '../css/App.css';
 
 // const storage = require('electron-json-storage');
 
-function App() {
+function App({ settings, initSettings }) {
   //
   let id, pw
   const [userToken, setUserToken] = React.useState(null);
@@ -37,6 +40,7 @@ function App() {
     //   setUserToken(token)
     // })
     setUserToken(token)
+    initSettings({ key: token });
   }
 
   return (
@@ -87,5 +91,13 @@ function App() {
   );
 }
 
+const mapStateToProps = state => ({
+  settings: state.settings,
+})
 
-export default App;
+const mapDispatchToProps = dispatch => ({
+  initSettings: s => dispatch(initSettings(s)),
+})
+
+// export default App;
+export default connect(mapStateToProps, mapDispatchToProps)(App);

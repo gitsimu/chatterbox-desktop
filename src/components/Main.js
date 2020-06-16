@@ -5,6 +5,9 @@ import "firebase/auth";
 import "firebase/database";
 import axios from 'axios';
 
+import { connect } from 'react-redux'
+import { addUsers, clearUsers, selectedUser } from '../actions'
+
 import UserList from './UserList';
 import Chat from './Chat';
 import Memo from './Memo';
@@ -12,27 +15,14 @@ import Info from './Info';
 import Setting from './Setting';
 import '../css/style.css';
 import '../js/global.js'
+import * as script from '../js/script.js';
 
 const USERS = [];
-const initialState = {users: []};
 
-function reducer(state, action) {
-    switch (action.type) {
-      case 'addUser':
-        return {users: [...state.users, action.users]}
-      case 'clearUser':
-        return {users: []}
-      default:
-        throw new Error();
-    }
-}
-
-function Main(props) {
-  const [state, dispatch] = React.useReducer(reducer, initialState);
-  const [selectedUser, setSelectedUser] = React.useState('');
+function Main({ users, messages, settings, addUsers, clearUsers, selectedUser, ...props }) {
   const [screenState, setScreenState] = React.useState(0);
   const [tabState, setTabState] = React.useState(0);
-  const key = props.userToken;
+  const key = 'c1cd7759-9784-4fac-a667-3685d6b2e4a0';
   const isLoading = props.isLoading;
 
   if (!firebase.apps.length) {
@@ -64,20 +54,22 @@ function Main(props) {
 
               const chat = database.ref(databaseUserRef).orderByChild('timestamp');
               chat.on('value', function(snapshot) {
-                dispatch({ type: 'clearUser' })
+                clearUsers();
 
                 let items = [];
-                snapshot.forEach(function (childSnapshot) {
+                snapshot.forEach((childSnapshot) => {
                   items.push(childSnapshot);
                 });
 
-                items.reverse().forEach(function (childSnapshot) { // order by desc
-                  dispatch({
-                    type: 'addUser',
-                    users: {
-                      key: childSnapshot.key,
-                      value: childSnapshot.val(),
-                    }
+                items.reverse().forEach((childSnapshot) => { // order by desc
+                  const k = childSnapshot.key;
+                  const v = childSnapshot.val();
+                  const code = script.guestCodeGenerator(k);
+                  addUsers({
+                    key: k,
+                    value: v,
+                    guestCode: (v && v.nickname) ? v.nickname : code.guestCode,
+                    colorCode: code.colorCode,
                   })
 
                   // global
@@ -103,7 +95,7 @@ function Main(props) {
                   if (target.length > 0) {
                     setScreenState(0);
                     setTabState(target[0].value.state ? target[0].value.state : 0);
-                    setSelectedUser(target[0].key);
+                    selectedUser(target[0])
                   }
                 }
               })
@@ -119,6 +111,10 @@ function Main(props) {
         alert('인증 서버가 동작하지 않습니다.');
       })
   }, [])
+
+  React.useEffect(() => {
+
+  }, [users]);
 
   return (
     <div className="App">
@@ -152,22 +148,17 @@ function Main(props) {
           <div className="container-center">
             <div className="chat-list card">
               <UserList
-                users={state.users}
+                database={database}
                 tabState={tabState}
-                setTabState={setTabState}
-                selectedUser={selectedUser}
-                setSelectedUser={setSelectedUser}/>
+                setTabState={setTabState}/>
             </div>
             <div className="chat-body">
-              {(selectedUser && selectedUser != '') && (
+              {(settings.selectedUser && settings.selectedUser.key) && (
                 <Chat
-                  keycode={key}
-                  userid={selectedUser}
                   database={database}
                   databaseRef={databaseMessageRef}
                   tabState={tabState}
                   setTabState={setTabState}
-                  users={state.users}
                   isLoading={isLoading}/>
               )}
             </div>
@@ -175,26 +166,15 @@ function Main(props) {
             </div>
           </div>
           <div className="container-right">
-            <Memo
-              users={state.users}
-              keycode={key}
-              userid={selectedUser}
-              database={database}/>
-            <Info
-              users={state.users}
-              keycode={key}
-              userid={selectedUser}
-              database={database}/>
+            <Memo database={database}/>
+            <Info database={database}/>
           </div>
         </div>
 
         <div className={ screenState === 1 ? "container-screen-1" : "container-screen-1 hide" }>
         </div>
         <div className={ screenState === 2 ? "container-screen-2" : "container-screen-2 hide" }>
-          <Setting
-            keycode={key}
-            userid={selectedUser}
-            database={database}/>
+          <Setting database={database}/>
         </div>
       </div>
     </div>
@@ -206,4 +186,17 @@ const getFirebaseAuthToken = async (uuid) => {
   return await res;
 }
 
-export default Main;
+const mapStateToProps = state => ({
+  users: state.users,
+  messages: state.messages,
+  settings: state.settings,
+})
+
+const mapDispatchToProps = dispatch => ({
+  addUsers: u => dispatch(addUsers(u)),
+  clearUsers: () => dispatch(clearUsers()),
+  selectedUser: u => dispatch(selectedUser(u)),
+})
+
+// export default Main;
+export default connect(mapStateToProps, mapDispatchToProps)(Main);

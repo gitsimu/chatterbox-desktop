@@ -1,8 +1,8 @@
 import React from 'react';
-import User from './User'
+import User from './User';
+import { connect } from 'react-redux';
 
-const UserList = (props) => {
-  const users = props.users;
+const UserList = ({ users, ...props }) => {
   const tabState = props.tabState;
   const setTabState = props.setTabState;
 
@@ -58,13 +58,17 @@ const UserList = (props) => {
         }).map((m, i) => (
           <User
             key={m.key}
-            data={m}
-            active={m.key === props.selectedUser}
-            clickEvent={props.setSelectedUser}/>
+            database={props.database}
+            data={m}/>
         ))}
       </div>
     </>
   )
 }
 
-export default UserList
+const mapStateToProps = state => ({
+  users: state.users,
+})
+
+// export default UserList
+export default connect(mapStateToProps)(UserList);

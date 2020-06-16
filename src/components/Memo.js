@@ -1,21 +1,19 @@
 import React from 'react';
+import { connect } from 'react-redux';
 
-const Memo = (props) => {
-  const users = props.users;
-  const key = props.keycode;
-  const userid = props.userid;
+const Memo = ({ users, settings, ...props }) => {
+  const key = settings.key;
   const database = props.database;
-  const userInfo = users.filter((f) => { return f.key === userid });
+  const userid = settings.selectedUser.key;
 
-  const m = (userInfo.length > 0 &&
-            userInfo[0].value &&
-            userInfo[0].value.memo) ?
-            userInfo[0].value.memo : '';
+  const m = (settings.selectedUser.value &&
+            settings.selectedUser.value.memo) ?
+            settings.selectedUser.value.memo : '';
   const [memo, setMemo] = React.useState(m);
 
   React.useEffect(() => {
     setMemo(m);    
-  }, [props]);
+  }, [settings.selectedUser]);
 
   return (
     <div className="chat-memo card">
@@ -27,7 +25,6 @@ const Memo = (props) => {
           onChange={(e) => { setMemo(e.target.value) }}>
         </textarea>
       </div>
-
 
       <div className="chat-memo-footer">
         {(userid && userid !== '') && (
@@ -43,4 +40,10 @@ const Memo = (props) => {
   )
 }
 
-export default Memo;
+const mapStateToProps = state => ({
+  users: state.users,
+  settings: state.settings,
+})
+
+// export default Memo;
+export default connect(mapStateToProps)(Memo);

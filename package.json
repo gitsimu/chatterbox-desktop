@@ -12,7 +12,9 @@
     "foreman": "^3.0.1",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
-    "react-scripts": "3.4.1"
+    "react-redux": "^7.2.0",
+    "react-scripts": "3.4.1",
+    "redux": "^4.0.5"
   },
   "main": "src/electron-starter.js",
   "scripts": {
@@ -22,7 +24,6 @@
     "eject": "react-scripts eject",
     "electron": "electron .",
     "start": "nf start",
-
     "pack": "electron-builder --dir",
     "dist": "electron-builder",
     "build:osx": "electron-builder --mac",
@@ -39,26 +40,25 @@
     "appId": "com.electron.smlog",
     "asar": true,
     "extends": null,
-    "protocols" : {
-        "name" : "smlog",
-        "schemes" : ["smlog"]
+    "protocols": {
+      "name": "smlog",
+      "schemes": [
+        "smlog"
+      ]
     },
     "mac": {
       "target": [
         "default"
       ]
-
     },
     "dmg": {
       "title": "SmartLog"
-
     },
     "win": {
       "target": [
         "zip",
         "nsis"
       ]
-
     },
     "linux": {
       "target": [
@@ -68,11 +68,10 @@
         "zip",
         "tar.gz"
       ]
-
     },
-    "nsis":{
-      "oneClick" : false,
-      "allowToChangeInstallationDirectory" :true
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
     },
     "directories": {
       "buildResources": "resources/installer/",

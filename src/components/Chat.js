@@ -2,9 +2,10 @@ import React from 'react';
 import ChatMessage from './ChatMessage';
 import EmojiContainer from './EmojiContainer';
 import axios from 'axios';
+import { connect } from 'react-redux';
+import { addMessages } from '../actions'
 
 const initialState = {messages: []};
-
 function reducer(state, action) {
     switch (action.type) {
       case 'addMessage':
@@ -19,21 +20,22 @@ function reducer(state, action) {
     }
 }
 
-const Chat = (props) => {
-  const key = props.keycode;
-  const userid = props.userid;
+const Chat = ({ users, messages, settings, addMessages, ...props }) => {
+  const key = settings.key;
+  const userid = settings.selectedUser.key;
   const database = props.database;
   const databaseRef = props.databaseRef + '/' + userid;
   const tabState = props.tabState;
   const setTabState = props.setTabState;
-  const users = props.users;
-  const target = users.filter((f) => { return f.key === userid })[0];
+  const target = settings.selectedUser;
   const isLoading = props.isLoading;
+
   const [state, dispatch] = React.useReducer(reducer, initialState);
   const [optionDialog, showOptionDialog] = React.useState(false);
   const [infoDialog, showInfoDialog] = React.useState(false);
   const [emojiContainer, showEmojiContainer] = React.useState(false);
   const [selectedEmoji, selectEmoji] = React.useState(null);
+  const [refresh, isRefresh] = React.useState(false);
   const body = React.useRef(null);
   let input
 
@@ -61,13 +63,7 @@ const Chat = (props) => {
     })
 
     // info dialog
-    if (target && target.key === userid && target.value.state === 2) {
-      showInfoDialog(true);
-    }
-    else {
-      showInfoDialog(false);
-    }
-
+    showInfoDialog(target && target.key === userid && target.value.state === 2)
     showOptionDialog(false);
 
     // 구독해제
@@ -82,6 +78,20 @@ const Chat = (props) => {
       input.value = input.value + selectedEmoji.emoji;
     }
   }, [selectedEmoji]);
+
+  // const firebaseConnect = (userid) => {
+  //   if (userid && !messages[userid]) {
+  //     const database = props.database;
+  //     const databaseRef = '/' + settings.key + '/messages/' + userid;
+  //     console.log('firebase connect', databaseRef);
+  //
+  //     const chat = database.ref(databaseRef).orderByChild('timestamp');
+  //     chat.on('child_added', function(snapshot) {
+  //       addMessages({ key: userid, value: snapshot.val() });
+  //       // isRefresh(!refresh);
+  //     });
+  //   }
+  // }
 
   const sendMessage = (key, id, message, type, database) => {
     const messageId = Math.random().toString(36).substr(2, 9)
@@ -127,15 +137,16 @@ const Chat = (props) => {
     <>
       <div className="messages card" ref={body}>
         { (state.userid === userid) &&  // 중복호출 예외처리
-          (state.messages.map((m, i) => (
-          <ChatMessage
-            opponent={userid}
-            target={target}
-            key={m.id}
-            prev={state.messages[i - 1]}
-            {...m}
-            />
-        ))) }
+           (state.messages.map((m, i) => (
+           <ChatMessage
+             opponent={userid}
+             target={target}
+             key={m.id}
+             prev={state.messages[i - 1]}
+             {...m}
+             />
+           )))
+        }
       </div>
       <div className="message-form">
         <EmojiContainer
@@ -205,4 +216,15 @@ const Chat = (props) => {
   )
 }
 
-export default Chat
+const mapStateToProps = state => ({
+  users: state.users,
+  messages: state.messages,
+  settings: state.settings,
+})
+
+const mapDispatchToProps = dispatch => ({
+  addMessages: m => dispatch(addMessages(m)),
+})
+
+// export default Chat
+export default connect(mapStateToProps, mapDispatchToProps)(Chat);
