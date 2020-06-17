@@ -70,6 +70,7 @@ div, input, textarea {
 }
 .app-container > div {
   width: 100%;
+  user-select: none;
 }
 .app-title {
   font-size: 18px;
@@ -100,12 +101,16 @@ div, input, textarea {
   padding: 10px;
   width: 100%;
   outline: none;
-  border: none;
+  border: 1px solid transparent;
   font-size: 14px;
   background: rgba(27, 29, 35, 1);
   color: #fff;
   border-radius: 5px;
   margin-top: 3px;
+  transition: 0.3s ease border;
+}
+.app-input-item input:focus {
+  border-color: rgba(0, 188, 212, 0.5);
 }
 .app-button-login {
   padding: 0 20px;
@@ -127,15 +132,18 @@ div, input, textarea {
 
 .app-options {
   margin: 15px;
-  color: rgba(117, 124, 140, 1);
   font-size: 12px;
   text-align: center;
 }
 
 .app-options > a {
+  text-decoration: none;
+  color: rgba(117, 124, 140, 1) !important;
   cursor: pointer;
+  outline: none;
 }
 .app-options > a:hover {
+  text-decoration: underline;
   color: #eee;
 }
 .app-options > a:after {

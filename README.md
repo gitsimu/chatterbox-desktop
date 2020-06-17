@@ -68,6 +68,9 @@ This section has moved here: https://facebook.github.io/create-react-app/docs/de
 This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
 
 
+## react-color
+https://casesandberg.github.io/react-color/
+
 ## electron guide
 https://kyuhyuk.kr/article/electron/2020/02/14/Electron-React
 https://gist.github.com/hymm/b621cf64a781cadb92db9312c0956e31
@@ -79,8 +82,9 @@ https://suwoni-codelab.com/electron/2017/04/17/Electron-distribution/
 https://github.com/electron-userland/electron-builder/issues/2030 <- [ERROR] Application entry file "build/electron.js" in th...
 https://stackoverflow.com/questions/54591664/reactjs-neterr-file-not-found <- [ERROR] blank screen issue
 
-npm run build:win
-npm run dist
+npm run react-build
+npm run build:win   ( /dist/~.exe )
+npm run dist        ( /dist/~.dmg )
 ...
 
 ## react-app-rewired

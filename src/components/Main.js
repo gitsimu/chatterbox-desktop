@@ -6,7 +6,7 @@ import "firebase/database";
 import axios from 'axios';
 
 import { connect } from 'react-redux'
-import { addUsers, clearUsers, selectedUser } from '../actions'
+import { addUsers, clearUsers, selectedUser, signOut } from '../actions'
 
 import UserList from './UserList';
 import Chat from './Chat';
@@ -19,7 +19,7 @@ import * as script from '../js/script.js';
 
 const USERS = [];
 
-function Main({ users, messages, settings, addUsers, clearUsers, selectedUser, ...props }) {
+function Main({ users, messages, settings, addUsers, clearUsers, selectedUser, signOut, ...props }) {
   const [screenState, setScreenState] = React.useState(0);
   const [tabState, setTabState] = React.useState(0);
   const key = 'c1cd7759-9784-4fac-a667-3685d6b2e4a0';
@@ -35,11 +35,11 @@ function Main({ users, messages, settings, addUsers, clearUsers, selectedUser, .
 
   React.useEffect(() => {
     // simpleline icons
-    let simmplelineLink = document.createElement("link");
-    simmplelineLink.href = "https://cdnjs.cloudflare.com/ajax/libs/simple-line-icons/2.4.1/css/simple-line-icons.min.css";
-    simmplelineLink.rel = "stylesheet";
-    simmplelineLink.type = "text/css";
-    document.querySelector('body').appendChild(simmplelineLink);
+    let simplelineLink = document.createElement("link");
+    simplelineLink.href = "https://cdnjs.cloudflare.com/ajax/libs/simple-line-icons/2.4.1/css/simple-line-icons.min.css";
+    simplelineLink.rel = "stylesheet";
+    simplelineLink.type = "text/css";
+    document.querySelector('body').appendChild(simplelineLink);
 
     isLoading(true);
 
@@ -53,7 +53,7 @@ function Main({ users, messages, settings, addUsers, clearUsers, selectedUser, .
               isLoading(false);
 
               const chat = database.ref(databaseUserRef).orderByChild('timestamp');
-              chat.on('value', function(snapshot) {
+              chat.on('value', (snapshot) => {
                 clearUsers();
 
                 let items = [];
@@ -84,7 +84,7 @@ function Main({ users, messages, settings, addUsers, clearUsers, selectedUser, .
               // https://www.electronjs.org/docs/api/notification
               // https://snutiise.github.io/html5-desktop-api/
               const recent = database.ref(databaseRecentRef);
-              recent.on('value', function(snapshot) {
+              recent.on('value', (snapshot) => {
                 const recentsData = snapshot.val();
                 const notification = new Notification('새 메세지', {
                   body: recentsData.message,
@@ -112,9 +112,9 @@ function Main({ users, messages, settings, addUsers, clearUsers, selectedUser, .
       })
   }, [])
 
-  React.useEffect(() => {
 
-  }, [users]);
+  // React.useEffect(() => {
+  // }, [users]);
 
   return (
     <div className="App">
@@ -124,23 +124,24 @@ function Main({ users, messages, settings, addUsers, clearUsers, selectedUser, .
             className={screenState === 0 ? "chat-lnb-item active" : "chat-lnb-item"}
             onClick={() => { setScreenState(0); }}>
             <i className="icon-bubble"></i>
-            <tooltip>채팅 목록</tooltip>
+            <div className="tooltip">채팅 목록</div>
           </div>
           <div
             className={screenState === 1 ? "chat-lnb-item active" : "chat-lnb-item"}
             onClick={() => { setScreenState(1); }}>
             <i className="icon-user"></i>
-            <tooltip>유저 목록</tooltip>
+            <div className="tooltip">유저 목록</div>
           </div>
           <div
             className={screenState === 2 ? "chat-lnb-item active" : "chat-lnb-item"}
             onClick={() => { setScreenState(2); }}>
             <i className="icon-settings"></i>
-            <tooltip>설정</tooltip>
+            <div className="tooltip">설정</div>
           </div>
-          <div className="chat-lnb-item sign-out">
+          <div className="chat-lnb-item sign-out"
+            onClick={() => { signOut(); console.log('signout') }}>
             <i className="icon-power"></i>
-            <tooltip>로그아웃</tooltip>
+            <div className="tooltip">로그아웃</div>
           </div>
         </div>
 
@@ -156,11 +157,10 @@ function Main({ users, messages, settings, addUsers, clearUsers, selectedUser, .
               {(settings.selectedUser && settings.selectedUser.key) && (
                 <Chat
                   database={database}
-                  databaseRef={databaseMessageRef}
                   tabState={tabState}
                   setTabState={setTabState}
                   isLoading={isLoading}/>
-              )}
+              )}              
             </div>
             <div className="chat-options">
             </div>
@@ -172,6 +172,7 @@ function Main({ users, messages, settings, addUsers, clearUsers, selectedUser, .
         </div>
 
         <div className={ screenState === 1 ? "container-screen-1" : "container-screen-1 hide" }>
+          <div></div>
         </div>
         <div className={ screenState === 2 ? "container-screen-2" : "container-screen-2 hide" }>
           <Setting database={database}/>
@@ -196,6 +197,7 @@ const mapDispatchToProps = dispatch => ({
   addUsers: u => dispatch(addUsers(u)),
   clearUsers: () => dispatch(clearUsers()),
   selectedUser: u => dispatch(selectedUser(u)),
+  signOut: () => dispatch(signOut()),
 })
 
 // export default Main;

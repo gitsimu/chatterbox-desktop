@@ -3,7 +3,7 @@ const initialState = {
   selectedUser: {},
 };
 
-const settings = (state = initialState, action) => {  
+const settings = (state = initialState, action) => {
   switch (action.type) {
     case 'INIT_SETTINGS':
       return {
@@ -15,6 +15,13 @@ const settings = (state = initialState, action) => {
         ...state,
         selectedUser: action.user,
       };
+    case 'SIGN_IN':
+      return {
+        ...state,
+        key: action.key,
+      };
+    case 'SIGN_OUT':
+      return {};
     default:
       return state
   }

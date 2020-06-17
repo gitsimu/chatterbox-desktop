@@ -94,10 +94,12 @@ div, input, textarea {
   /* background: rgba(41, 45, 55, 1); */
   color: rgb(141, 152, 177);
 }
-.chat-lnb-item.active,
 .chat-lnb-item:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: #eee;
+  background: rgba(0, 0, 0, 0.1);
+}
+.chat-lnb-item.active {
+  background: rgba(0, 0, 0, 0.2);
+  color: #FF9800;
 }
 .chat-lnb-item.sign-out {
   position: absolute;
@@ -199,9 +201,11 @@ div, input, textarea {
 .chat-user-datetime {
   position: absolute;
   right: 5px;
+  font-size: 11px;
 }
 
 .chat-body {
+  position: relative;
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -295,7 +299,8 @@ div, input, textarea {
 }
 .chat-info-item {
   padding: 2px 10px;
-  margin-bottom: 3px;
+  margin-bottom: 10px;
+  font-size: 0;
 }
 .chat-info-item span {
   font-size: 13px;
@@ -733,7 +738,7 @@ div, input, textarea {
   color: #FFC107;
 }
 .setting-list-tab {
-  padding: 15px;
+  padding: 15px 25px;
   font-size: 14px;
   /* font-weight: bold; */
   background: rgba(0, 0, 0, 0);
@@ -751,10 +756,12 @@ div, input, textarea {
   flex: 1;
   margin-left: 5px;
   height: 100%;
+  max-height: calc(100vh - 10px);
 }
 .setting-body > div {
   display: flex;
   flex-direction: column;
+  height: 100%;
 }
 .setting-tab-header {
   border-bottom: 1px solid rgba(34, 37, 43, 1);
@@ -766,15 +773,20 @@ div, input, textarea {
 .setting-tab-body {
   display: flex;
   flex-direction: row;
+  align-items: center;
+  /* align-items: center; */
   padding: 20px;
+  height: 100%;
 }
 
 .setting-mockup {
   flex: 1;
   border-radius: 5px;
+  margin-right: 20px;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
 }
 .setting-items {
   flex: 1;
@@ -782,15 +794,17 @@ div, input, textarea {
   padding: 30px;
 }
 .setting-input-item {
-  margin-bottom: 10px;
+  position: relative;
+  margin-bottom: 25px;
+  font-size: 0;
 }
 .setting-input-item span {
   font-size: 13px;
-  color: rgba(117, 124, 140, 1);
+  color: rgb(141, 152, 177);
 }
 .setting-input-item input,
 .setting-input-item textarea {
-  padding: 10px;
+  padding: 10px 15px;
   width: 100%;
   outline: none;
   border: none;
@@ -802,8 +816,71 @@ div, input, textarea {
   resize: none;
 }
 .setting-input-item textarea {
-  min-height: 100px;
+  min-height: 120px;
 }
+
+.setting-theme {
+  display: flex;
+  flex-direction: column;
+  width: 320px;
+}
+.setting-theme > div {
+  flex: 1;
+}
+.setting-profile-image-upload {
+
+}
+.setting-profile-image-upload > input {
+  display: none;
+}
+.setting-profile-image-upload > div,
+.setting-profile-image-remove {
+  font-size: 14px;
+  padding: 10px;
+  cursor: pointer;
+  color: #eee;
+  background: rgba(27, 29, 35, 1);
+  text-align: center;
+  border-radius: 5px;
+  margin-top: 3px;
+  width: 155px;
+}
+.setting-profile-image-remove {
+  background: #F44336;
+  margin-left: 10px;
+}
+.setting-color-picker {
+  display: none;
+  position: absolute;
+  right: 5px;
+  bottom: 45px;
+  z-index: 1;
+}
+.setting-color-picker.active {
+  display: block;
+}
+.setting-color-picker:after {
+    content: '';
+    background: #fff;
+    width: 10px;
+    height: 10px;
+    position: absolute;
+    transform: rotate(45deg);
+    left: calc(50% - 5px);
+    bottom: -5px;
+}
+.setting-color-picker input {
+  background: transparent;
+}
+.empty-background {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  z-index: -1;
+}
+
 /* MOCKUP MOCKUP MOCKUP MOCKUP MOCKUP */
 .setting .header {
   position: relative;
@@ -852,7 +929,8 @@ div, input, textarea {
 .setting .chat-window {
   position: relative;
   /* background: #fff; */
-  width: 350px;
+  width: 320px;
+  height: 260px;
   margin: 0 auto;
   overflow: hidden;
   border-top-left-radius: 20px;
@@ -861,7 +939,7 @@ div, input, textarea {
 }
 .setting .chat-window .chat-window-body {
   position: relative;
-  height: 300px;
+  height:175px;
   padding: 20px 0;
   overflow: auto;
   background: #fff;
@@ -921,6 +999,7 @@ div, input, textarea {
 }
 
 
+
 #loading {
   position: absolute;
   width: 100%;
@@ -958,7 +1037,7 @@ div, input, textarea {
   100% {opacity:1}
 }
 
-tooltip {
+.tooltip {
   display: none;
   position: absolute;
   white-space: pre;
@@ -968,9 +1047,10 @@ tooltip {
   background: #111;
   padding: 5px 14px 5px 12px;
   border-radius: 5px;
-  pointer-events: none
+  pointer-events: none;
+  color: #eee;
 }
-tooltip:before {
+.tooltip:before {
   content: '';
   position: absolute;
   top: 9px;
@@ -980,7 +1060,7 @@ tooltip:before {
   transform: rotate(45deg);
   background: #111;
 }
-div:hover > tooltip {
+div:hover > .tooltip {
   display: block;
 }
 

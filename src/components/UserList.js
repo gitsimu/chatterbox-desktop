@@ -50,7 +50,7 @@ const UserList = ({ users, ...props }) => {
         </div>
       </div>
       <div
-        style={ {flex:1} }
+        className="chat-users"
         key="chat-list">
         { users.filter((f) => {
           const userState = f.value.state ? f.value.state : 0;

@@ -19,7 +19,7 @@ const Info = ({ users, settings, ...props }) => {
 
   React.useEffect(() => {
     setInfo(i);
-  }, [props]);
+  }, [props, i]);
 
   React.useEffect(() => {
     setNickname((i.value && i.value.nickname) ? i.value.nickname : '');

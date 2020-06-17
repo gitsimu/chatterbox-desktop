@@ -18,6 +18,15 @@ export const initSettings = settings => ({
   key: settings.key,
 })
 
+export const signIn = settings => ({
+  type: 'SIGN_IN',
+  key: settings.key,
+})
+
+export const signOut = () => ({
+  type: 'SIGN_OUT',
+})
+
 export const selectedUser = user => ({
   type: 'SELECTED_USER',
   user

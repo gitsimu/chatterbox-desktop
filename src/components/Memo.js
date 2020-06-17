@@ -13,7 +13,7 @@ const Memo = ({ users, settings, ...props }) => {
 
   React.useEffect(() => {
     setMemo(m);
-  }, [settings.selectedUser]);
+  }, [settings.selectedUser, m]);
 
   return (
     <div className="chat-memo card">

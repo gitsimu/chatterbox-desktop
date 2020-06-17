@@ -1,6 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import Mockup from './Mockup';
+import { ChromePicker } from 'react-color';
 
 const Setting = ({ settings, ...props }) => {
   const database = props.database;
@@ -14,18 +15,38 @@ const Setting = ({ settings, ...props }) => {
 
   const [tabState, setTabState] = React.useState(0);
 
+  const [themeColor, setThemeColor] = React.useState('#444c5d');
+  const [themeColorPicker, showThemeColorPicker] = React.useState(false);
+  // const [profileImagePath, setProfileImagePath] = React.useState(null);
+
   React.useEffect(() => {
     info.once('value', function(snapshot) {
       const data = snapshot.val();
       if (!data) return;
 
-      console.log('setting effect')
+      // console.log('setting effect')
       setTitle(data.title);
       setSubTitle(data.subTitle);
       setNickname(data.nickname);
       setFirstMessage(data.firstMessage);
     })
   }, [])
+
+  const handleFileInput = (e) => {
+
+  }
+
+  const updateUserInfo = () => {
+    info.update({
+      title: title,
+      subTitle: subTitle,
+      nickname: nickname,
+      firstMessage: firstMessage,
+      themeColor: themeColor,
+      // profileImagePath: profileImagePath,
+    });
+    // alert('적용되었습니다.');
+  }
 
   return (
     <div className="setting">
@@ -35,6 +56,17 @@ const Setting = ({ settings, ...props }) => {
           className={ tabState === 0 ? "setting-list-tab active" : "setting-list-tab"}
           onClick={() => { setTabState(0) }}>
           <div>채팅 설정</div>
+        </div>
+        <div className="setting-list-title">Etc</div>
+        <div
+          className="setting-list-tab"
+          onClick={() => { window.open("https://smlog.co.kr/notice_list.htm", "_blank") }}>
+          <div>새 소식</div>
+        </div>
+        <div
+          className="setting-list-tab"
+          onClick={() => { window.open("https://smlog.co.kr/faq_list.htm", "_blank") }}>
+          <div>고객센터</div>
         </div>
         <div
           className={ tabState === 1 ? "setting-list-tab active" : "setting-list-tab"}
@@ -55,39 +87,66 @@ const Setting = ({ settings, ...props }) => {
                 title={title}
                 subTitle={subTitle}
                 nickname={nickname}
-                firstMessage={firstMessage}/>
+                firstMessage={firstMessage}
+                themeColor={themeColor}/>
+
+              <div className="setting-theme">
+                <div className="setting-input-item">
+                  <span>테마색상</span>
+                  <input type="text"
+                    value={themeColor}
+                    onChange={() => {}}
+                    onClick={() => {
+                      showThemeColorPicker(!themeColorPicker);
+                    }}/>
+                  <div className={themeColorPicker ? "setting-color-picker active" : "setting-color-picker"}>
+                    <ChromePicker
+                      color={themeColor}
+                      onChange={(color) => { setThemeColor(color.hex) }}/>
+                    <div className="empty-background"
+                      onClick={() => {
+                        updateUserInfo()
+                        showThemeColorPicker(false)
+                      }}>
+                    </div>
+                  </div>
+                </div>
+                <div className="setting-input-item">
+                  <span>프로필 이미지</span>
+                  <div style={{ display: "flex" }}>
+                    <label className="setting-profile-image-upload">
+                      <div>새 이미지 업로드</div>
+                      <input type="file" onChange={e => handleFileInput(e)}/>
+                    </label>
+                    <div className="setting-profile-image-remove">이미지 삭제</div>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div style={{ flex: 1, marginLeft: 50 }}>
+            <div style={{ flex: 1, marginLeft: 20 }}>
               <div className="setting-input-item">
                 <span>제목</span>
-                <input value={title} onChange={(e) => { setTitle(e.target.value) }}/>
+                <input value={title}
+                  onBlur={() => updateUserInfo()}
+                  onChange={(e) => { setTitle(e.target.value) }}/>
               </div>
               <div className="setting-input-item">
                 <span>설명</span>
-                <input value={subTitle} onChange={(e) => { setSubTitle(e.target.value) }}/>
+                <input value={subTitle}
+                  onBlur={() => updateUserInfo()}
+                  onChange={(e) => { setSubTitle(e.target.value) }}/>
               </div>
               <div className="setting-input-item">
                 <span>프로필 이름</span>
-                <input value={nickname} onChange={(e) => { setNickname(e.target.value) }}/>
+                <input value={nickname}
+                  onBlur={() => updateUserInfo()}
+                  onChange={(e) => { setNickname(e.target.value) }}/>
               </div>
               <div className="setting-input-item">
                 <span>첫 응대 메세지</span>
-                <textarea value={firstMessage} onChange={(e) => { setFirstMessage(e.target.value) }}/>
-              </div>
-              <div style={{marginTop: 10}}>
-                <div
-                  style={{ backgroundColor: '#00aaff', textAlign: 'center', padding: 10, fontSize: 14, color: '#fff', borderRadius: 3 }}
-                  onClick={() => {
-                    info.update({
-                      title: title,
-                      subTitle: subTitle,
-                      nickname: nickname,
-                      firstMessage: firstMessage,
-                    });
-                    alert('적용되었습니다.');
-                  }}>
-                  적용하기
-                </div>
+                <textarea value={firstMessage}
+                  onBlur={() => updateUserInfo()}
+                  onChange={(e) => { setFirstMessage(e.target.value) }}/>
               </div>
             </div>
           </div>
@@ -101,6 +160,8 @@ const Setting = ({ settings, ...props }) => {
           </div>
         </div>
 
+        <div className={ tabState === 2 ? "setting-tab-2" : "setting-tab-2 hide" }>
+        </div>
       </div>
     </div>
   )

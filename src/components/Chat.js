@@ -19,25 +19,28 @@ import { addMessages } from '../actions'
 //         throw new Error();
 //     }
 // }
-
+let search = {}
 const Chat = ({ users, messages, settings, addMessages, ...props }) => {
   const key = settings.key;
   const userid = settings.selectedUser.key;
   const database = props.database;
-  const databaseRef = props.databaseRef + '/' + userid;
   const tabState = props.tabState;
   const setTabState = props.setTabState;
   const target = settings.selectedUser;
-  const isLoading = props.isLoading;
+  // const isLoading = props.isLoading;
 
   // const [state, dispatch] = React.useReducer(reducer, initialState);
   const [optionDialog, showOptionDialog] = React.useState(false);
   const [infoDialog, showInfoDialog] = React.useState(false);
   const [emojiContainer, showEmojiContainer] = React.useState(false);
   const [selectedEmoji, selectEmoji] = React.useState(null);
-  const [messageId, refresh] = React.useState(null);
+  const [loading, isLoading] = React.useState(false);
+
+  const [searchResult, setSearchResult] = React.useState({});
+  // const [messageId, refresh] = React.useState(null);
   const body = React.useRef(null);
   let form, input
+
 
   // React.useEffect(() => {
   //   dispatch({ type: 'clearMessage' });
@@ -96,21 +99,22 @@ const Chat = ({ users, messages, settings, addMessages, ...props }) => {
   const firebaseConnect = (userid) => {
     // 최초 1회만 연결
     if (userid && !messages[userid]) {
+      isLoading(true);
       const database = props.database;
       const databaseRef = '/' + settings.key + '/messages/' + userid;
-      // console.log('firebase connect', databaseRef);
 
       const chat = database.ref(databaseRef).orderByChild('timestamp').limitToLast(100);
-      chat.on('child_added', function(snapshot) {
+      chat.on('child_added', (snapshot) => {
         addMessages({ key: userid, value: snapshot.val() });
-        refresh(snapshot.val().id);
+        // refresh(snapshot.val().id);
 
         setTimeout(() => {
           if (body && body.current) {
             body.current.scrollTop = body.current.scrollHeight;
           }
+          isLoading(false);
         }, 10)
-      });
+      })
     }
   }
 
@@ -159,8 +163,28 @@ const Chat = ({ users, messages, settings, addMessages, ...props }) => {
     showEmojiContainer(!emojiContainer)
   }
 
+  const searchMessage = () => {
+    if (users.length === 0) return;
+
+    // users.forEach(user => {
+    //   const search = database.ref('/' + key + '/messages/' + user.key).orderByChild('message').startAt(input.value).endAt(input.value + "\uf8ff");
+    //   // const search = database.ref('/' + key + '/messages/' + user.key).orderByChild('message').startAt("[a-zA-Z0-9가-힣]*").endAt(input.value);
+    //   search.once('value').then(c => {
+    //     if (c.val() === null) return;
+    //     setSearchResult(obj => Object.assign(obj, c.val()));
+    //
+    //     console.log(searchResult)
+    //   });
+    // })
+    // setSearchResult({'n73sh5s3g': {id: "n73sh5s3g", message: "aa", timestamp: 1591946946749, type: 1, userId: "c1cd7759-9784-4fac-a667-3685d6b2e4a0"}})
+  }
+
   return (
     <>
+      // <div className="message-search-result">
+      // { Object.keys(searchResult).map((k, i) => (<div key={k}>{searchResult[k].message}</div>))}
+      // </div>
+
       <div className="messages card" ref={body}>
         { (messages[userid]) &&  // 중복호출 예외처리
            (messages[userid].map((m, i) => (
@@ -189,7 +213,8 @@ const Chat = ({ users, messages, settings, addMessages, ...props }) => {
           <div className="message-addon">
             <label>
               <i className="icon-paper-clip"></i>
-              <input type="file" onChange={e => handleFileInput(e)}/>
+              <input type="file"
+                onChange={e => handleFileInput(e)}/>
             </label>
             <label>
               <i className="icon-emotsmile"
@@ -212,6 +237,12 @@ const Chat = ({ users, messages, settings, addMessages, ...props }) => {
           <div className="message-button-more"
             onClick={() => {
               showOptionDialog(!optionDialog);
+
+              // search test
+              // const search = database.ref('/' + key + '/messages/' + userid).orderByChild('message').startAt(input.value).endAt(input.value + "\uf8ff");
+              // const search = database.ref('/' + key + '/messages').orderByChild('message').startAt("[a-zA-Z0-9]*").endAt(input.value)
+              // search.once('value').then(c => console.log(input.value, c.val()));
+              // searchMessage();
             }}>
             <i className="icon-options-vertical"></i>
           </div>
@@ -247,6 +278,10 @@ const Chat = ({ users, messages, settings, addMessages, ...props }) => {
           </div>
         )}
       </div>
+
+      { loading && (
+        <div id="loading"><div></div></div>
+      )}
     </>
   )
 }

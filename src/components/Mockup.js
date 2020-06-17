@@ -4,7 +4,7 @@ const Mockup = (props) => {
 
   return (
     <div className="chat-window">
-      <div className="header">
+      <div className="header" style={{ backgroundColor: props.themeColor}}>
         <div className="header-title">
           <div className="mainTitle">{props.title}</div>
           <div className="subTitle">{props.subTitle}</div>

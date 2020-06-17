@@ -2,7 +2,7 @@ export const setCookie = (cName, cValue, cDay) => {
   let expire = new Date();
   expire.setDate(expire.getDate() + cDay);
   let cookies = cName + '=' + escape(cValue) + '; path=/ '; // 한글 깨짐을 막기위해 escape(cValue)를 합니다.
-  if(typeof cDay != 'undefined') cookies += ';expires=' + expire.toGMTString() + ';';
+  if(typeof cDay !== 'undefined') cookies += ';expires=' + expire.toGMTString() + ';';
   document.cookie = cookies;
 }
 
@@ -11,10 +11,10 @@ export const getCookie = (cName) => {
   let cookieData = document.cookie;
   let start = cookieData.indexOf(cName);
   let cValue = '';
-  if(start != -1){
+  if(start !== -1){
     start += cName.length;
     let end = cookieData.indexOf(';', start);
-    if(end == -1)end = cookieData.length;
+    if(end === -1)end = cookieData.length;
     cValue = cookieData.substring(start, end);
   }
   return unescape(cValue);
@@ -22,7 +22,7 @@ export const getCookie = (cName) => {
 
 export const bytesToSize = (bytes) => {
     const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
-    if (bytes == 0) return '0 Byte';
+    if (bytes === 0) return '0 Byte';
     const i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
     return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[i];
 }
@@ -183,7 +183,7 @@ export const getNiceTime = (fromDate, toDate, levels, prefix) => {
             count = 99;
     }
     if(prefix){
-        if(returnString == ""){
+        if(returnString === ""){
             returnString = langFn("date.now");
         } else if(past)
             returnString = langFn("date.past",[returnString]);

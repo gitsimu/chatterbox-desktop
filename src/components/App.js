@@ -2,21 +2,21 @@ import React from 'react';
 import axios from 'axios';
 
 import { connect } from 'react-redux'
-import { initSettings } from '../actions'
+import { signIn } from '../actions'
 
 import Main from './Main';
 import '../css/App.css';
 
-// import UserList from './UserList';
-// import Chat from './Chat';
-// import '../js/global.js'
-
+// 내부 스토리지 관리
 // const storage = require('electron-json-storage');
 
-function App({ settings, initSettings }) {
+// URL을 OS 기본 브라우저로 열기위한 shell
+// https://github.com/electron/electron/blob/master/docs/api/shell.md#shellopenexternalurl
+// const { shell } = require('electron')
+
+function App({ settings, signIn }) {
   //
   let id, pw
-  const [userToken, setUserToken] = React.useState(null);
   const [loading, isLoading] = React.useState(false);
 
   React.useEffect(() => {
@@ -35,17 +35,19 @@ function App({ settings, initSettings }) {
   }, [])
 
   const signInProcess = (id, pw) => {
+    if (!id || id === '') { alert('아이디를 입력해주세요.'); return; }
+    if (!pw || pw === '') { alert('비밀번호를 입력해주세요.'); return; }
+
     const token = 'c1cd7759-9784-4fac-a667-3685d6b2e4a0';
     // storage.set('userData', { token: token, id: id, pw: pw }, () => {
     //   setUserToken(token)
     // })
-    setUserToken(token)
-    initSettings({ key: token });
+    signIn({ key: token });
   }
 
   return (
     <>
-    { !userToken ? (
+    { !settings.key ? (
       <div className="app">
         <div className="app-container card">
           <div className="app-title">
@@ -59,29 +61,31 @@ function App({ settings, initSettings }) {
             </div>
             <div className="app-input-item">
               <span>비밀번호</span>
-              <input type="password" ref={node => pw = node}/>
+              <input type="password"
+                ref={node => pw = node}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault()
+                    signInProcess(id.value, pw.value);
+                  }
+                }}/>
             </div>
           </div>
           <div
             className="app-button-login"
             onClick={() => {
-              if (!id.value || id.value === '') { alert('아이디를 입력해주세요.'); return; }
-              if (!pw.value || pw.value === '') { alert('비밀번호를 입력해주세요.'); return; }
               signInProcess(id.value, pw.value);
             }}>
             <div>로그인</div>
           </div>
           <div className="app-options">
-            <a>회원가입</a>
-            <a>아이디 찾기</a>
-            <a>비밀번호 찾기</a>
+            <a href="https://smlog.co.kr/member/member_join_check.htm" target="_blank">회원가입</a>
+            <a href="https://smlog.co.kr/member/id_pass.htm" target="_blank">아이디/비밀번호 찾기</a>
           </div>
         </div>
       </div>
     ) : (
-      <Main
-        userToken={userToken}
-        isLoading={isLoading}/>
+      <Main isLoading={isLoading}/>
     )}
 
     { loading && (
@@ -91,12 +95,23 @@ function App({ settings, initSettings }) {
   );
 }
 
+// <a onClick={() => {
+//   if (typeof(shell) === "object") {
+//     shell.openExternal('https://smlog.co.kr/member/member_join_check.htm')
+//   }
+// }}>회원가입</a>
+// <a onClick={() => {
+//   if (typeof(shell) === "object") {
+//     shell.openExternal('https://smlog.co.kr/member/id_pass.htm')
+//   }
+// }}>아이디/비밀번호 찾기</a>
+
 const mapStateToProps = state => ({
   settings: state.settings,
 })
 
 const mapDispatchToProps = dispatch => ({
-  initSettings: s => dispatch(initSettings(s)),
+  signIn: s => dispatch(signIn(s)),
 })
 
 // export default App;
