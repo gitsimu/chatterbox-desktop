@@ -3,8 +3,7 @@ import { connect } from 'react-redux';
 
 const Memo = ({ users, settings, ...props }) => {
   const key = settings.key;
-  const database = props.database;
-  const userid = settings.selectedUser.key;
+  const database = props.database;  
 
   const m = (settings.selectedUser.value &&
             settings.selectedUser.value.memo) ?
@@ -27,7 +26,7 @@ const Memo = ({ users, settings, ...props }) => {
       </div>
 
       <div className="chat-memo-footer">
-        {(userid && userid !== '') && (
+        {(settings.selectedUser && settings.selectedUser !== '') && (
           <div
             onClick={() => {
               if (memo.length > 200) {
@@ -35,7 +34,7 @@ const Memo = ({ users, settings, ...props }) => {
                 return;
               }
 
-              database.ref('/' + key + '/users/' + userid).update({ memo: memo })
+              database.ref('/' + key + '/users/' + settings.selectedUser.key).update({ memo: memo })
               alert('메모를 저장하였습니다.');
             }}>메모 저장하기</div>
         )}

@@ -1,7 +1,8 @@
 import React from 'react';
 
 const Mockup = (props) => {
-
+  const iconText = (props.nickname && props.nickname.length > 0) ? props.nickname.substring(0, 1) : 'S';
+  
   return (
     <div className="chat-window">
       <div className="header" style={{ backgroundColor: props.themeColor}}>
@@ -14,7 +15,14 @@ const Mockup = (props) => {
       <div className="chat-window-body">
         <div className="message opponent">
           <div className="message-profile">
-            <div className="message-profile-icon">S</div>
+            { props.profileImage === null ? (
+              <div className="message-profile-icon">{ iconText }</div>
+            ): (
+              <div className="message-profile-image">
+                <img src={ JSON.parse(props.profileImage).location }/>
+              </div>
+            )}
+
           </div>
           <div className="message-body">
             <div className="message-top">

@@ -4,7 +4,6 @@ import { connect } from 'react-redux';
 const Info = ({ users, settings, ...props }) => {
   const key = settings.key;
   const database = props.database;
-  const userid = settings.selectedUser.key;
 
   const i = settings.selectedUser;
   const [info, setInfo] = React.useState(i);
@@ -31,7 +30,7 @@ const Info = ({ users, settings, ...props }) => {
     <div className="chat-info card">
       <div className="chat-info-header">사용자 정보</div>
       <div className="chat-info-body">
-        {(userid && userid !== '') && (
+        {(settings.selectedUser && settings.selectedUser !== '') && (
           <>
           <div className="chat-info-item">
             <span>사용자 닉네임</span>
@@ -42,12 +41,13 @@ const Info = ({ users, settings, ...props }) => {
                 onChange={(e) => { setNickname(e.target.value) }}/>
               <div className="chat-info-item-save"
                 onClick={() => {
-                  if (nickname.length > 30) {
-                    alert('닉네임 30자를 넘길 수 없습니다.');
+                  if (nickname.trim().length === 0) { return; }
+                  else if (nickname.trim().length > 30) {
+                    alert('닉네임의 허용 길이는 최대 30자 입니다.');
                     return;
                   }
 
-                  database.ref('/' + key + '/users/' + userid).update({ nickname: nickname })
+                  database.ref('/' + key + '/users/' + settings.selectedUser.key).update({ nickname: nickname.trim() })
                   alert('닉네임을 저장하였습니다.');
                 }}>저장
               </div>
@@ -61,12 +61,13 @@ const Info = ({ users, settings, ...props }) => {
                 onChange={(e) => { setMobile(e.target.value) }}/>
               <div className="chat-info-item-save"
                 onClick={() => {
-                  if (mobile.length > 30) {
-                    alert('연락5 30자를 넘길 수 없습니다.');
+                  if (mobile.trim().length === 0) { return; }
+                  else if (mobile.trim().length > 30) {
+                    alert('연락처의 허용 길이는 최대 30자 입니다.');
                     return;
                   }
 
-                  database.ref('/' + key + '/users/' + userid).update({ mobile: mobile })
+                  database.ref('/' + key + '/users/' + settings.selectedUser.key).update({ mobile: mobile.trim() })
                   alert('연락처를 저장하였습니다.');
                 }}>저장
               </div>
@@ -80,12 +81,13 @@ const Info = ({ users, settings, ...props }) => {
                 onChange={(e) => { setEmail(e.target.value) }}/>
               <div className="chat-info-item-save"
                 onClick={() => {
-                  if (email.length > 50) {
-                    alert('닉네임 50자를 넘길 수 없습니다.');
+                  if (mobile.trim().length === 0) { return; }
+                  else if (mobile.trim().length > 50) {
+                    alert('이메일의 허용 길이는 최대 50자 입니다.');
                     return;
                   }
 
-                  database.ref('/' + key + '/users/' + userid).update({ email: email })
+                  database.ref('/' + key + '/users/' + settings.selectedUser.key).update({ email: email.trim() })
                   alert('이메일을 저장하였습니다.');
                 }}>저장
               </div>

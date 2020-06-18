@@ -29,9 +29,9 @@ function Main({ users, messages, settings, addUsers, clearUsers, selectedUser, s
     firebase.initializeApp(FirebaseConfig);
   }
   const database = firebase.database();
-  const databaseUserRef = '/' + key + '/users';
-  const databaseMessageRef = '/' + key + '/messages';
-  const databaseRecentRef = '/' + key + '/recents';
+  // const databaseUserRef = '/' + key + '/users';
+  // const databaseMessageRef = '/' + key + '/messages';
+  // const databaseRecentRef = '/' + key + '/recents';
 
   React.useEffect(() => {
     // simpleline icons
@@ -52,7 +52,7 @@ function Main({ users, messages, settings, addUsers, clearUsers, selectedUser, s
             .then(success => {
               isLoading(false);
 
-              const chat = database.ref(databaseUserRef).orderByChild('timestamp');
+              const chat = database.ref('/' + key + '/users').orderByChild('timestamp');
               chat.on('value', (snapshot) => {
                 clearUsers();
 
@@ -83,7 +83,7 @@ function Main({ users, messages, settings, addUsers, clearUsers, selectedUser, s
               // https://www.electronjs.org/docs/tutorial/notifications?q=Notification
               // https://www.electronjs.org/docs/api/notification
               // https://snutiise.github.io/html5-desktop-api/
-              const recent = database.ref(databaseRecentRef);
+              const recent = database.ref('/' + key + '/recents');
               recent.on('value', (snapshot) => {
                 const recentsData = snapshot.val();
                 const notification = new Notification('새 메세지', {
@@ -126,12 +126,14 @@ function Main({ users, messages, settings, addUsers, clearUsers, selectedUser, s
             <i className="icon-bubble"></i>
             <div className="tooltip">채팅 목록</div>
           </div>
+          { false && (
           <div
             className={screenState === 1 ? "chat-lnb-item active" : "chat-lnb-item"}
             onClick={() => { setScreenState(1); }}>
             <i className="icon-user"></i>
             <div className="tooltip">유저 목록</div>
           </div>
+          )}
           <div
             className={screenState === 2 ? "chat-lnb-item active" : "chat-lnb-item"}
             onClick={() => { setScreenState(2); }}>
@@ -158,9 +160,8 @@ function Main({ users, messages, settings, addUsers, clearUsers, selectedUser, s
                 <Chat
                   database={database}
                   tabState={tabState}
-                  setTabState={setTabState}
-                  isLoading={isLoading}/>
-              )}              
+                  setTabState={setTabState}/>
+              )}
             </div>
             <div className="chat-options">
             </div>
@@ -175,7 +176,9 @@ function Main({ users, messages, settings, addUsers, clearUsers, selectedUser, s
           <div></div>
         </div>
         <div className={ screenState === 2 ? "container-screen-2" : "container-screen-2 hide" }>
-          <Setting database={database}/>
+          <Setting
+            database={database}
+            isLoading={isLoading}/>
         </div>
       </div>
     </div>

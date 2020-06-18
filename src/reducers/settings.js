@@ -21,7 +21,7 @@ const settings = (state = initialState, action) => {
         key: action.key,
       };
     case 'SIGN_OUT':
-      return {};
+      return initialState;
     default:
       return state
   }

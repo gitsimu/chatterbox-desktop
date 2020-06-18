@@ -181,10 +181,6 @@ const Chat = ({ users, messages, settings, addMessages, ...props }) => {
 
   return (
     <>
-      // <div className="message-search-result">
-      // { Object.keys(searchResult).map((k, i) => (<div key={k}>{searchResult[k].message}</div>))}
-      // </div>
-
       <div className="messages card" ref={body}>
         { (messages[userid]) &&  // 중복호출 예외처리
            (messages[userid].map((m, i) => (

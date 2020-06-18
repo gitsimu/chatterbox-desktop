@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import axios from 'axios';
 import Mockup from './Mockup';
 import { ChromePicker } from 'react-color';
 
@@ -12,12 +13,12 @@ const Setting = ({ settings, ...props }) => {
   const [subTitle, setSubTitle] = React.useState('');
   const [nickname, setNickname] = React.useState('');
   const [firstMessage, setFirstMessage] = React.useState('');
-
-  const [tabState, setTabState] = React.useState(0);
-
+  const [profileImage, setProfileImage] = React.useState(null);
   const [themeColor, setThemeColor] = React.useState('#444c5d');
   const [themeColorPicker, showThemeColorPicker] = React.useState(false);
-  // const [profileImagePath, setProfileImagePath] = React.useState(null);
+
+  const [tabState, setTabState] = React.useState(0);
+  const isLoading = props.isLoading;
 
   React.useEffect(() => {
     info.once('value', function(snapshot) {
@@ -29,23 +30,71 @@ const Setting = ({ settings, ...props }) => {
       setSubTitle(data.subTitle);
       setNickname(data.nickname);
       setFirstMessage(data.firstMessage);
+      setThemeColor(data.themeColor);
+      setProfileImage(data.profileImage ? data.profileImage : null);
     })
   }, [])
 
   const handleFileInput = (e) => {
+    const config = { headers: { 'content-type': 'multipart/form-data' } }
+    const formData = new FormData();
+    formData.append('file', e.target.files[0]);
+    formData.append('key', settings.key);
 
+    isLoading(true);
+
+    return axios.post(global.serverAddress + '/api/upload', formData, config)
+      .then(res => {
+        console.log('upload-success', res);
+        isLoading(false);
+
+        if (res.data.result === 'success') {
+          const path = JSON.stringify(res.data.file);
+          info.update({ profileImage: path });
+          setProfileImage(path);
+        }
+      })
+      .catch(err => {
+        console.log('upload-failure', err);
+        isLoading(false);
+      })
+  }
+
+  const handleFileRemove = () => {
+    if (profileImage === null) return;
+
+    info.update({ profileImage: null });
+    setProfileImage(null);
+
+    // s3 file remove
+    const config = { headers: { 'content-type': 'multipart/form-data' } }
+    const formData = new FormData();
+    formData.append('filename', JSON.parse(profileImage).name);
+    formData.append('key', settings.key);
+
+    return axios.post(global.serverAddress + '/api/remove', formData, config)
+      .then(res => {
+        console.log('upload-success', res);
+        isLoading(false);
+
+        if (res.data.result === 'success') {
+          console.log(res);
+        }
+      })
+      .catch(err => {
+        console.log('upload-failure', err);
+      })
   }
 
   const updateUserInfo = () => {
     info.update({
-      title: title,
-      subTitle: subTitle,
-      nickname: nickname,
-      firstMessage: firstMessage,
+      title: title.trim(),
+      subTitle: subTitle.trim(),
+      nickname: nickname.trim(),
+      firstMessage: firstMessage.trim(),
       themeColor: themeColor,
       // profileImagePath: profileImagePath,
     });
-    // alert('적용되었습니다.');
   }
 
   return (
@@ -88,7 +137,8 @@ const Setting = ({ settings, ...props }) => {
                 subTitle={subTitle}
                 nickname={nickname}
                 firstMessage={firstMessage}
-                themeColor={themeColor}/>
+                themeColor={themeColor}
+                profileImage={profileImage}/>
 
               <div className="setting-theme">
                 <div className="setting-input-item">
@@ -118,7 +168,9 @@ const Setting = ({ settings, ...props }) => {
                       <div>새 이미지 업로드</div>
                       <input type="file" onChange={e => handleFileInput(e)}/>
                     </label>
-                    <div className="setting-profile-image-remove">이미지 삭제</div>
+                    <div
+                      className="setting-profile-image-remove"
+                      onClick={() => { handleFileRemove() }}>이미지 삭제</div>
                   </div>
                 </div>
               </div>
