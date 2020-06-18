@@ -7,6 +7,9 @@ const messages = (state = {}, action) => {
                       [action.value];
 
       return Object.assign(state, o);
+    case 'DELETE_MESSAGES':
+      delete state[action.key];
+      return state
     case 'CLEAR_MESSAGES':
       return {}
     default:

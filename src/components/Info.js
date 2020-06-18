@@ -26,31 +26,73 @@ const Info = ({ users, settings, ...props }) => {
     setEmail((i.value && i.value.email) ? i.value.email : '');
   }, [i]);
 
+  const saveInfo = (type) => {
+    let data
+
+    switch(type) {
+      case 'nickname':
+        if (nickname.trim().length === 0) { return; }
+        else if (nickname.trim().length > 30) {
+          alert('닉네임의 허용 길이는 최대 30자 입니다.');
+          return;
+        }
+
+        data = { nickname: nickname.trim() }
+        break;
+
+      case 'mobile':
+        if (mobile.trim().length === 0) { return; }
+        else if (mobile.trim().length > 30) {
+          alert('연락처의 허용 길이는 최대 30자 입니다.');
+          return;
+        }
+
+        data = { mobile: mobile.trim() }
+        break;
+
+      case 'email':
+        if (mobile.trim().length === 0) { return; }
+        else if (mobile.trim().length > 50) {
+          alert('이메일의 허용 길이는 최대 50자 입니다.');
+          return;
+        }
+
+        data = { email: email.trim() }
+        break;
+    }
+
+    if (data) {
+      database.ref('/' + key + '/users/' + settings.selectedUser.key).update(data);
+      alert('변경되었습니다.');
+    }
+  }
+
   return (
     <div className="chat-info card">
       <div className="chat-info-header">사용자 정보</div>
-      <div className="chat-info-body">
-        {(settings.selectedUser && settings.selectedUser !== '') && (
+      <div className="chat-info-body">        
+        {(settings.selectedUser && settings.selectedUser.key) && (
           <>
           <div className="chat-info-item">
             <span>사용자 닉네임</span>
             <div className="chat-info-item-input">
               <input type="text" placeholder="데이터가 없습니다"
                 value={nickname}
-                // onBlur={(e) => { setNickname(initNickname) }}
-                onChange={(e) => { setNickname(e.target.value) }}/>
-              <div className="chat-info-item-save"
-                onClick={() => {
-                  if (nickname.trim().length === 0) { return; }
-                  else if (nickname.trim().length > 30) {
-                    alert('닉네임의 허용 길이는 최대 30자 입니다.');
-                    return;
+                onChange={(e) => { setNickname(e.target.value) }}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault()
+                    saveInfo('nickname');
                   }
+                }}/>
 
-                  database.ref('/' + key + '/users/' + settings.selectedUser.key).update({ nickname: nickname.trim() })
-                  alert('닉네임을 저장하였습니다.');
-                }}>저장
-              </div>
+              {(nickname && nickname !== '') && (
+                <div className="chat-info-item-save"
+                  onClick={() => {
+                    saveInfo('nickname');
+                  }}>저장
+                </div>
+              )}
             </div>
           </div>
           <div className="chat-info-item">
@@ -58,19 +100,21 @@ const Info = ({ users, settings, ...props }) => {
             <div className="chat-info-item-input">
               <input type="text" placeholder="데이터가 없습니다"
                 value={mobile}
-                onChange={(e) => { setMobile(e.target.value) }}/>
-              <div className="chat-info-item-save"
-                onClick={() => {
-                  if (mobile.trim().length === 0) { return; }
-                  else if (mobile.trim().length > 30) {
-                    alert('연락처의 허용 길이는 최대 30자 입니다.');
-                    return;
+                onChange={(e) => { setMobile(e.target.value) }}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault()
+                    saveInfo('mobile');
                   }
+                }}/>
 
-                  database.ref('/' + key + '/users/' + settings.selectedUser.key).update({ mobile: mobile.trim() })
-                  alert('연락처를 저장하였습니다.');
-                }}>저장
-              </div>
+              {(mobile && mobile !== '') && (
+                <div className="chat-info-item-save"
+                  onClick={() => {
+                    saveInfo('mobile');
+                  }}>저장
+                </div>
+              )}
             </div>
           </div>
           <div className="chat-info-item">
@@ -78,19 +122,21 @@ const Info = ({ users, settings, ...props }) => {
             <div className="chat-info-item-input">
               <input type="text" placeholder="데이터가 없습니다"
                 value={email}
-                onChange={(e) => { setEmail(e.target.value) }}/>
-              <div className="chat-info-item-save"
-                onClick={() => {
-                  if (mobile.trim().length === 0) { return; }
-                  else if (mobile.trim().length > 50) {
-                    alert('이메일의 허용 길이는 최대 50자 입니다.');
-                    return;
+                onChange={(e) => { setEmail(e.target.value) }}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault()
+                    saveInfo('email');
                   }
+                }}/>
 
-                  database.ref('/' + key + '/users/' + settings.selectedUser.key).update({ email: email.trim() })
-                  alert('이메일을 저장하였습니다.');
-                }}>저장
-              </div>
+              {(email && email !== '') && (
+                <div className="chat-info-item-save"
+                  onClick={() => {
+                    saveInfo('email');
+                  }}>저장
+                </div>
+              )}
             </div>
           </div>
           <div className="chat-info-item">

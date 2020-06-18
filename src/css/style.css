@@ -150,9 +150,12 @@ div, input, textarea {
   /* border-bottom: 1px solid #f1f1f1; */
   font-size: 13px;
   cursor: pointer;
-  transition: 0.2s ease all;
+  transition: 0.2s ease background;
   /* background: #fff; */
   background: rgba(0, 0, 0, 0.1);
+}
+.chat-user:hover {
+  background: rgba(0, 0, 0, 0.2);
 }
 .chat-user.active {
   /* background: #e1ffe6; */

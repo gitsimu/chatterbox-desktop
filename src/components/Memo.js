@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 
 const Memo = ({ users, settings, ...props }) => {
   const key = settings.key;
-  const database = props.database;  
+  const database = props.database;
 
   const m = (settings.selectedUser.value &&
             settings.selectedUser.value.memo) ?
@@ -26,7 +26,7 @@ const Memo = ({ users, settings, ...props }) => {
       </div>
 
       <div className="chat-memo-footer">
-        {(settings.selectedUser && settings.selectedUser !== '') && (
+        {(settings.selectedUser && settings.selectedUser.key) && (
           <div
             onClick={() => {
               if (memo.length > 200) {

@@ -3,7 +3,7 @@ import ChatMessage from './ChatMessage';
 import EmojiContainer from './EmojiContainer';
 import axios from 'axios';
 import { connect } from 'react-redux';
-import { addMessages } from '../actions'
+import { addMessages, deleteMessages, selectedUser } from '../actions'
 
 // const initialState = {messages: []};
 // function reducer(state, action) {
@@ -19,8 +19,9 @@ import { addMessages } from '../actions'
 //         throw new Error();
 //     }
 // }
-let search = {}
-const Chat = ({ users, messages, settings, addMessages, ...props }) => {
+
+const CONNECTIONS = {};
+const Chat = ({ users, messages, settings, addMessages, deleteMessages, selectedUser, ...props }) => {
   const key = settings.key;
   const userid = settings.selectedUser.key;
   const database = props.database;
@@ -37,7 +38,7 @@ const Chat = ({ users, messages, settings, addMessages, ...props }) => {
   const [loading, isLoading] = React.useState(false);
 
   const [searchResult, setSearchResult] = React.useState({});
-  // const [messageId, refresh] = React.useState(null);
+  const [messageId, refresh] = React.useState(null);
   const body = React.useRef(null);
   let form, input
 
@@ -106,7 +107,7 @@ const Chat = ({ users, messages, settings, addMessages, ...props }) => {
       const chat = database.ref(databaseRef).orderByChild('timestamp').limitToLast(100);
       chat.on('child_added', (snapshot) => {
         addMessages({ key: userid, value: snapshot.val() });
-        // refresh(snapshot.val().id);
+        refresh(snapshot.val().id);
 
         setTimeout(() => {
           if (body && body.current) {
@@ -115,6 +116,8 @@ const Chat = ({ users, messages, settings, addMessages, ...props }) => {
           isLoading(false);
         }, 10)
       })
+
+      CONNECTIONS[userid] = chat;
     }
   }
 
@@ -161,22 +164,6 @@ const Chat = ({ users, messages, settings, addMessages, ...props }) => {
 
   const handleEmojiContainer = (e) => {
     showEmojiContainer(!emojiContainer)
-  }
-
-  const searchMessage = () => {
-    if (users.length === 0) return;
-
-    // users.forEach(user => {
-    //   const search = database.ref('/' + key + '/messages/' + user.key).orderByChild('message').startAt(input.value).endAt(input.value + "\uf8ff");
-    //   // const search = database.ref('/' + key + '/messages/' + user.key).orderByChild('message').startAt("[a-zA-Z0-9가-힣]*").endAt(input.value);
-    //   search.once('value').then(c => {
-    //     if (c.val() === null) return;
-    //     setSearchResult(obj => Object.assign(obj, c.val()));
-    //
-    //     console.log(searchResult)
-    //   });
-    // })
-    // setSearchResult({'n73sh5s3g': {id: "n73sh5s3g", message: "aa", timestamp: 1591946946749, type: 1, userId: "c1cd7759-9784-4fac-a667-3685d6b2e4a0"}})
   }
 
   return (
@@ -256,7 +243,19 @@ const Chat = ({ users, messages, settings, addMessages, ...props }) => {
             <i className="icon-power"></i>대화 종료하기
           </div>
           <div className="message-option-delete"
-            onClick={() => {}}>
+            onClick={() => {
+              /* firebase */
+              database.ref('/' + key + '/messages/' + userid).remove();
+              database.ref('/' + key + '/users/' + userid).remove();
+              /* redux store*/
+              deleteMessages({ key: userid });
+              selectedUser({});
+              /* connections */
+              CONNECTIONS[userid].off();
+              delete CONNECTIONS[userid];
+
+              alert('이 대화가 삭제처리 되었습니다.')
+            }}>
             <i className="icon-trash"></i>대화 삭제하기
           </div>
         </div>
@@ -290,6 +289,8 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   addMessages: m => dispatch(addMessages(m)),
+  deleteMessages: m => dispatch(deleteMessages(m)),
+  selectedUser: u => dispatch(selectedUser(u)),
 })
 
 // export default Chat
