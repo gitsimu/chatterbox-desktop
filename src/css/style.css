@@ -1,6 +1,7 @@
 div, input, textarea {
   box-sizing: border-box;
   font-family: "Avenir", "Noto Sans Japanese", "Hiragino Kaku Gothic ProN", "YuGothic", "Yu Gothic", "メイリオ", "Apple SD Gothic Neo", "Nanum Barun Gothic", "Helvetica", "Arial", "Malgun Gothic", "맑은 고딕", "돋움", "Dotum", "sans-serif";
+  /* font-family: 'Nanum Gothic', cursive; */
 }
 /* width */
 ::-webkit-scrollbar {
@@ -771,14 +772,14 @@ div, input, textarea {
   flex-direction: column;
   height: 100%;
 }
-.setting-tab-header {
+.setting-menu-header {
   border-bottom: 1px solid rgba(34, 37, 43, 1);
   padding: 15px;
   font-weight: bold;
   font-size: 18px;
   color: rgba(117, 124, 140, 1);
 }
-.setting-tab-body {
+.setting-menu-body {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -857,6 +858,16 @@ div, input, textarea {
   background: #F44336;
   margin-left: 10px;
 }
+.setting-color-sample {
+  position: absolute;
+  width: 50px;
+  height: 20px;
+  background: #000;
+  bottom: 10px;
+  right: 10px;
+  border: 1px solid rgba(0,0,0,0.5);
+  border-radius: 2px;
+}
 .setting-color-picker {
   display: none;
   position: absolute;
@@ -900,6 +911,15 @@ div, input, textarea {
   align-items: center;
   box-shadow: 0px 5px 15px 0px rgba(0, 0, 0, 0.15);
   z-index: 1;
+}
+.setting .header .header-image {
+  display: flex;
+}
+.setting .header .header-image > img {
+  max-height: 30px;
+  max-width: 30px;
+  border-radius: 5px;
+  margin-right: 3px;
 }
 .setting .header .header-title {
   flex: 1;

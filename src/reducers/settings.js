@@ -1,5 +1,6 @@
 const initialState = {
   key: '',
+  smlogKey: '',
   selectedUser: {},
 };
 

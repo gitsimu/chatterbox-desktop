@@ -72,10 +72,14 @@ function Main({ users, messages, settings, addUsers, clearUsers, selectedUser, s
                     colorCode: code.colorCode,
                   })
 
-                  // global
+                  /* notification onClick 시 redux store에 있는 객체 접근을 하면 빈 값으로 나옴
+                   * USERS 라는 전역변수를 별도로 두어 onClick 시 해당 유저를 찾을 수 있도록 함 
+                   */
                   USERS.push({
-                    key: childSnapshot.key,
-                    value: childSnapshot.val(),
+                    key: k,
+                    value: v,
+                    guestCode: (v && v.nickname) ? v.nickname : code.guestCode,
+                    colorCode: code.colorCode,
                   })
                 });
               })

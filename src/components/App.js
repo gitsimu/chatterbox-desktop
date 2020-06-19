@@ -83,6 +83,9 @@ function App({ settings, signIn }) {
             <a href="https://smlog.co.kr/member/id_pass.htm" target="_blank">아이디/비밀번호 찾기</a>
           </div>
         </div>
+        <div className="app-copyright">
+          COPYRIGHT (C) Creative Soft. All Rights reserved.
+        </div>
       </div>
     ) : (
       <Main isLoading={isLoading}/>
@@ -95,6 +98,7 @@ function App({ settings, signIn }) {
   );
 }
 
+// shell을 사용하여 새 브라우저창에 띄움
 // <a onClick={() => {
 //   if (typeof(shell) === "object") {
 //     shell.openExternal('https://smlog.co.kr/member/member_join_check.htm')

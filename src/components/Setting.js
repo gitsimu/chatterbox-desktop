@@ -17,7 +17,7 @@ const Setting = ({ settings, ...props }) => {
   const [themeColor, setThemeColor] = React.useState('#444c5d');
   const [themeColorPicker, showThemeColorPicker] = React.useState(false);
 
-  const [tabState, setTabState] = React.useState(0);
+  const [settingMenuState, setSettingMenuState] = React.useState(0);
   const isLoading = props.isLoading;
 
   React.useEffect(() => {
@@ -102,8 +102,8 @@ const Setting = ({ settings, ...props }) => {
       <div className="setting-list card">
         <div className="setting-list-title">Settings</div>
         <div
-          className={ tabState === 0 ? "setting-list-tab active" : "setting-list-tab"}
-          onClick={() => { setTabState(0) }}>
+          className={ settingMenuState === 0 ? "setting-list-tab active" : "setting-list-tab"}
+          onClick={() => { setSettingMenuState(0) }}>
           <div>채팅 설정</div>
         </div>
         <div className="setting-list-title">Etc</div>
@@ -118,19 +118,18 @@ const Setting = ({ settings, ...props }) => {
           <div>고객센터</div>
         </div>
         <div
-          className={ tabState === 1 ? "setting-list-tab active" : "setting-list-tab"}
-          onClick={() => { setTabState(1) }}>
+          className={ settingMenuState === 1 ? "setting-list-tab active" : "setting-list-tab"}
+          onClick={() => { setSettingMenuState(1) }}>
           <div>버전 정보</div>
         </div>
       </div>
 
       <div className="setting-body card">
-
-        <div className={ tabState === 0 ? "setting-tab-0" : "setting-tab-0 hide" }>
-          <div className="setting-tab-header">
+        <div className={ settingMenuState === 0 ? "setting-menu-0" : "setting-menu-0 hide" }>
+          <div className="setting-menu-header">
             채팅 설정
           </div>
-          <div className="setting-tab-body">
+          <div className="setting-menu-body">
             <div className="setting-mockup">
               <Mockup
                 title={title}
@@ -149,6 +148,7 @@ const Setting = ({ settings, ...props }) => {
                     onClick={() => {
                       showThemeColorPicker(!themeColorPicker);
                     }}/>
+                  <div className="setting-color-sample" style={{ backgroundColor: themeColor }}></div>
                   <div className={themeColorPicker ? "setting-color-picker active" : "setting-color-picker"}>
                     <ChromePicker
                       color={themeColor}
@@ -204,15 +204,15 @@ const Setting = ({ settings, ...props }) => {
           </div>
         </div>
 
-        <div className={ tabState === 1 ? "setting-tab-1" : "setting-tab-1 hide" }>
-          <div className="setting-tab-header">
+        <div className={ settingMenuState === 1 ? "setting-menu-1" : "setting-menu-1 hide" }>
+          <div className="setting-menu-header">
             버전 정보
           </div>
-          <div className="setting-tab-body">
+          <div className="setting-menu-body">
           </div>
         </div>
 
-        <div className={ tabState === 2 ? "setting-tab-2" : "setting-tab-2 hide" }>
+        <div className={ settingMenuState === 2 ? "setting-menu-2" : "setting-menu-2 hide" }>
         </div>
       </div>
     </div>
