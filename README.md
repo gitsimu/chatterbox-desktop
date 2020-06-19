@@ -88,3 +88,7 @@ npm run dist        ( /dist/~.dmg )
 ...
 
 ## react-app-rewired
+
+## file drag n drop
+https://tinydew4.github.io/electron-ko/docs/api/dialog/
+https://steemit.com/utopian-io/@pckurdu/file-drag-and-drop-module-in-electron-with-text-editing-example

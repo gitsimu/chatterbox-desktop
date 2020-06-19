@@ -39,9 +39,10 @@ const Chat = ({ users, messages, settings, addMessages, deleteMessages, selected
 
   const [searchResult, setSearchResult] = React.useState({});
   const [messageId, refresh] = React.useState(null);
-  const body = React.useRef(null);
-  let form, input
 
+  const [fileDropLayer, showFileDropLayer] = React.useState(false);
+  const body = React.useRef(null);
+  let form, input, path;
 
   // React.useEffect(() => {
   //   dispatch({ type: 'clearMessage' });
@@ -97,6 +98,41 @@ const Chat = ({ users, messages, settings, addMessages, deleteMessages, selected
     }, 10)
   }, [userid])
 
+  React.useEffect(() => {
+    if (body && body.current && key) {
+      document.getElementById('file-drop-layer').addEventListener('dragover', (e) => {
+        e.preventDefault()
+        e.stopPropagation()
+        console.log('dragover')
+      })
+
+      body.current.addEventListener('dragenter', (e) => {
+        e.preventDefault()
+        e.stopPropagation()
+        showFileDropLayer(true)
+        console.log('dragenter')
+      })
+
+      document.getElementById('file-drop-layer').addEventListener('dragleave', (e) => {
+        e.preventDefault()
+        e.stopPropagation()
+        showFileDropLayer(false)
+        console.log('dragleave')
+      })
+
+      document.getElementById('file-drop-layer').addEventListener('drop', (e) => {
+        e.preventDefault()
+        e.stopPropagation();
+        showFileDropLayer(false)
+        for (let f of e.dataTransfer.files) {
+          console.log('the files you dragged: ', f)
+          path = f.path;
+          // handleFileInput(e, f);
+        }
+      })
+    }
+  }, [])
+
   const firebaseConnect = (userid) => {
     // 최초 1회만 연결
     if (userid && !messages[userid]) {
@@ -139,10 +175,11 @@ const Chat = ({ users, messages, settings, addMessages, deleteMessages, selected
     showInfoDialog(false);
   }
 
-  const handleFileInput = (e) => {
+  const handleFileInput = (e, file) => {
     const config = { headers: { 'content-type': 'multipart/form-data' } }
     const formData = new FormData();
-    formData.append('file', e.target.files[0]);
+    console.log(e.target.files);
+    formData.append('file', file ? file : e.target.files[0]);
     formData.append('key', key);
 
     isLoading(true);
@@ -180,6 +217,15 @@ const Chat = ({ users, messages, settings, addMessages, deleteMessages, selected
              />
            )))
         }
+
+        <div className={ fileDropLayer ? "file-drop-layer active" : "file-drop-layer" }
+          id="file-drop-layer">
+          <div>
+            <i className="icon-cloud-upload"></i>
+            <div>여기에 파일을 드래그하면</div>
+            <div>바로 업로드됩니다.</div>
+          </div>
+        </div>
       </div>
       <div className="message-form">
         <EmojiContainer

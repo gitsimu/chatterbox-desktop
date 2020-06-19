@@ -1,4 +1,4 @@
-const { app, BrowserWindow } = require('electron')
+const { app, BrowserWindow, ipcMain } = require('electron')
 const url = require('url')
 const path = require('path')
 
@@ -24,7 +24,15 @@ function createWindow () {
     slashes: true
   });
   win.loadURL(startUrl);
+  win.openDevTools();
 }
+
+// ipcMain.on('ondragstart', (event, filePath) => {
+//   event.sender.startDrag({
+//     file: filePath,
+//     icon: 'https://chatter-box-bucket.s3.ap-northeast-2.amazonaws.com/chatterbox/c1cd7759-9784-4fac-a667-3685d6b2e4a0/NaverBand.png'
+//   })
+// })
 
 // 이 메소드는 Electron의 초기화가 완료되고
 // 브라우저 윈도우가 생성될 준비가 되었을때 호출된다.
