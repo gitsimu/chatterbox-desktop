@@ -22,6 +22,7 @@ const USERS = [];
 function Main({ users, messages, settings, addUsers, clearUsers, selectedUser, signOut, ...props }) {
   const [screenState, setScreenState] = React.useState(0);
   const [tabState, setTabState] = React.useState(0);
+  const [imageViewer, showImageViewer] = React.useState(null);
   const key = 'c1cd7759-9784-4fac-a667-3685d6b2e4a0';
   const isLoading = props.isLoading;
 
@@ -73,7 +74,7 @@ function Main({ users, messages, settings, addUsers, clearUsers, selectedUser, s
                   })
 
                   /* notification onClick 시 redux store에 있는 객체 접근을 하면 빈 값으로 나옴
-                   * USERS 라는 전역변수를 별도로 두어 onClick 시 해당 유저를 찾을 수 있도록 함 
+                   * USERS 라는 전역변수를 별도로 두어 onClick 시 해당 유저를 찾을 수 있도록 함
                    */
                   USERS.push({
                     key: k,
@@ -164,7 +165,8 @@ function Main({ users, messages, settings, addUsers, clearUsers, selectedUser, s
                 <Chat
                   database={database}
                   tabState={tabState}
-                  setTabState={setTabState}/>
+                  setTabState={setTabState}
+                  showImageViewer={showImageViewer}/>
               )}
             </div>
             <div className="chat-options">
@@ -185,6 +187,14 @@ function Main({ users, messages, settings, addUsers, clearUsers, selectedUser, s
             isLoading={isLoading}/>
         </div>
       </div>
+
+      { imageViewer !== null && (
+        <div className="image-viewer">
+          <div className="image-viewer-close"
+            onClick={() => showImageViewer(null)}></div>
+          <img src={imageViewer}/>
+        </div>
+      )}
     </div>
   );
 }

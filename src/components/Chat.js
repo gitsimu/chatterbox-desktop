@@ -114,7 +114,10 @@ const Chat = ({ users, messages, settings, addMessages, deleteMessages, selected
       body.current.addEventListener('dragenter', (e) => {
         e.preventDefault()
         e.stopPropagation()
-        showFileDropLayer(true)
+        console.log('enter', e.dataTransfer)
+        if (e.dataTransfer) {
+          showFileDropLayer(true)
+        }
       })
 
       document.getElementById('file-drop-layer').addEventListener('dragleave', (e) => {
@@ -217,6 +220,7 @@ const Chat = ({ users, messages, settings, addMessages, deleteMessages, selected
              key={m.id}
              prev={messages[userid][i - 1]}
              {...m}
+             {...props}
              />
            )))
         }

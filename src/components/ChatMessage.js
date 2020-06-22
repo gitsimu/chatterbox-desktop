@@ -6,6 +6,7 @@ const ChatMessage = ({ users, settings, ...props }) => {
   const isMyself = props.opponent !== props.userId;
   const isSameUser = (props.prev && (props.prev.userId === props.userId));
   const target = props.target.value;
+  const showImageViewer = props.showImageViewer;
 
   const skipDate = () => {
     if (!props.prev) return false;
@@ -32,7 +33,8 @@ const ChatMessage = ({ users, settings, ...props }) => {
         <div
           className="message-thumbnail"
           onClick={() => {
-            window.parent.postMessage({ method: 'image', url: JSON.parse(props.message).location })
+            // window.parent.postMessage({ method: 'image', url: JSON.parse(props.message).location })
+            showImageViewer(JSON.parse(props.message).location);
           }}>
           <img src={ JSON.parse(props.message).location }/>
         </div>
