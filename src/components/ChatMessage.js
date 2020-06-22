@@ -100,7 +100,7 @@ const ChatMessage = ({ users, settings, ...props }) => {
 
 const mapStateToProps = state => ({
   users: state.users,
-  settings: state.settings,
+  settings: state.settings
 })
 
 // export default ChatMessage

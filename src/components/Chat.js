@@ -28,7 +28,6 @@ const Chat = ({ users, messages, settings, addMessages, deleteMessages, selected
   const tabState = props.tabState
   const setTabState = props.setTabState
   const target = settings.selectedUser
-  // const isLoading = props.isLoading
 
   // const [state, dispatch] = React.useReducer(reducer, initialState)
   const [optionDialog, showOptionDialog] = React.useState(false)
@@ -84,7 +83,6 @@ const Chat = ({ users, messages, settings, addMessages, deleteMessages, selected
     }
   }, [selectedEmoji])
 
-
   React.useEffect(() => {
     firebaseConnect(userid)
 
@@ -121,14 +119,24 @@ const Chat = ({ users, messages, settings, addMessages, deleteMessages, selected
     }
   }, [userid])
 
+  React.useEffect(() => {
+    /* Sign out 등의 이유로 Chat 객체를 내릴 때
+     * 연결되어있는 firebase connection을 모두 off 처리한다
+     */
+    return () => {
+      Object.keys(CONNECTIONS).map((u, i) => {
+        console.log('[Connection off]', CONNECTIONS[u])
+        CONNECTIONS[u].off()
+      })
+    }
+  }, [])
+
   const firebaseConnect = (userid) => {
     // 최초 1회만 연결
     if (userid && !messages[userid]) {
       isLoading(true)
       const database = props.database
-      const databaseRef = '/' + settings.key + '/messages/' + userid
-
-      const chat = database.ref(databaseRef).orderByChild('timestamp').limitToLast(100)
+      const chat = database.ref(`/${settings.key}/messages/${userid}`).orderByChild('timestamp').limitToLast(100)
       chat.on('child_added', (snapshot) => {
         addMessages({ key: userid, value: snapshot.val() })
         refresh(snapshot.val().id)
@@ -148,12 +156,12 @@ const Chat = ({ users, messages, settings, addMessages, deleteMessages, selected
   const sendMessage = (key, id, message, type, database) => {
     const messageId = Math.random().toString(36).substr(2, 9)
     const lastMessage = (type === 2) ? JSON.parse(message).name : message
-    database.ref('/' + key + '/users/' + id).update({
+    database.ref(`/${key}/users/${id}`).update({
       state:1,
       lastMessage: lastMessage,
-      timestamp: new Date().getTime(),
+      timestamp: new Date().getTime()
     })
-    database.ref('/' + key + '/messages/' + id + '/' + messageId).update({
+    database.ref(`/${key}/messages/${id}/${messageId}`).update({
       id: messageId,
       userId: key,
       message: message,
@@ -167,11 +175,11 @@ const Chat = ({ users, messages, settings, addMessages, deleteMessages, selected
   const handleFileInput = (e, file) => {
     const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
     const ALLOW_FILE_EXTENSIONS = [
-      "jpg", "jpeg", "gif", "bmp", "png", "tif", "tiff", "tga", "psd", "ai", // 이미지
-      "mp4", "m4v", "avi", "asf", "wmv", "mkv", "ts", "mpg", "mpeg", "mov", "flv", "ogv", // 동영상
-      "mp3", "wav", "flac", "tta", "tak", "aac", "wma", "ogg", "m4a", // 음성
-      "doc", "docx", "hwp", "txt", "rtf", "xml", "pdf", "wks", "wps", "xps", "md", "odf", "odt", "ods", "odp", "csv", "tsv", "xls", "xlsx", "ppt", "pptx", "pages", "key", "numbers", "show", "ce", // 문서
-      "zip", "gz", "bz2", "rar", "7z", "lzh", "alz"]
+      'jpg', 'jpeg', 'gif', 'bmp', 'png', 'tif', 'tiff', 'tga', 'psd', 'ai', // 이미지
+      'mp4', 'm4v', 'avi', 'asf', 'wmv', 'mkv', 'ts', 'mpg', 'mpeg', 'mov', 'flv', 'ogv', // 동영상
+      'mp3', 'wav', 'flac', 'tta', 'tak', 'aac', 'wma', 'ogg', 'm4a', // 음성
+      'doc', 'docx', 'hwp', 'txt', 'rtf', 'xml', 'pdf', 'wks', 'wps', 'xps', 'md', 'odf', 'odt', 'ods', 'odp', 'csv', 'tsv', 'xls', 'xlsx', 'ppt', 'pptx', 'pages', 'key', 'numbers', 'show', 'ce', // 문서
+      'zip', 'gz', 'bz2', 'rar', '7z', 'lzh', 'alz']
 
     const target = file || e.target.files[0]
     const fileSize = target.size
@@ -192,7 +200,7 @@ const Chat = ({ users, messages, settings, addMessages, deleteMessages, selected
 
     isLoading(true)
 
-    return axios.post(global.serverAddress + '/api/upload', formData, config)
+    return axios.post(`${global.serverAddress}/api/upload`, formData, config)
       .then(res => {
         console.log('upload-success', res)
         isLoading(false)
@@ -242,7 +250,7 @@ const Chat = ({ users, messages, settings, addMessages, deleteMessages, selected
 
   return (
     <>
-      <div className="messages card" ref={body}>
+      <div className='messages card' ref={body}>
         { (messages[userid]) &&  // 중복호출 예외처리
            (messages[userid].map((m, i) => (
            <ChatMessage
@@ -256,16 +264,16 @@ const Chat = ({ users, messages, settings, addMessages, deleteMessages, selected
            )))
         }
 
-        <div className={ fileDropLayer ? "file-drop-layer active" : "file-drop-layer" }
-          id="file-drop-layer">
+        <div className={ fileDropLayer ? 'file-drop-layer active' : 'file-drop-layer' }
+          id='file-drop-layer'>
           <div>
-            <i className="icon-cloud-upload"></i>
+            <i className='icon-cloud-upload'></i>
             <div>여기에 파일을 드래그하면</div>
             <div>바로 업로드됩니다.</div>
           </div>
         </div>
       </div>
-      <div className="message-form">
+      <div className='message-form'>
         <EmojiContainer
           getState={emojiContainer}
           setState={showEmojiContainer}
@@ -277,60 +285,60 @@ const Chat = ({ users, messages, settings, addMessages, deleteMessages, selected
           sendMessage(key, userid, input.value, 1, database)
           input.value = ''
         }}>
-          <div className="message-addon">
+          <div className='message-addon'>
             <label>
-              <i className="icon-paper-clip"></i>
-              <input type="file"
+              <i className='icon-paper-clip'></i>
+              <input type='file'
                 onChange={e => handleFileInput(e)}/>
             </label>
             <label>
-              <i className="icon-emotsmile"
+              <i className='icon-emotsmile'
                 onClick={e => handleEmojiContainer(e)}></i>
             </label>
           </div>
           <textarea
             ref={node => input = node}
-            className="message-input"
-            placeholder="메세지를 입력해주세요."
+            className='message-input'
+            placeholder='메세지를 입력해주세요.'
             onKeyPress={(e) => {
               if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault()
                 form.dispatchEvent(new Event('submit'))
               }
             }}/>
-          <button className="message-button-send" type="submit">
-            <i className="icon-paper-plane"></i>
+          <button className='message-button-send' type='submit'>
+            <i className='icon-paper-plane'></i>
           </button>
-          <div className="message-button-more"
+          <div className='message-button-more'
             onClick={() => {
               showOptionDialog(!optionDialog)
 
               // search test
-              // const search = database.ref('/' + key + '/messages/' + userid).orderByChild('message').startAt(input.value).endAt(input.value + "\uf8ff")
-              // const search = database.ref('/' + key + '/messages').orderByChild('message').startAt("[a-zA-Z0-9]*").endAt(input.value)
+              // const search = database.ref('/' + key + '/messages/' + userid).orderByChild('message').startAt(input.value).endAt(input.value + '\uf8ff')
+              // const search = database.ref('/' + key + '/messages').orderByChild('message').startAt('[a-zA-Z0-9]*').endAt(input.value)
               // search.once('value').then(c => console.log(input.value, c.val()))
               // searchMessage()
             }}>
-            <i className="icon-options-vertical"></i>
+            <i className='icon-options-vertical'></i>
           </div>
         </form>
 
-        <div className={optionDialog ? "message-option-dialog" : "message-option-dialog hide"}>
-          <div className="message-option-complete"
+        <div className={optionDialog ? 'message-option-dialog' : 'message-option-dialog hide'}>
+          <div className='message-option-complete'
             onClick={() => {
-              database.ref('/' + key + '/users/' + userid).update({ state: 2 })
+              database.ref(`/${key}/users/${userid}`).update({ state: 2 })
               setTabState(2)
               showOptionDialog(false)
               showInfoDialog(true)
               alert('이 대화가 종료처리 되었습니다.')
             }}>
-            <i className="icon-power"></i>대화 종료하기
+            <i className='icon-power'></i>대화 종료하기
           </div>
-          <div className="message-option-delete"
+          <div className='message-option-delete'
             onClick={() => {
               /* firebase */
-              database.ref('/' + key + '/messages/' + userid).remove()
-              database.ref('/' + key + '/users/' + userid).remove()
+              database.ref(`/${key}/messages/${userid}`).remove()
+              database.ref(`/${key}/users/${userid}`).remove()
               /* redux store */
               deleteMessages({ key: userid })
               selectedUser({})
@@ -340,17 +348,17 @@ const Chat = ({ users, messages, settings, addMessages, deleteMessages, selected
 
               alert('이 대화가 삭제처리 되었습니다.')
             }}>
-            <i className="icon-trash"></i>대화 삭제하기
+            <i className='icon-trash'></i>대화 삭제하기
           </div>
         </div>
 
         { infoDialog && (
-          <div className="dialog info">
-            <div className="dialog-header">
-              <i className="icon-exclamation"></i>
+          <div className='dialog info'>
+            <div className='dialog-header'>
+              <i className='icon-exclamation'></i>
               <span>Infomation</span>
             </div>
-            <div className="dialog-body">
+            <div className='dialog-body'>
               <div>이 대화는 이미 종료된 대화입니다.</div>
               <div>메세지를 보내면 다시 활성화됩니다.</div>
             </div>
@@ -359,7 +367,7 @@ const Chat = ({ users, messages, settings, addMessages, deleteMessages, selected
       </div>
 
       { loading && (
-        <div id="loading"><div></div></div>
+        <div id='loading'><div></div></div>
       )}
     </>
   )
@@ -368,13 +376,13 @@ const Chat = ({ users, messages, settings, addMessages, deleteMessages, selected
 const mapStateToProps = state => ({
   users: state.users,
   messages: state.messages,
-  settings: state.settings,
+  settings: state.settings
 })
 
 const mapDispatchToProps = dispatch => ({
   addMessages: m => dispatch(addMessages(m)),
   deleteMessages: m => dispatch(deleteMessages(m)),
-  selectedUser: u => dispatch(selectedUser(u)),
+  selectedUser: u => dispatch(selectedUser(u))
 })
 
 // export default Chat

@@ -24,7 +24,6 @@ const Memo = ({ users, settings, ...props }) => {
           onChange={(e) => { setMemo(e.target.value) }}>
         </textarea>
       </div>
-
       <div className="chat-memo-footer">
         {(settings.selectedUser && settings.selectedUser.key) && (
           <div
@@ -34,19 +33,18 @@ const Memo = ({ users, settings, ...props }) => {
                 return
               }
 
-              database.ref('/' + key + '/users/' + settings.selectedUser.key).update({ memo: memo })
+              database.ref(`/${key}/users/${settings.selectedUser.key}`).update({ memo: memo })
               alert('메모를 저장하였습니다.')
             }}>메모 저장하기</div>
         )}
       </div>
-
     </div>
   )
 }
 
 const mapStateToProps = state => ({
   users: state.users,
-  settings: state.settings,
+  settings: state.settings
 })
 
 // export default Memo

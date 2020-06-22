@@ -13,17 +13,17 @@ const UserList = ({ users, ...props }) => {
   React.useEffect(() => {
     setCountWait(users.filter((f) => {
       const userState = f.value.state || 0
-      return userState === 0
+      return (userState === 0)
     }).length)
 
     setCountProgress(users.filter((f) => {
       const userState = f.value.state
-      return userState === 1
+      return (userState === 1)
     }).length)
 
     setCountComplete(users.filter((f) => {
       const userState = f.value.state
-      return userState === 2
+      return (userState === 2)
     }).length)
   }, [users])
 
@@ -54,7 +54,7 @@ const UserList = ({ users, ...props }) => {
         key="chat-list">
         { users.filter((f) => {
           const userState = f.value.state || 0
-          return userState === tabState
+          return (userState === tabState)
         }).map((m, i) => (
           <User
             key={m.key}
@@ -67,7 +67,7 @@ const UserList = ({ users, ...props }) => {
 }
 
 const mapStateToProps = state => ({
-  users: state.users,
+  users: state.users
 })
 
 // export default UserList

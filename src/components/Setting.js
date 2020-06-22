@@ -6,8 +6,7 @@ import { ChromePicker } from 'react-color'
 
 const Setting = ({ settings, ...props }) => {
   const database = props.database
-  const databaseRef = '/' + settings.key + '/' + 'config'
-  const info = database.ref(databaseRef)
+  const info = database.ref(`/${settings.key}/config`)
 
   const [title, setTitle] = React.useState('')
   const [subTitle, setSubTitle] = React.useState('')
@@ -25,7 +24,6 @@ const Setting = ({ settings, ...props }) => {
       const data = snapshot.val()
       if (!data) return
 
-      // console.log('setting effect')
       setTitle(data.title)
       setSubTitle(data.subTitle)
       setNickname(data.nickname)
@@ -92,8 +90,7 @@ const Setting = ({ settings, ...props }) => {
       subTitle: subTitle.trim(),
       nickname: nickname.trim(),
       firstMessage: firstMessage.trim(),
-      themeColor: themeColor,
-      // profileImagePath: profileImagePath,
+      themeColor: themeColor      
     })
   }
 
@@ -221,7 +218,7 @@ const Setting = ({ settings, ...props }) => {
 
 const mapStateToProps = state => ({
   users: state.users,
-  settings: state.settings,
+  settings: state.settings
 })
 
 // export default Setting

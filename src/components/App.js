@@ -36,8 +36,13 @@ function App({ settings, signIn }) {
   }, [])
 
   const signInProcess = (id, pw) => {
-    if (!id || id === '') { alert('아이디를 입력해주세요.'); return }
-    if (!pw || pw === '') { alert('비밀번호를 입력해주세요.'); return }
+    if (!id || id === '') {
+      alert('아이디를 입력해주세요.')
+      return
+    } else if (!pw || pw === '') {
+      alert('비밀번호를 입력해주세요.')
+      return
+    }
 
     const token = 'c1cd7759-9784-4fac-a667-3685d6b2e4a0'
     storage.set('userData', { token: token, id: id, pw: pw }, () => {
@@ -120,11 +125,11 @@ function App({ settings, signIn }) {
 // }}>아이디/비밀번호 찾기</a>
 
 const mapStateToProps = state => ({
-  settings: state.settings,
+  settings: state.settings
 })
 
 const mapDispatchToProps = dispatch => ({
-  signIn: s => dispatch(signIn(s)),
+  signIn: s => dispatch(signIn(s))
 })
 
 // export default App

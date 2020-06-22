@@ -11,31 +11,11 @@ const User = ({ messages, settings, addMessages, selectedUser, ...props }) => {
   const guestCode = props.data.guestCode
   const colorCode = props.data.colorCode
 
-  // console.log('user', props.data)
-
-  React.useEffect(() => {
-
-  }, [])
-
-  // const firebaseConnect = (userid) => {
-  //   console.log('firebase connect', userid)
-  //   if (userid && !messages[userid]) {
-  //     const database = props.database
-  //     const databaseRef = '/' + settings.key + '/messages/' + userid
-  //
-  //     const chat = database.ref(databaseRef).orderByChild('timestamp')
-  //     chat.on('child_added', function(snapshot) {
-  //       addMessages({ key: userid, value: snapshot.val() })
-  //     })
-  //   }
-  // }
-
   return (
     <div
       className={settings.selectedUser.key === props.data.key ? 'chat-user active' : 'chat-user'}
       onClick={() => {
         selectedUser(props.data)
-        // firebaseConnect(props.data.key)
       }}>
 
       <div className="chat-user-icon">
@@ -60,11 +40,11 @@ const User = ({ messages, settings, addMessages, selectedUser, ...props }) => {
 
 const mapStateToProps = state => ({
   messages: state.messages,
-  settings: state.settings,
+  settings: state.settings
 })
 const mapDispatchToProps = dispatch => ({
   addMessages: m => dispatch(addMessages(m)),
-  selectedUser: u => dispatch(selectedUser(u)),
+  selectedUser: u => dispatch(selectedUser(u))
 })
 
 // export default User

@@ -24,7 +24,6 @@ function Main({ users, messages, settings, addUsers, clearUsers, selectedUser, s
   const [screenState, setScreenState] = React.useState(0)
   const [tabState, setTabState] = React.useState(0)
   const [imageViewer, showImageViewer] = React.useState(null)
-  const key = 'c1cd7759-9784-4fac-a667-3685d6b2e4a0'
   const isLoading = props.isLoading
 
   if (!firebase.apps.length) {
@@ -33,6 +32,7 @@ function Main({ users, messages, settings, addUsers, clearUsers, selectedUser, s
   const database = firebase.database()
 
   React.useEffect(() => {
+    let chat
     // simpleline icons
     let simplelineLink = document.createElement("link")
     simplelineLink.href = "https://cdnjs.cloudflare.com/ajax/libs/simple-line-icons/2.4.1/css/simple-line-icons.min.css"
@@ -43,7 +43,7 @@ function Main({ users, messages, settings, addUsers, clearUsers, selectedUser, s
     isLoading(true)
 
     // firebase
-    getFirebaseAuthToken(key)
+    getFirebaseAuthToken(settings.key)
       .then(res => {
         const data = res.data
         if (data.result === 'success') {
@@ -51,7 +51,7 @@ function Main({ users, messages, settings, addUsers, clearUsers, selectedUser, s
             .then(success => {
               isLoading(false)
 
-              const chat = database.ref('/' + key + '/users').orderByChild('timestamp')
+              chat = database.ref(`/${settings.key}/users`).orderByChild('timestamp')
               chat.on('value', (snapshot) => {
                 clearUsers()
 
@@ -64,29 +64,26 @@ function Main({ users, messages, settings, addUsers, clearUsers, selectedUser, s
                   const k = childSnapshot.key
                   const v = childSnapshot.val()
                   const code = script.guestCodeGenerator(k)
-                  addUsers({
+                  const user = {
                     key: k,
                     value: v,
                     guestCode: (v && v.nickname) ? v.nickname : code.guestCode,
                     colorCode: code.colorCode,
-                  })
+                  }
+
+                  addUsers(user)
 
                   /* notification onClick 시 redux store에 있는 객체 접근을 하면 빈 값으로 나옴
                    * USERS 라는 전역변수를 별도로 두어 onClick 시 해당 유저를 찾을 수 있도록 함
                    */
-                  USERS.push({
-                    key: k,
-                    value: v,
-                    guestCode: (v && v.nickname) ? v.nickname : code.guestCode,
-                    colorCode: code.colorCode,
-                  })
+                  USERS.push(user)
                 })
               })
 
               // https://www.electronjs.org/docs/tutorial/notifications?q=Notification
               // https://www.electronjs.org/docs/api/notification
               // https://snutiise.github.io/html5-desktop-api/
-              const recent = database.ref('/' + key + '/recents')
+              const recent = database.ref(`/${settings.key}/recents`)
               recent.on('value', (snapshot) => {
                 const recentsData = snapshot.val()
                 const notification = new Notification('새 메세지', {
@@ -113,11 +110,9 @@ function Main({ users, messages, settings, addUsers, clearUsers, selectedUser, s
         isLoading(false)
         alert('인증 서버에서 연결을 거부하였습니다.')
       })
+
+    return () => { chat.off() }
   }, [])
-
-
-  // React.useEffect(() => {
-  // }, [users])
 
   return (
     <div className="App">
@@ -145,10 +140,12 @@ function Main({ users, messages, settings, addUsers, clearUsers, selectedUser, s
           </div>
           <div className="chat-lnb-item sign-out"
             onClick={() => {
-              /* local storage*/
+              /* local storage */
               storage.remove('userData', (err) => {
-                if (err) throw err
-                console.log('[ERROR] Local storage remove failure', err)
+                if (err) {
+                  throw err
+                  console.log('[ERROR] Local storage remove failure', err)
+                }
               })
               signOut()
             }}>
@@ -156,7 +153,6 @@ function Main({ users, messages, settings, addUsers, clearUsers, selectedUser, s
             <div className="tooltip">로그아웃</div>
           </div>
         </div>
-
         <div className={ screenState === 0 ? "container-screen-0" : "container-screen-0 hide" }>
           <div className="container-center">
             <div className="chat-list card">
@@ -182,7 +178,6 @@ function Main({ users, messages, settings, addUsers, clearUsers, selectedUser, s
             <Info database={database}/>
           </div>
         </div>
-
         <div className={ screenState === 1 ? "container-screen-1" : "container-screen-1 hide" }>
           <div></div>
         </div>
@@ -192,7 +187,6 @@ function Main({ users, messages, settings, addUsers, clearUsers, selectedUser, s
             isLoading={isLoading}/>
         </div>
       </div>
-
       { imageViewer !== null && (
         <div className="image-viewer">
           <div className="image-viewer-close"
@@ -205,21 +199,21 @@ function Main({ users, messages, settings, addUsers, clearUsers, selectedUser, s
 }
 
 const getFirebaseAuthToken = async (uuid) => {
-  const res = await axios.post(global.serverAddress + '/api/auth', { uuid: uuid })
+  const res = await axios.post(`${global.serverAddress}/api/auth`, { uuid: uuid })
   return await res
 }
 
 const mapStateToProps = state => ({
   users: state.users,
   messages: state.messages,
-  settings: state.settings,
+  settings: state.settings
 })
 
 const mapDispatchToProps = dispatch => ({
   addUsers: u => dispatch(addUsers(u)),
   clearUsers: () => dispatch(clearUsers()),
   selectedUser: u => dispatch(selectedUser(u)),
-  signOut: () => dispatch(signOut()),
+  signOut: () => dispatch(signOut())
 })
 
 // export default Main

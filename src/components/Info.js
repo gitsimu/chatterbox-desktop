@@ -62,7 +62,7 @@ const Info = ({ users, settings, ...props }) => {
     }
 
     if (data) {
-      database.ref('/' + key + '/users/' + settings.selectedUser.key).update(data)
+      database.ref(`/${key}/users/${settings.selectedUser.key}`).update(data)
       alert('변경되었습니다.')
     }
   }
@@ -88,9 +88,8 @@ const Info = ({ users, settings, ...props }) => {
 
               {(nickname && nickname !== '') && (
                 <div className="chat-info-item-save"
-                  onClick={() => {
-                    saveInfo('nickname')
-                  }}>저장
+                  onClick={() => { saveInfo('nickname') }}>
+                  저장
                 </div>
               )}
             </div>
@@ -110,9 +109,8 @@ const Info = ({ users, settings, ...props }) => {
 
               {(mobile && mobile !== '') && (
                 <div className="chat-info-item-save"
-                  onClick={() => {
-                    saveInfo('mobile')
-                  }}>저장
+                  onClick={() => { saveInfo('mobile') }}>
+                  저장
                 </div>
               )}
             </div>
@@ -132,9 +130,8 @@ const Info = ({ users, settings, ...props }) => {
 
               {(email && email !== '') && (
                 <div className="chat-info-item-save"
-                  onClick={() => {
-                    saveInfo('email')
-                  }}>저장
+                  onClick={() => { saveInfo('email') }}>
+                  저장
                 </div>
               )}
             </div>
@@ -152,7 +149,7 @@ const Info = ({ users, settings, ...props }) => {
 
 const mapStateToProps = state => ({
   users: state.users,
-  settings: state.settings,
+  settings: state.settings
 })
 
 // export default Info
