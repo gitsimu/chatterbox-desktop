@@ -1,76 +1,76 @@
-import React from 'react';
-import { connect } from 'react-redux';
+import React from 'react'
+import { connect } from 'react-redux'
 
 const Info = ({ users, settings, ...props }) => {
-  const key = settings.key;
-  const database = props.database;
+  const key = settings.key
+  const database = props.database
 
-  const i = settings.selectedUser;
-  const [info, setInfo] = React.useState(i);
+  const i = settings.selectedUser
+  const [info, setInfo] = React.useState(i)
 
-  const initNickname = (i.value && i.value.nickname) ? i.value.nickname : '';
-  const initMobile = (i.value && i.value.mobile) ? i.value.mobile : '';
-  const initEmail = (i.value && i.value.email) ? i.value.email : '';
+  const initNickname = (i.value && i.value.nickname) ? i.value.nickname : ''
+  const initMobile = (i.value && i.value.mobile) ? i.value.mobile : ''
+  const initEmail = (i.value && i.value.email) ? i.value.email : ''
 
-  const [nickname, setNickname] = React.useState(initNickname);
-  const [mobile, setMobile] = React.useState(initMobile);
-  const [email, setEmail] = React.useState(initEmail);
-
-  React.useEffect(() => {
-    setInfo(i);
-  }, [props, i]);
+  const [nickname, setNickname] = React.useState(initNickname)
+  const [mobile, setMobile] = React.useState(initMobile)
+  const [email, setEmail] = React.useState(initEmail)
 
   React.useEffect(() => {
-    setNickname((i.value && i.value.nickname) ? i.value.nickname : '');
-    setMobile((i.value && i.value.mobile) ? i.value.mobile : '');
-    setEmail((i.value && i.value.email) ? i.value.email : '');
-  }, [i]);
+    setInfo(i)
+  }, [props, i])
+
+  React.useEffect(() => {
+    setNickname((i.value && i.value.nickname) ? i.value.nickname : '')
+    setMobile((i.value && i.value.mobile) ? i.value.mobile : '')
+    setEmail((i.value && i.value.email) ? i.value.email : '')
+  }, [i])
 
   const saveInfo = (type) => {
     let data
 
     switch(type) {
       case 'nickname':
-        if (nickname.trim().length === 0) { return; }
+        if (nickname.trim().length === 0) { return }
         else if (nickname.trim().length > 30) {
-          alert('닉네임의 허용 길이는 최대 30자 입니다.');
-          return;
+          alert('닉네임의 허용 길이는 최대 30자 입니다.')
+          return
         }
 
         data = { nickname: nickname.trim() }
-        break;
+        break
 
       case 'mobile':
-        if (mobile.trim().length === 0) { return; }
+        if (mobile.trim().length === 0) { return }
         else if (mobile.trim().length > 30) {
-          alert('연락처의 허용 길이는 최대 30자 입니다.');
-          return;
+          alert('연락처의 허용 길이는 최대 30자 입니다.')
+          return
         }
 
         data = { mobile: mobile.trim() }
-        break;
+        break
 
       case 'email':
-        if (mobile.trim().length === 0) { return; }
+        if (mobile.trim().length === 0) { return }
         else if (mobile.trim().length > 50) {
-          alert('이메일의 허용 길이는 최대 50자 입니다.');
-          return;
+          alert('이메일의 허용 길이는 최대 50자 입니다.')
+          return
         }
 
         data = { email: email.trim() }
-        break;
+        break
     }
 
     if (data) {
-      database.ref('/' + key + '/users/' + settings.selectedUser.key).update(data);
-      alert('변경되었습니다.');
+      database.ref('/' + key + '/users/' + settings.selectedUser.key).update(data)
+      alert('변경되었습니다.')
     }
   }
 
   return (
     <div className="chat-info card">
       <div className="chat-info-header">사용자 정보</div>
-      <div className="chat-info-body">        
+      <div className="chat-info-body">
         {(settings.selectedUser && settings.selectedUser.key) && (
           <>
           <div className="chat-info-item">
@@ -82,14 +82,14 @@ const Info = ({ users, settings, ...props }) => {
                 onKeyPress={(e) => {
                   if (e.key === 'Enter') {
                     e.preventDefault()
-                    saveInfo('nickname');
+                    saveInfo('nickname')
                   }
                 }}/>
 
               {(nickname && nickname !== '') && (
                 <div className="chat-info-item-save"
                   onClick={() => {
-                    saveInfo('nickname');
+                    saveInfo('nickname')
                   }}>저장
                 </div>
               )}
@@ -104,14 +104,14 @@ const Info = ({ users, settings, ...props }) => {
                 onKeyPress={(e) => {
                   if (e.key === 'Enter') {
                     e.preventDefault()
-                    saveInfo('mobile');
+                    saveInfo('mobile')
                   }
                 }}/>
 
               {(mobile && mobile !== '') && (
                 <div className="chat-info-item-save"
                   onClick={() => {
-                    saveInfo('mobile');
+                    saveInfo('mobile')
                   }}>저장
                 </div>
               )}
@@ -126,14 +126,14 @@ const Info = ({ users, settings, ...props }) => {
                 onKeyPress={(e) => {
                   if (e.key === 'Enter') {
                     e.preventDefault()
-                    saveInfo('email');
+                    saveInfo('email')
                   }
                 }}/>
 
               {(email && email !== '') && (
                 <div className="chat-info-item-save"
                   onClick={() => {
-                    saveInfo('email');
+                    saveInfo('email')
                   }}>저장
                 </div>
               )}
@@ -155,5 +155,5 @@ const mapStateToProps = state => ({
   settings: state.settings,
 })
 
-// export default Info;
-export default connect(mapStateToProps)(Info);
+// export default Info
+export default connect(mapStateToProps)(Info)

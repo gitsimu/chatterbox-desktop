@@ -1,7 +1,7 @@
-import React from 'react';
+import React from 'react'
 
 const Mockup = (props) => {
-  const iconText = (props.nickname && props.nickname.length > 0) ? props.nickname.substring(0, 1) : 'S';
+  const iconText = (props.nickname && props.nickname.length > 0) ? props.nickname.substring(0, 1) : 'S'
 
   return (
     <div className="chat-window">
@@ -44,4 +44,4 @@ const Mockup = (props) => {
   )
 }
 
-export default Mockup;
+export default Mockup

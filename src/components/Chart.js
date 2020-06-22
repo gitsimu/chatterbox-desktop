@@ -1,11 +1,11 @@
-import React from 'react';
+import React from 'react'
 
 const Chart = (props) => {
 
   React.useEffect(() => {
 
-  });
-  
+  })
+
   return (
     <div className="chart">
       <div></div>
@@ -13,4 +13,4 @@ const Chart = (props) => {
   )
 }
 
-export default Chart;
+export default Chart

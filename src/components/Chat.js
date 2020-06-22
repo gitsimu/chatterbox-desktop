@@ -1,11 +1,11 @@
-import React from 'react';
-import ChatMessage from './ChatMessage';
-import EmojiContainer from './EmojiContainer';
-import axios from 'axios';
-import { connect } from 'react-redux';
+import React from 'react'
+import ChatMessage from './ChatMessage'
+import EmojiContainer from './EmojiContainer'
+import axios from 'axios'
+import { connect } from 'react-redux'
 import { addMessages, deleteMessages, selectedUser } from '../actions'
 
-// const initialState = {messages: []};
+// const initialState = {messages: []}
 // function reducer(state, action) {
 //     switch (action.type) {
 //       case 'addMessage':
@@ -16,84 +16,84 @@ import { addMessages, deleteMessages, selectedUser } from '../actions'
 //       case 'clearMessage':
 //         return {messages: []}
 //       default:
-//         throw new Error();
+//         throw new Error()
 //     }
 // }
 
-const CONNECTIONS = {};
+const CONNECTIONS = {}
 const Chat = ({ users, messages, settings, addMessages, deleteMessages, selectedUser, ...props }) => {
-  const key = settings.key;
-  const userid = settings.selectedUser.key;
-  const database = props.database;
-  const tabState = props.tabState;
-  const setTabState = props.setTabState;
-  const target = settings.selectedUser;
-  // const isLoading = props.isLoading;
+  const key = settings.key
+  const userid = settings.selectedUser.key
+  const database = props.database
+  const tabState = props.tabState
+  const setTabState = props.setTabState
+  const target = settings.selectedUser
+  // const isLoading = props.isLoading
 
-  // const [state, dispatch] = React.useReducer(reducer, initialState);
-  const [optionDialog, showOptionDialog] = React.useState(false);
-  const [infoDialog, showInfoDialog] = React.useState(false);
-  const [emojiContainer, showEmojiContainer] = React.useState(false);
-  const [selectedEmoji, selectEmoji] = React.useState(null);
-  const [loading, isLoading] = React.useState(false);
+  // const [state, dispatch] = React.useReducer(reducer, initialState)
+  const [optionDialog, showOptionDialog] = React.useState(false)
+  const [infoDialog, showInfoDialog] = React.useState(false)
+  const [emojiContainer, showEmojiContainer] = React.useState(false)
+  const [selectedEmoji, selectEmoji] = React.useState(null)
+  const [loading, isLoading] = React.useState(false)
 
-  const [searchResult, setSearchResult] = React.useState({});
-  const [messageId, refresh] = React.useState(null);
+  const [searchResult, setSearchResult] = React.useState({})
+  const [messageId, refresh] = React.useState(null)
 
-  const [fileDropLayer, showFileDropLayer] = React.useState(false);
-  const body = React.useRef(null);
-  let form, input;
+  const [fileDropLayer, showFileDropLayer] = React.useState(false)
+  const body = React.useRef(null)
+  let form, input
 
   // React.useEffect(() => {
-  //   dispatch({ type: 'clearMessage' });
-  //   const chat = database.ref(databaseRef).orderByChild('timestamp');
+  //   dispatch({ type: 'clearMessage' })
+  //   const chat = database.ref(databaseRef).orderByChild('timestamp')
   //
   //   // 구독
   //   chat.on('child_added', function(snapshot) {
   //     if (snapshot.key === 'userinfo'
-  //      || snapshot.key === 'timestamp') return; // ignore userinfo, timestamp
+  //      || snapshot.key === 'timestamp') return // ignore userinfo, timestamp
   //
   //     dispatch({
   //       type: 'addMessage',
   //       messages: snapshot.val(),
   //       userid: userid
   //     })
-  //     console.log('addMessage', snapshot.val());
+  //     console.log('addMessage', snapshot.val())
   //
   //     setTimeout(() => {
   //       if (body && body.current) {
-  //         body.current.scrollTop = body.current.scrollHeight;
+  //         body.current.scrollTop = body.current.scrollHeight
   //       }
   //     }, 100)
   //   })
   //
   //   // info dialog
   //   showInfoDialog((target && target.key === userid) && target.value.state === 2)
-  //   showOptionDialog(false);
+  //   showOptionDialog(false)
   //
   //   // 구독해제
   //   return () => {
-  //     chat.off();
+  //     chat.off()
   //   }
   // }, [userid])
 
   React.useEffect(() => {
-    console.log(selectedEmoji);
+    console.log(selectedEmoji)
     if (input && selectedEmoji) {
-      input.value = input.value + selectedEmoji.emoji;
+      input.value = input.value + selectedEmoji.emoji
     }
-  }, [selectedEmoji]);
+  }, [selectedEmoji])
 
 
   React.useEffect(() => {
-    firebaseConnect(userid);
+    firebaseConnect(userid)
 
     showInfoDialog((target && target.key === userid) && target.value.state === 2)
-    showOptionDialog(false);
+    showOptionDialog(false)
 
     setTimeout(() => {
       if (body && body.current) {
-        body.current.scrollTop = body.current.scrollHeight;
+        body.current.scrollTop = body.current.scrollHeight
       }
     }, 10)
   }, [userid])
@@ -128,10 +128,10 @@ const Chat = ({ users, messages, settings, addMessages, deleteMessages, selected
 
       document.getElementById('file-drop-layer').addEventListener('drop', (e) => {
         e.preventDefault()
-        e.stopPropagation();
+        e.stopPropagation()
         showFileDropLayer(false)
         for (let f of e.dataTransfer.files) {
-          handleFileInput(e, f);
+          handleFileInput(e, f)
         }
       })
       /* file upload drag&drop event end */
@@ -141,24 +141,24 @@ const Chat = ({ users, messages, settings, addMessages, deleteMessages, selected
   const firebaseConnect = (userid) => {
     // 최초 1회만 연결
     if (userid && !messages[userid]) {
-      isLoading(true);
-      const database = props.database;
-      const databaseRef = '/' + settings.key + '/messages/' + userid;
+      isLoading(true)
+      const database = props.database
+      const databaseRef = '/' + settings.key + '/messages/' + userid
 
-      const chat = database.ref(databaseRef).orderByChild('timestamp').limitToLast(100);
+      const chat = database.ref(databaseRef).orderByChild('timestamp').limitToLast(100)
       chat.on('child_added', (snapshot) => {
-        addMessages({ key: userid, value: snapshot.val() });
-        refresh(snapshot.val().id);
+        addMessages({ key: userid, value: snapshot.val() })
+        refresh(snapshot.val().id)
 
         setTimeout(() => {
           if (body && body.current) {
-            body.current.scrollTop = body.current.scrollHeight;
+            body.current.scrollTop = body.current.scrollHeight
           }
-          isLoading(false);
+          isLoading(false)
         }, 10)
       })
 
-      CONNECTIONS[userid] = chat;
+      CONNECTIONS[userid] = chat
     }
   }
 
@@ -178,30 +178,50 @@ const Chat = ({ users, messages, settings, addMessages, deleteMessages, selected
       timestamp: new Date().getTime()
     })
     setTabState(1)
-    showInfoDialog(false);
+    showInfoDialog(false)
   }
 
   const handleFileInput = (e, file) => {
-    const config = { headers: { 'content-type': 'multipart/form-data' } }
-    const formData = new FormData();
-    console.log(e.target.files);
-    formData.append('file', file ? file : e.target.files[0]);
-    formData.append('key', key);
+    const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
+    const ALLOW_FILE_EXTENSIONS = [
+      "jpg", "jpeg", "gif", "bmp", "png", "tif", "tiff", "tga", "psd", "ai", // 이미지
+      "mp4", "m4v", "avi", "asf", "wmv", "mkv", "ts", "mpg", "mpeg", "mov", "flv", "ogv", // 동영상
+      "mp3", "wav", "flac", "tta", "tak", "aac", "wma", "ogg", "m4a", // 음성
+      "doc", "docx", "hwp", "txt", "rtf", "xml", "pdf", "wks", "wps", "xps", "md", "odf", "odt", "ods", "odp", "csv", "tsv", "xls", "xlsx", "ppt", "pptx", "pages", "key", "numbers", "show", "ce", // 문서
+      "zip", "gz", "bz2", "rar", "7z", "lzh", "alz"]
 
-    isLoading(true);
+    const target = file ? file : e.target.files[0]
+    const fileSize = target.size
+    const fileExtension = file.name.split('.').pop().toLowerCase()
+
+    if (MAX_FILE_SIZE < fileSize) {
+      alert('한 번에 업로드 할 수 있는 최대 파일 크기는 5MB 입니다.')
+      return
+    }
+    else if (ALLOW_FILE_EXTENSIONS.indexOf(fileExtension) === -1) {
+      alert('지원하지 않는 파일 형식입니다.')
+      return
+    }
+
+    const config = { headers: { 'content-type': 'multipart/form-data' } }
+    const formData = new FormData()
+    formData.append('file', target)
+    formData.append('key', key)
+
+    isLoading(true)
 
     return axios.post(global.serverAddress + '/api/upload', formData, config)
       .then(res => {
-        console.log('upload-success', res);
-        isLoading(false);
+        console.log('upload-success', res)
+        isLoading(false)
 
         if (res.data.result === 'success') {
-          sendMessage(key, userid, JSON.stringify(res.data.file), 2, database);
+          sendMessage(key, userid, JSON.stringify(res.data.file), 2, database)
         }
       })
       .catch(err => {
-        console.log('upload-failure', err);
-        isLoading(false);
+        console.log('upload-failure', err)
+        isLoading(false)
       })
   }
 
@@ -243,7 +263,7 @@ const Chat = ({ users, messages, settings, addMessages, deleteMessages, selected
           e.preventDefault()
           if (!input.value.trim()) return
 
-          sendMessage(key, userid, input.value, 1, database);
+          sendMessage(key, userid, input.value, 1, database)
           input.value = ''
         }}>
           <div className="message-addon">
@@ -272,13 +292,13 @@ const Chat = ({ users, messages, settings, addMessages, deleteMessages, selected
           </button>
           <div className="message-button-more"
             onClick={() => {
-              showOptionDialog(!optionDialog);
+              showOptionDialog(!optionDialog)
 
               // search test
-              // const search = database.ref('/' + key + '/messages/' + userid).orderByChild('message').startAt(input.value).endAt(input.value + "\uf8ff");
+              // const search = database.ref('/' + key + '/messages/' + userid).orderByChild('message').startAt(input.value).endAt(input.value + "\uf8ff")
               // const search = database.ref('/' + key + '/messages').orderByChild('message').startAt("[a-zA-Z0-9]*").endAt(input.value)
-              // search.once('value').then(c => console.log(input.value, c.val()));
-              // searchMessage();
+              // search.once('value').then(c => console.log(input.value, c.val()))
+              // searchMessage()
             }}>
             <i className="icon-options-vertical"></i>
           </div>
@@ -298,14 +318,14 @@ const Chat = ({ users, messages, settings, addMessages, deleteMessages, selected
           <div className="message-option-delete"
             onClick={() => {
               /* firebase */
-              database.ref('/' + key + '/messages/' + userid).remove();
-              database.ref('/' + key + '/users/' + userid).remove();
+              database.ref('/' + key + '/messages/' + userid).remove()
+              database.ref('/' + key + '/users/' + userid).remove()
               /* redux store */
-              deleteMessages({ key: userid });
-              selectedUser({});
+              deleteMessages({ key: userid })
+              selectedUser({})
               /* connections */
-              CONNECTIONS[userid].off();
-              delete CONNECTIONS[userid];
+              CONNECTIONS[userid].off()
+              delete CONNECTIONS[userid]
 
               alert('이 대화가 삭제처리 되었습니다.')
             }}>
@@ -347,4 +367,4 @@ const mapDispatchToProps = dispatch => ({
 })
 
 // export default Chat
-export default connect(mapStateToProps, mapDispatchToProps)(Chat);
+export default connect(mapStateToProps, mapDispatchToProps)(Chat)

@@ -1,28 +1,28 @@
-import React from 'react';
-import User from './User';
-import { connect } from 'react-redux';
+import React from 'react'
+import User from './User'
+import { connect } from 'react-redux'
 
 const UserList = ({ users, ...props }) => {
-  const tabState = props.tabState;
-  const setTabState = props.setTabState;
+  const tabState = props.tabState
+  const setTabState = props.setTabState
 
-  const [countWait, setCountWait] = React.useState(0);
-  const [countProgress, setCountProgress] = React.useState(0);
-  const [countComplete, setCountComplete] = React.useState(0);
+  const [countWait, setCountWait] = React.useState(0)
+  const [countProgress, setCountProgress] = React.useState(0)
+  const [countComplete, setCountComplete] = React.useState(0)
 
   React.useEffect(() => {
     setCountWait(users.filter((f) => {
-      const userState = f.value.state ? f.value.state : 0;
+      const userState = f.value.state ? f.value.state : 0
       return userState === 0
     }).length)
 
     setCountProgress(users.filter((f) => {
-      const userState = f.value.state;
+      const userState = f.value.state
       return userState === 1
     }).length)
 
     setCountComplete(users.filter((f) => {
-      const userState = f.value.state;
+      const userState = f.value.state
       return userState === 2
     }).length)
   }, [users])
@@ -53,7 +53,7 @@ const UserList = ({ users, ...props }) => {
         className="chat-users"
         key="chat-list">
         { users.filter((f) => {
-          const userState = f.value.state ? f.value.state : 0;
+          const userState = f.value.state ? f.value.state : 0
           return userState === tabState
         }).map((m, i) => (
           <User
@@ -71,4 +71,4 @@ const mapStateToProps = state => ({
 })
 
 // export default UserList
-export default connect(mapStateToProps)(UserList);
+export default connect(mapStateToProps)(UserList)

@@ -1,15 +1,15 @@
-import React from 'react';
-import { connect } from 'react-redux';
+import React from 'react'
+import { connect } from 'react-redux'
 import { selectedUser, addMessages } from '../actions'
-import * as script from '../js/script.js';
+import * as script from '../js/script.js'
 
 const User = ({ messages, settings, addMessages, selectedUser, ...props }) => {
-  const userInfo = props.data.value;
-  const lastMessage = (userInfo && userInfo.lastMessage) ? userInfo.lastMessage : '';
-  const dateTime = (userInfo && userInfo.timestamp) ? userInfo.timestamp : null;
+  const userInfo = props.data.value
+  const lastMessage = (userInfo && userInfo.lastMessage) ? userInfo.lastMessage : ''
+  const dateTime = (userInfo && userInfo.timestamp) ? userInfo.timestamp : null
 
-  const guestCode = props.data.guestCode;
-  const colorCode = props.data.colorCode;
+  const guestCode = props.data.guestCode
+  const colorCode = props.data.colorCode
 
   // console.log('user', props.data)
 
@@ -18,15 +18,15 @@ const User = ({ messages, settings, addMessages, selectedUser, ...props }) => {
   }, [])
 
   // const firebaseConnect = (userid) => {
-  //   console.log('firebase connect', userid);
+  //   console.log('firebase connect', userid)
   //   if (userid && !messages[userid]) {
-  //     const database = props.database;
-  //     const databaseRef = '/' + settings.key + '/messages/' + userid;
+  //     const database = props.database
+  //     const databaseRef = '/' + settings.key + '/messages/' + userid
   //
-  //     const chat = database.ref(databaseRef).orderByChild('timestamp');
+  //     const chat = database.ref(databaseRef).orderByChild('timestamp')
   //     chat.on('child_added', function(snapshot) {
-  //       addMessages({ key: userid, value: snapshot.val() });
-  //     });
+  //       addMessages({ key: userid, value: snapshot.val() })
+  //     })
   //   }
   // }
 
@@ -34,8 +34,8 @@ const User = ({ messages, settings, addMessages, selectedUser, ...props }) => {
     <div
       className={settings.selectedUser.key === props.data.key ? 'chat-user active' : 'chat-user'}
       onClick={() => {
-        selectedUser(props.data);
-        // firebaseConnect(props.data.key);
+        selectedUser(props.data)
+        // firebaseConnect(props.data.key)
       }}>
 
       <div className="chat-user-icon">
@@ -48,7 +48,7 @@ const User = ({ messages, settings, addMessages, selectedUser, ...props }) => {
         <div className="chat-user-detail">
           <div className="chat-user-message">{ lastMessage }</div>
           { dateTime && (
-            <>            
+            <>
             <div className="chat-user-datetime">{ script.getNiceTime(dateTime, new Date(), 1, true) }</div>
             </>
           )}
@@ -68,4 +68,4 @@ const mapDispatchToProps = dispatch => ({
 })
 
 // export default User
-export default connect(mapStateToProps, mapDispatchToProps)(User);
+export default connect(mapStateToProps, mapDispatchToProps)(User)

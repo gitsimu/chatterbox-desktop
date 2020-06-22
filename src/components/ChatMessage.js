@@ -1,31 +1,31 @@
-import React from 'react';
-import { connect } from 'react-redux';
-import * as script from '../js/script.js';
+import React from 'react'
+import { connect } from 'react-redux'
+import * as script from '../js/script.js'
 
 const ChatMessage = ({ users, settings, ...props }) => {
-  const isMyself = props.opponent !== props.userId;
-  const isSameUser = (props.prev && (props.prev.userId === props.userId));
-  const target = props.target.value;
-  const showImageViewer = props.showImageViewer;
+  const isMyself = props.opponent !== props.userId
+  const isSameUser = (props.prev && (props.prev.userId === props.userId))
+  const target = props.target.value
+  const showImageViewer = props.showImageViewer
 
   const skipDate = () => {
-    if (!props.prev) return false;
+    if (!props.prev) return false
     else {
-      const prevDate = script.timestampToDay(props.prev.timestamp);
-      const curDate = script.timestampToDay(props.timestamp);
+      const prevDate = script.timestampToDay(props.prev.timestamp)
+      const curDate = script.timestampToDay(props.timestamp)
 
-      return (prevDate === curDate) ? true : false;
+      return (prevDate === curDate) ? true : false
     }
   }
 
-  let messageInner;
+  let messageInner
   if (props.type === 1) {
-    messageInner = <div className="message-inner">{ props.message }</div>;
+    messageInner = <div className="message-inner">{ props.message }</div>
   }
   else {
-    const images = ['jpg', 'png', 'gif', 'jpeg', 'bmp'];
-    const extension = JSON.parse(props.message).location.split('.').pop();
-    const expired = script.timestampToDay(props.timestamp, 1, 0);
+    const images = ['jpg', 'png', 'gif', 'jpeg', 'bmp']
+    const extension = JSON.parse(props.message).location.split('.').pop()
+    const expired = script.timestampToDay(props.timestamp, 1, 0)
 
     messageInner =
     <div>
@@ -34,7 +34,7 @@ const ChatMessage = ({ users, settings, ...props }) => {
           className="message-thumbnail"
           onClick={() => {
             // window.parent.postMessage({ method: 'image', url: JSON.parse(props.message).location })
-            showImageViewer(JSON.parse(props.message).location);
+            showImageViewer(JSON.parse(props.message).location)
           }}>
           <img src={ JSON.parse(props.message).location }/>
         </div>
@@ -47,7 +47,7 @@ const ChatMessage = ({ users, settings, ...props }) => {
           className="message-file-save"
           onClick={() => {
             setTimeout(() => {
-              window.open(JSON.parse(props.message).location);
+              window.open(JSON.parse(props.message).location)
             }, 100)
           }}>
           저장하기
@@ -103,5 +103,5 @@ const mapStateToProps = state => ({
   settings: state.settings,
 })
 
-// export default ChatMessage;
-export default connect(mapStateToProps)(ChatMessage);
+// export default ChatMessage
+export default connect(mapStateToProps)(ChatMessage)

@@ -1,18 +1,18 @@
-import React from 'react';
-import { connect } from 'react-redux';
+import React from 'react'
+import { connect } from 'react-redux'
 
 const Memo = ({ users, settings, ...props }) => {
-  const key = settings.key;
-  const database = props.database;
+  const key = settings.key
+  const database = props.database
 
   const m = (settings.selectedUser.value &&
             settings.selectedUser.value.memo) ?
-            settings.selectedUser.value.memo : '';
-  const [memo, setMemo] = React.useState(m);
+            settings.selectedUser.value.memo : ''
+  const [memo, setMemo] = React.useState(m)
 
   React.useEffect(() => {
-    setMemo(m);
-  }, [settings.selectedUser, m]);
+    setMemo(m)
+  }, [settings.selectedUser, m])
 
   return (
     <div className="chat-memo card">
@@ -30,12 +30,12 @@ const Memo = ({ users, settings, ...props }) => {
           <div
             onClick={() => {
               if (memo.length > 200) {
-                alert('메모는 200자를 넘길 수 없습니다.');
-                return;
+                alert('메모는 200자를 넘길 수 없습니다.')
+                return
               }
 
               database.ref('/' + key + '/users/' + settings.selectedUser.key).update({ memo: memo })
-              alert('메모를 저장하였습니다.');
+              alert('메모를 저장하였습니다.')
             }}>메모 저장하기</div>
         )}
       </div>
@@ -49,5 +49,5 @@ const mapStateToProps = state => ({
   settings: state.settings,
 })
 
-// export default Memo;
-export default connect(mapStateToProps)(Memo);
+// export default Memo
+export default connect(mapStateToProps)(Memo)

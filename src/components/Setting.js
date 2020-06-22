@@ -1,88 +1,88 @@
-import React from 'react';
-import { connect } from 'react-redux';
-import axios from 'axios';
-import Mockup from './Mockup';
-import { ChromePicker } from 'react-color';
+import React from 'react'
+import { connect } from 'react-redux'
+import axios from 'axios'
+import Mockup from './Mockup'
+import { ChromePicker } from 'react-color'
 
 const Setting = ({ settings, ...props }) => {
-  const database = props.database;
-  const databaseRef = '/' + settings.key + '/' + 'config';
-  const info = database.ref(databaseRef);
+  const database = props.database
+  const databaseRef = '/' + settings.key + '/' + 'config'
+  const info = database.ref(databaseRef)
 
-  const [title, setTitle] = React.useState('');
-  const [subTitle, setSubTitle] = React.useState('');
-  const [nickname, setNickname] = React.useState('');
-  const [firstMessage, setFirstMessage] = React.useState('');
-  const [profileImage, setProfileImage] = React.useState(null);
-  const [themeColor, setThemeColor] = React.useState('#444c5d');
-  const [themeColorPicker, showThemeColorPicker] = React.useState(false);
+  const [title, setTitle] = React.useState('')
+  const [subTitle, setSubTitle] = React.useState('')
+  const [nickname, setNickname] = React.useState('')
+  const [firstMessage, setFirstMessage] = React.useState('')
+  const [profileImage, setProfileImage] = React.useState(null)
+  const [themeColor, setThemeColor] = React.useState('#444c5d')
+  const [themeColorPicker, showThemeColorPicker] = React.useState(false)
 
-  const [settingMenuState, setSettingMenuState] = React.useState(0);
-  const isLoading = props.isLoading;
+  const [settingMenuState, setSettingMenuState] = React.useState(0)
+  const isLoading = props.isLoading
 
   React.useEffect(() => {
     info.once('value', function(snapshot) {
-      const data = snapshot.val();
-      if (!data) return;
+      const data = snapshot.val()
+      if (!data) return
 
       // console.log('setting effect')
-      setTitle(data.title);
-      setSubTitle(data.subTitle);
-      setNickname(data.nickname);
-      setFirstMessage(data.firstMessage);
-      setThemeColor(data.themeColor);
-      setProfileImage(data.profileImage ? data.profileImage : null);
+      setTitle(data.title)
+      setSubTitle(data.subTitle)
+      setNickname(data.nickname)
+      setFirstMessage(data.firstMessage)
+      setThemeColor(data.themeColor)
+      setProfileImage(data.profileImage ? data.profileImage : null)
     })
   }, [])
 
   const handleFileInput = (e) => {
     const config = { headers: { 'content-type': 'multipart/form-data' } }
-    const formData = new FormData();
-    formData.append('file', e.target.files[0]);
-    formData.append('key', settings.key);
+    const formData = new FormData()
+    formData.append('file', e.target.files[0])
+    formData.append('key', settings.key)
 
-    isLoading(true);
+    isLoading(true)
 
     return axios.post(global.serverAddress + '/api/upload', formData, config)
       .then(res => {
-        console.log('upload-success', res);
-        isLoading(false);
+        console.log('upload-success', res)
+        isLoading(false)
 
         if (res.data.result === 'success') {
-          const path = JSON.stringify(res.data.file);
-          info.update({ profileImage: path });
-          setProfileImage(path);
+          const path = JSON.stringify(res.data.file)
+          info.update({ profileImage: path })
+          setProfileImage(path)
         }
       })
       .catch(err => {
-        console.log('upload-failure', err);
-        isLoading(false);
+        console.log('upload-failure', err)
+        isLoading(false)
       })
   }
 
   const handleFileRemove = () => {
-    if (profileImage === null) return;
+    if (profileImage === null) return
 
-    info.update({ profileImage: null });
-    setProfileImage(null);
+    info.update({ profileImage: null })
+    setProfileImage(null)
 
     // s3 file remove
     const config = { headers: { 'content-type': 'multipart/form-data' } }
-    const formData = new FormData();
-    formData.append('filename', JSON.parse(profileImage).name);
-    formData.append('key', settings.key);
+    const formData = new FormData()
+    formData.append('filename', JSON.parse(profileImage).name)
+    formData.append('key', settings.key)
 
     return axios.post(global.serverAddress + '/api/remove', formData, config)
       .then(res => {
-        console.log('upload-success', res);
-        isLoading(false);
+        console.log('upload-success', res)
+        isLoading(false)
 
         if (res.data.result === 'success') {
-          console.log(res);
+          console.log(res)
         }
       })
       .catch(err => {
-        console.log('upload-failure', err);
+        console.log('upload-failure', err)
       })
   }
 
@@ -94,7 +94,7 @@ const Setting = ({ settings, ...props }) => {
       firstMessage: firstMessage.trim(),
       themeColor: themeColor,
       // profileImagePath: profileImagePath,
-    });
+    })
   }
 
   return (
@@ -146,7 +146,7 @@ const Setting = ({ settings, ...props }) => {
                     value={themeColor}
                     onChange={() => {}}
                     onClick={() => {
-                      showThemeColorPicker(!themeColorPicker);
+                      showThemeColorPicker(!themeColorPicker)
                     }}/>
                   <div className="setting-color-sample" style={{ backgroundColor: themeColor }}></div>
                   <div className={themeColorPicker ? "setting-color-picker active" : "setting-color-picker"}>
@@ -224,5 +224,5 @@ const mapStateToProps = state => ({
   settings: state.settings,
 })
 
-// export default Setting;
-export default connect(mapStateToProps)(Setting);
+// export default Setting
+export default connect(mapStateToProps)(Setting)
