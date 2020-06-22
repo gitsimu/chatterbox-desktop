@@ -97,7 +97,7 @@ function Main({ users, messages, settings, addUsers, clearUsers, selectedUser, s
                   const target = USERS.filter((u) => { return u.key === recentsData.userId})
                   if (target.length > 0) {
                     setScreenState(0)
-                    setTabState(target[0].value.state ? target[0].value.state : 0)
+                    setTabState(target[0].value.state || 0)
                     selectedUser(target[0])
                   }
                 }
@@ -146,7 +146,10 @@ function Main({ users, messages, settings, addUsers, clearUsers, selectedUser, s
           <div className="chat-lnb-item sign-out"
             onClick={() => {
               /* local storage*/
-              storage.remove('userData', (err) => { console.log('[ERROR] Local storage remove failure', err) })
+              storage.remove('userData', (err) => {
+                if (err) throw err
+                console.log('[ERROR] Local storage remove failure', err)
+              })
               signOut()
             }}>
             <i className="icon-power"></i>

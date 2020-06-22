@@ -12,7 +12,7 @@ const UserList = ({ users, ...props }) => {
 
   React.useEffect(() => {
     setCountWait(users.filter((f) => {
-      const userState = f.value.state ? f.value.state : 0
+      const userState = f.value.state || 0
       return userState === 0
     }).length)
 
@@ -53,7 +53,7 @@ const UserList = ({ users, ...props }) => {
         className="chat-users"
         key="chat-list">
         { users.filter((f) => {
-          const userState = f.value.state ? f.value.state : 0
+          const userState = f.value.state || 0
           return userState === tabState
         }).map((m, i) => (
           <User

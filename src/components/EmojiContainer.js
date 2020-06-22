@@ -9,7 +9,7 @@ const EmojiConatiner = (props) => {
   },[])
 
   return (
-    <div className={props.getState === true ? 'emoji-container active' : 'emoji-container'}>
+    <div className={(props.getState === true) ? 'emoji-container active' : 'emoji-container'}>
       { emoji && emoji.split(',').map((m, i) => (
         <div
           key={i}

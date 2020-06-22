@@ -204,7 +204,7 @@ export const guestCodeGenerator = (uid) => {
   const code3 = parseInt(uid32.slice(uid32.length - 4, uid32.length - 3), 32); // 32
   const code4 = parseInt(uid.slice(0, 2), 32);
 
-  const obj = new Object();
+  const obj = {};
   if (name1[code1] && name2[code2 + code3]) {
     obj.guestCode = name1[code1] + ' ' + name2[code2 + code3] + ' ' + code4;
     obj.colorCode = color1[code1];

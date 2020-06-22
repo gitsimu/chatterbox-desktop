@@ -100,43 +100,26 @@ const Chat = ({ users, messages, settings, addMessages, deleteMessages, selected
 
   React.useEffect(() => {
     if (body && body.current && key) {
-      /* 파일 드래그&드랍 지원 이벤트
+      /* 파일 드래그&드랍 지원 이벤트 할당
        * dragover
        * dragenter
        * dragleave
        * drop
        */
-      document.getElementById('file-drop-layer').addEventListener('dragover', (e) => {
-        e.preventDefault()
-        e.stopPropagation()
-      })
+      body.current.addEventListener('dragenter', handleDragEnter)
+      document.getElementById('file-drop-layer').addEventListener('dragover', handleDragOver)
+      document.getElementById('file-drop-layer').addEventListener('dragleave', handleDragLeave)
+      document.getElementById('file-drop-layer').addEventListener('drop', handleDrop)
 
-      body.current.addEventListener('dragenter', (e) => {
-        e.preventDefault()
-        e.stopPropagation()
-        console.log('enter', e.dataTransfer)
-        if (e.dataTransfer) {
-          showFileDropLayer(true)
-        }
-      })
-
-      document.getElementById('file-drop-layer').addEventListener('dragleave', (e) => {
-        e.preventDefault()
-        e.stopPropagation()
-        showFileDropLayer(false)
-      })
-
-      document.getElementById('file-drop-layer').addEventListener('drop', (e) => {
-        e.preventDefault()
-        e.stopPropagation()
-        showFileDropLayer(false)
-        for (let f of e.dataTransfer.files) {
-          handleFileInput(e, f)
-        }
-      })
-      /* file upload drag&drop event end */
+      /* 이벤트 해제 */
+      return () => {
+        body.current.removeEventListener('dragenter', handleDragEnter)
+        document.getElementById('file-drop-layer').removeEventListener('dragover', handleDragOver)
+        document.getElementById('file-drop-layer').removeEventListener('dragleave', handleDragLeave)
+        document.getElementById('file-drop-layer').removeEventListener('drop', handleDrop)
+      }
     }
-  }, [])
+  }, [userid])
 
   const firebaseConnect = (userid) => {
     // 최초 1회만 연결
@@ -190,15 +173,14 @@ const Chat = ({ users, messages, settings, addMessages, deleteMessages, selected
       "doc", "docx", "hwp", "txt", "rtf", "xml", "pdf", "wks", "wps", "xps", "md", "odf", "odt", "ods", "odp", "csv", "tsv", "xls", "xlsx", "ppt", "pptx", "pages", "key", "numbers", "show", "ce", // 문서
       "zip", "gz", "bz2", "rar", "7z", "lzh", "alz"]
 
-    const target = file ? file : e.target.files[0]
+    const target = file || e.target.files[0]
     const fileSize = target.size
-    const fileExtension = file.name.split('.').pop().toLowerCase()
+    const fileExtension = target.name.split('.').pop().toLowerCase()
 
     if (MAX_FILE_SIZE < fileSize) {
       alert('한 번에 업로드 할 수 있는 최대 파일 크기는 5MB 입니다.')
       return
-    }
-    else if (ALLOW_FILE_EXTENSIONS.indexOf(fileExtension) === -1) {
+    } else if (ALLOW_FILE_EXTENSIONS.indexOf(fileExtension) === -1) {
       alert('지원하지 않는 파일 형식입니다.')
       return
     }
@@ -227,6 +209,35 @@ const Chat = ({ users, messages, settings, addMessages, deleteMessages, selected
 
   const handleEmojiContainer = (e) => {
     showEmojiContainer(!emojiContainer)
+  }
+
+  const handleDragOver = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+  }
+
+  const handleDragEnter = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (e.dataTransfer) {
+      showFileDropLayer(true)
+    }
+  }
+
+  const handleDragLeave = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    showFileDropLayer(false)
+  }
+
+  const handleDrop = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+
+    showFileDropLayer(false)
+    for (let f of e.dataTransfer.files) {
+      handleFileInput(e, f)
+    }
   }
 
   return (

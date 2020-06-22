@@ -31,7 +31,7 @@ const Setting = ({ settings, ...props }) => {
       setNickname(data.nickname)
       setFirstMessage(data.firstMessage)
       setThemeColor(data.themeColor)
-      setProfileImage(data.profileImage ? data.profileImage : null)
+      setProfileImage(data.profileImage || null)
     })
   }, [])
 

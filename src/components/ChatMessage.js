@@ -9,8 +9,9 @@ const ChatMessage = ({ users, settings, ...props }) => {
   const showImageViewer = props.showImageViewer
 
   const skipDate = () => {
-    if (!props.prev) return false
-    else {
+    if (!props.prev) {
+      return false
+    } else {
       const prevDate = script.timestampToDay(props.prev.timestamp)
       const curDate = script.timestampToDay(props.timestamp)
 
@@ -21,8 +22,7 @@ const ChatMessage = ({ users, settings, ...props }) => {
   let messageInner
   if (props.type === 1) {
     messageInner = <div className="message-inner">{ props.message }</div>
-  }
-  else {
+  } else {
     const images = ['jpg', 'png', 'gif', 'jpeg', 'bmp']
     const extension = JSON.parse(props.message).location.split('.').pop()
     const expired = script.timestampToDay(props.timestamp, 1, 0)
