@@ -42,7 +42,7 @@ const Chat = ({ users, messages, settings, addMessages, deleteMessages, selected
 
   const [fileDropLayer, showFileDropLayer] = React.useState(false);
   const body = React.useRef(null);
-  let form, input, path;
+  let form, input;
 
   // React.useEffect(() => {
   //   dispatch({ type: 'clearMessage' });
@@ -100,24 +100,27 @@ const Chat = ({ users, messages, settings, addMessages, deleteMessages, selected
 
   React.useEffect(() => {
     if (body && body.current && key) {
+      /* 파일 드래그&드랍 지원 이벤트
+       * dragover
+       * dragenter
+       * dragleave
+       * drop
+       */
       document.getElementById('file-drop-layer').addEventListener('dragover', (e) => {
         e.preventDefault()
         e.stopPropagation()
-        console.log('dragover')
       })
 
       body.current.addEventListener('dragenter', (e) => {
         e.preventDefault()
         e.stopPropagation()
         showFileDropLayer(true)
-        console.log('dragenter')
       })
 
       document.getElementById('file-drop-layer').addEventListener('dragleave', (e) => {
         e.preventDefault()
         e.stopPropagation()
         showFileDropLayer(false)
-        console.log('dragleave')
       })
 
       document.getElementById('file-drop-layer').addEventListener('drop', (e) => {
@@ -125,11 +128,10 @@ const Chat = ({ users, messages, settings, addMessages, deleteMessages, selected
         e.stopPropagation();
         showFileDropLayer(false)
         for (let f of e.dataTransfer.files) {
-          console.log('the files you dragged: ', f)
-          path = f.path;
-          // handleFileInput(e, f);
+          handleFileInput(e, f);
         }
       })
+      /* file upload drag&drop event end */
     }
   }, [])
 
@@ -159,9 +161,10 @@ const Chat = ({ users, messages, settings, addMessages, deleteMessages, selected
 
   const sendMessage = (key, id, message, type, database) => {
     const messageId = Math.random().toString(36).substr(2, 9)
+    const lastMessage = (type === 2) ? JSON.parse(message).name : message
     database.ref('/' + key + '/users/' + id).update({
       state:1,
-      lastMessage: message,
+      lastMessage: lastMessage,
       timestamp: new Date().getTime(),
     })
     database.ref('/' + key + '/messages/' + id + '/' + messageId).update({
@@ -293,7 +296,7 @@ const Chat = ({ users, messages, settings, addMessages, deleteMessages, selected
               /* firebase */
               database.ref('/' + key + '/messages/' + userid).remove();
               database.ref('/' + key + '/users/' + userid).remove();
-              /* redux store*/
+              /* redux store */
               deleteMessages({ key: userid });
               selectedUser({});
               /* connections */
