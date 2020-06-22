@@ -3,144 +3,36 @@ import ChatMessage from './ChatMessage'
 import EmojiContainer from './EmojiContainer'
 import axios from 'axios'
 import { connect } from 'react-redux'
-import { addMessages, deleteMessages, selectedUser } from '../actions'
-
-// const initialState = {messages: []}
-// function reducer(state, action) {
-//     switch (action.type) {
-//       case 'addMessage':
-//         return {
-//           messages: [...state.messages, action.messages],
-//           userid: action.userid,
-//         }
-//       case 'clearMessage':
-//         return {messages: []}
-//       default:
-//         throw new Error()
-//     }
-// }
+import { addMessages, deleteMessages, clearMessages, selectedUser } from '../actions'
 
 const CONNECTIONS = {}
-const Chat = ({ users, messages, settings, addMessages, deleteMessages, selectedUser, ...props }) => {
+const Chat = ({ users, messages, settings, addMessages, deleteMessages, clearMessages, selectedUser, ...props }) => {
   const key = settings.key
   const userid = settings.selectedUser.key
   const database = props.database
-  const tabState = props.tabState
   const setTabState = props.setTabState
   const target = settings.selectedUser
 
-  // const [state, dispatch] = React.useReducer(reducer, initialState)
   const [optionDialog, showOptionDialog] = React.useState(false)
   const [infoDialog, showInfoDialog] = React.useState(false)
   const [emojiContainer, showEmojiContainer] = React.useState(false)
   const [selectedEmoji, selectEmoji] = React.useState(null)
   const [loading, isLoading] = React.useState(false)
-
-  const [searchResult, setSearchResult] = React.useState({})
-  const [messageId, refresh] = React.useState(null)
-
+  const [refresh, doRefresh] = React.useState(null)
   const [fileDropLayer, showFileDropLayer] = React.useState(false)
   const body = React.useRef(null)
+
   let form, input
 
-  // React.useEffect(() => {
-  //   dispatch({ type: 'clearMessage' })
-  //   const chat = database.ref(databaseRef).orderByChild('timestamp')
-  //
-  //   // 구독
-  //   chat.on('child_added', function(snapshot) {
-  //     if (snapshot.key === 'userinfo'
-  //      || snapshot.key === 'timestamp') return // ignore userinfo, timestamp
-  //
-  //     dispatch({
-  //       type: 'addMessage',
-  //       messages: snapshot.val(),
-  //       userid: userid
-  //     })
-  //     console.log('addMessage', snapshot.val())
-  //
-  //     setTimeout(() => {
-  //       if (body && body.current) {
-  //         body.current.scrollTop = body.current.scrollHeight
-  //       }
-  //     }, 100)
-  //   })
-  //
-  //   // info dialog
-  //   showInfoDialog((target && target.key === userid) && target.value.state === 2)
-  //   showOptionDialog(false)
-  //
-  //   // 구독해제
-  //   return () => {
-  //     chat.off()
-  //   }
-  // }, [userid])
-
-  React.useEffect(() => {
-    console.log(selectedEmoji)
-    if (input && selectedEmoji) {
-      input.value = input.value + selectedEmoji.emoji
-    }
-  }, [selectedEmoji])
-
-  React.useEffect(() => {
-    firebaseConnect(userid)
-
-    showInfoDialog((target && target.key === userid) && target.value.state === 2)
-    showOptionDialog(false)
-
-    setTimeout(() => {
-      if (body && body.current) {
-        body.current.scrollTop = body.current.scrollHeight
-      }
-    }, 10)
-  }, [userid])
-
-  React.useEffect(() => {
-    if (body && body.current && key) {
-      /* 파일 드래그&드랍 지원 이벤트 할당
-       * dragover
-       * dragenter
-       * dragleave
-       * drop
-       */
-      body.current.addEventListener('dragenter', handleDragEnter)
-      document.getElementById('file-drop-layer').addEventListener('dragover', handleDragOver)
-      document.getElementById('file-drop-layer').addEventListener('dragleave', handleDragLeave)
-      document.getElementById('file-drop-layer').addEventListener('drop', handleDrop)
-
-      /* 이벤트 해제 */
-      return () => {
-        body.current.removeEventListener('dragenter', handleDragEnter)
-        document.getElementById('file-drop-layer').removeEventListener('dragover', handleDragOver)
-        document.getElementById('file-drop-layer').removeEventListener('dragleave', handleDragLeave)
-        document.getElementById('file-drop-layer').removeEventListener('drop', handleDrop)
-      }
-    }
-  }, [userid])
-
-  React.useEffect(() => {
-    /* Sign out 등의 이유로 Chat 객체를 내릴 때
-     * 연결되어있는 firebase connection을 모두 off 처리한다
-     */
-    return () => {
-      Object.keys(CONNECTIONS).map((u, i) => {
-        console.log('[Connection off]', CONNECTIONS[u])
-        CONNECTIONS[u].off()
-      })
-    }
-  }, [])
-
-  const firebaseConnect = (userid) => {
-    // 최초 1회만 연결
-    if (userid && !messages[userid]) {
+  const firebaseConnect = React.useCallback((userid) => {
+    if (userid && !messages[userid]) { // 최초 1회만 연결
       isLoading(true)
       const database = props.database
-      const chat = database.ref(`/${settings.key}/messages/${userid}`).orderByChild('timestamp').limitToLast(100)
+      const chat = database.ref(`/${settings.key}/messages/${userid}`).orderByChild('timestamp').limitToLast(50)
       chat.on('child_added', (snapshot) => {
-        addMessages({ key: userid, value: snapshot.val() })
-        refresh(snapshot.val().id)
-
+        const value = snapshot.val()
+        addMessages({ key: userid, value: value })
+        doRefresh(refresh !== value.id ? value.id : null)
         setTimeout(() => {
           if (body && body.current) {
             body.current.scrollTop = body.current.scrollHeight
@@ -151,11 +43,12 @@ const Chat = ({ users, messages, settings, addMessages, deleteMessages, selected
 
       CONNECTIONS[userid] = chat
     }
-  }
+  }, [messages, refresh, props.database, settings.key, addMessages])
 
-  const sendMessage = (key, id, message, type, database) => {
+  const sendMessage = React.useCallback((key, id, message, type, database) => {
     const messageId = Math.random().toString(36).substr(2, 9)
     const lastMessage = (type === 2) ? JSON.parse(message).name : message
+
     database.ref(`/${key}/users/${id}`).update({
       state:1,
       lastMessage: lastMessage,
@@ -170,9 +63,13 @@ const Chat = ({ users, messages, settings, addMessages, deleteMessages, selected
     })
     setTabState(1)
     showInfoDialog(false)
+  }, [setTabState])
+
+  const handleEmojiContainer = () => {
+    showEmojiContainer(!emojiContainer)
   }
 
-  const handleFileInput = (e, file) => {
+  const handleFileInput = React.useCallback((e, file) => {
     const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
     const ALLOW_FILE_EXTENSIONS = [
       'jpg', 'jpeg', 'gif', 'bmp', 'png', 'tif', 'tiff', 'tga', 'psd', 'ai', // 이미지
@@ -193,66 +90,124 @@ const Chat = ({ users, messages, settings, addMessages, deleteMessages, selected
       return
     }
 
+    isLoading(true)
     const config = { headers: { 'content-type': 'multipart/form-data' } }
     const formData = new FormData()
+
     formData.append('file', target)
     formData.append('key', key)
 
-    isLoading(true)
-
     return axios.post(`${global.serverAddress}/api/upload`, formData, config)
       .then(res => {
-        console.log('upload-success', res)
         isLoading(false)
-
         if (res.data.result === 'success') {
           sendMessage(key, userid, JSON.stringify(res.data.file), 2, database)
+          console.log('upload-success', res)
         }
       })
       .catch(err => {
-        console.log('upload-failure', err)
         isLoading(false)
+        if (err) {
+          console.log('upload-failure', err)
+          throw err
+        }
       })
-  }
+  }, [database, key, sendMessage, userid])
 
-  const handleEmojiContainer = (e) => {
-    showEmojiContainer(!emojiContainer)
-  }
-
-  const handleDragOver = (e) => {
-    e.preventDefault()
-    e.stopPropagation()
-  }
-
-  const handleDragEnter = (e) => {
-    e.preventDefault()
-    e.stopPropagation()
-    if (e.dataTransfer) {
-      showFileDropLayer(true)
+  React.useEffect(() => {
+    console.log(selectedEmoji)
+    if (input && selectedEmoji) {
+      input.value = input.value + selectedEmoji.emoji
     }
-  }
+  }, [input, selectedEmoji])
 
-  const handleDragLeave = (e) => {
-    e.preventDefault()
-    e.stopPropagation()
-    showFileDropLayer(false)
-  }
+  React.useEffect(() => {
+    firebaseConnect(userid)
 
-  const handleDrop = (e) => {
-    e.preventDefault()
-    e.stopPropagation()
+    showInfoDialog((target && target.key === userid) && target.value.state === 2)
+    showOptionDialog(false)
 
-    showFileDropLayer(false)
-    for (let f of e.dataTransfer.files) {
-      handleFileInput(e, f)
+    setTimeout(() => {
+      if (body && body.current) {
+        body.current.scrollTop = body.current.scrollHeight
+      }
+    }, 10)
+  }, [userid, target, firebaseConnect])
+
+  React.useEffect(() => {
+    const handleDragOver = (e) => {
+      e.preventDefault()
+      e.stopPropagation()
     }
-  }
+
+    const handleDragEnter = (e) => {
+      e.preventDefault()
+      e.stopPropagation()
+      if (e.dataTransfer) {
+        showFileDropLayer(true)
+      }
+    }
+
+    const handleDragLeave = (e) => {
+      e.preventDefault()
+      e.stopPropagation()
+      showFileDropLayer(false)
+    }
+
+    const handleDrop = (e) => {
+      e.preventDefault()
+      e.stopPropagation()
+
+      showFileDropLayer(false)
+      for (let f of e.dataTransfer.files) {
+        handleFileInput(e, f)
+      }
+    }
+
+    /* 파일 드래그&드랍 지원 이벤트
+     * dragover
+     * dragenter
+     * dragleave
+     * drop
+     */
+    if (body && body.current && key) {
+      const chatBody = body.current
+
+      /* 이벤트 할당 */
+      chatBody.addEventListener('dragenter', handleDragEnter)
+      document.getElementById('file-drop-layer').addEventListener('dragover', handleDragOver)
+      document.getElementById('file-drop-layer').addEventListener('dragleave', handleDragLeave)
+      document.getElementById('file-drop-layer').addEventListener('drop', handleDrop)
+
+      /* 이벤트 해제 */
+      return () => {
+        chatBody.removeEventListener('dragenter', handleDragEnter)
+        document.getElementById('file-drop-layer').removeEventListener('dragover', handleDragOver)
+        document.getElementById('file-drop-layer').removeEventListener('dragleave', handleDragLeave)
+        document.getElementById('file-drop-layer').removeEventListener('drop', handleDrop)
+      }
+    }
+  }, [key, handleFileInput])
+
+  React.useEffect(() => {
+    /* Sign out 등의 이유로 Chat 객체를 내릴 때
+     * 연결되어있는 firebase connection을 모두 off 처리한다
+     */
+    return () => {
+      clearMessages()
+      Object.keys(CONNECTIONS).forEach((u, i) => {
+        console.log('[Connection off]', CONNECTIONS[u])
+        CONNECTIONS[u].off()
+        delete CONNECTIONS[u]
+      })
+    }
+  }, [clearMessages])
 
   return (
     <>
       <div className='messages card' ref={body}>
-        { (messages[userid]) &&  // 중복호출 예외처리
-           (messages[userid].map((m, i) => (
+        { (messages[userid]) // 중복호출 예외처리
+          && (messages[userid].map((m, i) => (
            <ChatMessage
              opponent={userid}
              target={target}
@@ -264,8 +219,7 @@ const Chat = ({ users, messages, settings, addMessages, deleteMessages, selected
            )))
         }
 
-        <div className={ fileDropLayer ? 'file-drop-layer active' : 'file-drop-layer' }
-          id='file-drop-layer'>
+        <div id='file-drop-layer' className={ fileDropLayer ? 'file-drop-layer active' : 'file-drop-layer' }>
           <div>
             <i className='icon-cloud-upload'></i>
             <div>여기에 파일을 드래그하면</div>
@@ -312,12 +266,6 @@ const Chat = ({ users, messages, settings, addMessages, deleteMessages, selected
           <div className='message-button-more'
             onClick={() => {
               showOptionDialog(!optionDialog)
-
-              // search test
-              // const search = database.ref('/' + key + '/messages/' + userid).orderByChild('message').startAt(input.value).endAt(input.value + '\uf8ff')
-              // const search = database.ref('/' + key + '/messages').orderByChild('message').startAt('[a-zA-Z0-9]*').endAt(input.value)
-              // search.once('value').then(c => console.log(input.value, c.val()))
-              // searchMessage()
             }}>
             <i className='icon-options-vertical'></i>
           </div>
@@ -382,6 +330,7 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
   addMessages: m => dispatch(addMessages(m)),
   deleteMessages: m => dispatch(deleteMessages(m)),
+  clearMessages: m => dispatch(clearMessages()),
   selectedUser: u => dispatch(selectedUser(u))
 })
 

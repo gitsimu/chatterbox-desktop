@@ -1,5 +1,5 @@
 import React from 'react'
-import axios from 'axios'
+// import axios from 'axios'
 
 import { connect } from 'react-redux'
 import { signIn } from '../actions'
@@ -7,35 +7,28 @@ import { signIn } from '../actions'
 import Main from './Main'
 import '../css/App.css'
 
-// 내부 스토리지 관리
+/* 내부 스토리지 관리 */
 const storage = require('electron-json-storage')
 
-// URL을 OS 기본 브라우저로 열기위한 shell
-// https://github.com/electron/electron/blob/master/docs/api/shell.md#shellopenexternalurl
+/* URL을 OS 기본 브라우저로 열기위한 shell
+ * https://github.com/electron/electron/blob/master/docs/api/shell.md#shellopenexternalurl
+ */
 const { shell } = require('electron')
 
 function App({ settings, signIn }) {
-  //
   let id, pw
   const [loading, isLoading] = React.useState(false)
 
+  /* simpleline icons */
   React.useEffect(() => {
-    // simpleline icons
     let simmplelineLink = document.createElement("link")
     simmplelineLink.href = "https://cdnjs.cloudflare.com/ajax/libs/simple-line-icons/2.4.1/css/simple-line-icons.min.css"
     simmplelineLink.rel = "stylesheet"
     simmplelineLink.type = "text/css"
     document.querySelector('body').appendChild(simmplelineLink)
-
-    storage.get('userData', (err, data) => {
-      if (data && data.id && data.pw) {
-        signInProcess(data.id, data.pw)
-        console.log('storage data', data)
-      }
-    })
   }, [])
 
-  const signInProcess = (id, pw) => {
+  const signInProcess = React.useCallback((id, pw) => {
     if (!id || id === '') {
       alert('아이디를 입력해주세요.')
       return
@@ -49,7 +42,19 @@ function App({ settings, signIn }) {
       signIn({ key: token })
     })
     // signIn({ key: token })
-  }
+  }, [signIn])
+
+  /* 첫 렌더링 시 local storage를 확인
+   * id/pw/token 값이 존자해면 바로 로그인한다
+   */
+  React.useEffect(() => {
+    storage.get('userData', (err, data) => {
+      if (data && data.id && data.pw) {
+        signInProcess(data.id, data.pw)
+        console.log('storage data', data)
+      }
+    })
+  }, [signInProcess])
 
   return (
     <>
@@ -85,16 +90,16 @@ function App({ settings, signIn }) {
             <div>로그인</div>
           </div>
           <div className="app-options">
-            <a onClick={() => {
+            <div onClick={() => {
               if (typeof(shell) === "object") {
                 shell.openExternal('https://smlog.co.kr/member/member_join_check.htm')
               }
-            }}>회원가입</a>
-            <a onClick={() => {
+            }}>회원가입</div>
+            <div onClick={() => {
               if (typeof(shell) === "object") {
                 shell.openExternal('https://smlog.co.kr/member/id_pass.htm')
               }
-            }}>아이디/비밀번호 찾기</a>
+            }}>아이디/비밀번호 찾기</div>
           </div>
         </div>
         <div className="app-copyright">
@@ -111,18 +116,6 @@ function App({ settings, signIn }) {
     </>
   )
 }
-
-// shell을 사용하여 새 브라우저창에 띄움
-// <a onClick={() => {
-//   if (typeof(shell) === "object") {
-//     shell.openExternal('https://smlog.co.kr/member/member_join_check.htm')
-//   }
-// }}>회원가입</a>
-// <a onClick={() => {
-//   if (typeof(shell) === "object") {
-//     shell.openExternal('https://smlog.co.kr/member/id_pass.htm')
-//   }
-// }}>아이디/비밀번호 찾기</a>
 
 const mapStateToProps = state => ({
   settings: state.settings

@@ -112,7 +112,7 @@ function Main({ users, messages, settings, addUsers, clearUsers, selectedUser, s
       })
 
     return () => { chat.off() }
-  }, [])
+  }, [addUsers, clearUsers, database, isLoading, selectedUser, settings.key])
 
   return (
     <div className="App">
@@ -143,8 +143,8 @@ function Main({ users, messages, settings, addUsers, clearUsers, selectedUser, s
               /* local storage */
               storage.remove('userData', (err) => {
                 if (err) {
-                  throw err
                   console.log('[ERROR] Local storage remove failure', err)
+                  throw err
                 }
               })
               signOut()
@@ -191,7 +191,7 @@ function Main({ users, messages, settings, addUsers, clearUsers, selectedUser, s
         <div className="image-viewer">
           <div className="image-viewer-close"
             onClick={() => showImageViewer(null)}></div>
-          <img src={imageViewer}/>
+          <img src={imageViewer} alt="imageViewer"/>
         </div>
       )}
     </div>

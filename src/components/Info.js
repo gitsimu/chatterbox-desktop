@@ -59,6 +59,10 @@ const Info = ({ users, settings, ...props }) => {
 
         data = { email: email.trim() }
         break
+
+      default:
+        data = null
+        break
     }
 
     if (data) {

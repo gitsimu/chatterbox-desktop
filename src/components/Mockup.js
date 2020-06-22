@@ -8,7 +8,7 @@ const Mockup = (props) => {
       <div className="header" style={{ backgroundColor: props.themeColor}}>
         { props.profileImage && (
           <div className="header-image">
-            <img src={ JSON.parse(props.profileImage).location }/>
+            <img src={ JSON.parse(props.profileImage).location } alt="header"/>
           </div>
         )}
         <div className="header-title">
@@ -24,7 +24,7 @@ const Mockup = (props) => {
               <div className="message-profile-icon">{ iconText }</div>
             ) : (
               <div className="message-profile-image">
-                <img src={ JSON.parse(props.profileImage).location }/>
+                <img src={ JSON.parse(props.profileImage).location } alt="message-profile"/>
               </div>
             )}
 

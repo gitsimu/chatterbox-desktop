@@ -45,7 +45,7 @@ export const timestampToTime = (timestamp, isSimple) => {
       day = date.getDate(),
       hour = date.getHours(),
       minute = date.getMinutes(),
-      week = new Array('일', '월', '화', '수', '목', '금', '토');
+      week = ['일', '월', '화', '수', '목', '금', '토'];
 
   const convertDate = year + "년 "+month+"월 "+ day +"일 ("+ week[date.getDay()] +") ";
   let convertHour = "";
@@ -118,24 +118,26 @@ export const getNiceTime = (fromDate, toDate, levels, prefix) => {
         }
         return returnValue;
     },
-    toDate = toDate ? toDate : new Date(),
-    diff = fromDate - toDate,
+    diff = fromDate - (toDate ? toDate : new Date()),
     past = diff < 0 ? true : false,
-    diff = diff < 0 ? diff * -1 : diff,
-    date = new Date(new Date(1970,0,1,0).getTime()+diff),
+    diffrent = diff < 0 ? diff * -1 : diff,
+    date = new Date(new Date(1970,0,1,0).getTime()+diffrent),
     returnString = '',
     count = 0,
     years = (date.getFullYear() - 1970);
+
+    let langSingle, langMultiple
+
     if(years > 0){
-        var langSingle = "date.year" + (prefix ? "" : ""),
-            langMultiple = "date.years" + (prefix ? ".prefixed" : "");
+        langSingle = "date.year" + (prefix ? "" : "")
+        langMultiple = "date.years" + (prefix ? ".prefixed" : "");
         returnString += (count > 0 ?  ', ' : '') + (years > 1 ? langFn(langMultiple,[years]) : langFn(langSingle,[years]));
         count ++;
     }
     var months = date.getMonth();
     if(count < levels && months > 0){
-        var langSingle = "date.month" + (prefix ? "" : ""),
-            langMultiple = "date.months" + (prefix ? ".prefixed" : "");
+        langSingle = "date.month" + (prefix ? "" : "")
+        langMultiple = "date.months" + (prefix ? ".prefixed" : "");
         returnString += (count > 0 ?  ', ' : '') + (months > 1 ? langFn(langMultiple,[months]) : langFn(langSingle,[months]));
         count ++;
     } else {
@@ -144,8 +146,8 @@ export const getNiceTime = (fromDate, toDate, levels, prefix) => {
     }
     var days = date.getDate() - 1;
     if(count < levels && days > 0){
-        var langSingle = "date.day" + (prefix ? "" : ""),
-            langMultiple = "date.days" + (prefix ? ".prefixed" : "");
+        langSingle = "date.day" + (prefix ? "" : "")
+        langMultiple = "date.days" + (prefix ? ".prefixed" : "");
         returnString += (count > 0 ?  ', ' : '') + (days > 1 ? langFn(langMultiple,[days]) : langFn(langSingle,[days]));
         count ++;
     } else {
@@ -154,8 +156,8 @@ export const getNiceTime = (fromDate, toDate, levels, prefix) => {
     }
     var hours = date.getHours();
     if(count < levels && hours > 0){
-        var langSingle = "date.hour" + (prefix ? "" : ""),
-            langMultiple = "date.hours" + (prefix ? ".prefixed" : "");
+        langSingle = "date.hour" + (prefix ? "" : "")
+        langMultiple = "date.hours" + (prefix ? ".prefixed" : "");
         returnString += (count > 0 ?  ', ' : '') + (hours > 1 ? langFn(langMultiple,[hours]) : langFn(langSingle,[hours]));
         count ++;
     } else {
@@ -164,8 +166,8 @@ export const getNiceTime = (fromDate, toDate, levels, prefix) => {
     }
     var minutes = date.getMinutes();
     if(count < levels && minutes > 0){
-        var langSingle = "date.minute" + (prefix ? "" : ""),
-            langMultiple = "date.minutes" + (prefix ? ".prefixed" : "");
+        langSingle = "date.minute" + (prefix ? "" : "")
+        langMultiple = "date.minutes" + (prefix ? ".prefixed" : "");
         returnString += (count > 0 ?  ', ' : '') + (minutes > 1 ? langFn(langMultiple,[minutes]) : langFn(langSingle,[minutes]));
         count ++;
     } else {
@@ -174,8 +176,8 @@ export const getNiceTime = (fromDate, toDate, levels, prefix) => {
     }
     var seconds = date.getSeconds();
     if(count < levels && seconds > 0){
-        var langSingle = "date.second" + (prefix ? "" : ""),
-            langMultiple = "date.seconds" + (prefix ? ".prefixed" : "");
+        langSingle = "date.second" + (prefix ? "" : "")
+        langMultiple = "date.seconds" + (prefix ? ".prefixed" : "");
         returnString += (count > 0 ?  ', ' : '') + (seconds > 1 ? langFn(langMultiple,[seconds]) : langFn(langSingle,[seconds]));
         count ++;
     } else {

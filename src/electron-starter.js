@@ -11,10 +11,11 @@ function createWindow () {
     minHeight: 600,
     webPreferences: {
       nodeIntegration: true,
+      enableRemoteModule: true
       // nodeIntegrationInWorker: true
     }
   })
-  win.removeMenu();
+  win.removeMenu()
 
   // React를 빌드할 경우 결과물은 build 폴더에 생성되기 때문에 loadURL 부분을 아래와 같이 작성합니다.
   const startUrl = process.env.ELECTRON_START_URL || url.format({
@@ -22,9 +23,9 @@ function createWindow () {
     // pathname: path.join(__dirname, "index.html"),
     protocol: 'file:',
     slashes: true
-  });
-  win.loadURL(startUrl);
-  win.openDevTools();
+  })
+  win.loadURL(startUrl)
+  win.openDevTools()
 }
 
 // ipcMain.on('ondragstart', (event, filePath) => {

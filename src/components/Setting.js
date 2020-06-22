@@ -31,7 +31,7 @@ const Setting = ({ settings, ...props }) => {
       setThemeColor(data.themeColor)
       setProfileImage(data.profileImage || null)
     })
-  }, [])
+  }, [info])
 
   const handleFileInput = (e) => {
     const config = { headers: { 'content-type': 'multipart/form-data' } }
@@ -90,7 +90,7 @@ const Setting = ({ settings, ...props }) => {
       subTitle: subTitle.trim(),
       nickname: nickname.trim(),
       firstMessage: firstMessage.trim(),
-      themeColor: themeColor      
+      themeColor: themeColor
     })
   }
 

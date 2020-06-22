@@ -136,17 +136,18 @@ div, input, textarea {
   text-align: center;
 }
 
-.app-options > a {
+.app-options > div {
+  display: inline-block;
   text-decoration: none;
   color: rgba(117, 124, 140, 1) !important;
   cursor: pointer;
   outline: none;
 }
-.app-options > a:hover {
+.app-options > div:hover {
   text-decoration: underline;
   color: #eee;
 }
-.app-options > a:after {
+.app-options > div:after {
   content: '';
   border-right: 1px solid rgba(117, 124, 140, 1);
   display: inline-block;
@@ -155,7 +156,7 @@ div, input, textarea {
   padding-right: 10px;
   margin-right: 10px;
 }
-.app-options > a:last-of-type:after {
+.app-options > div:last-of-type:after {
   content: none;
 }
 

@@ -5,7 +5,6 @@ import * as script from '../js/script.js'
 const ChatMessage = ({ users, settings, ...props }) => {
   const isMyself = props.opponent !== props.userId
   const isSameUser = (props.prev && (props.prev.userId === props.userId))
-  const target = props.target.value
   const showImageViewer = props.showImageViewer
 
   const skipDate = () => {
@@ -15,7 +14,7 @@ const ChatMessage = ({ users, settings, ...props }) => {
       const prevDate = script.timestampToDay(props.prev.timestamp)
       const curDate = script.timestampToDay(props.timestamp)
 
-      return (prevDate === curDate) ? true : false
+      return (prevDate === curDate)
     }
   }
 
@@ -36,7 +35,7 @@ const ChatMessage = ({ users, settings, ...props }) => {
             // window.parent.postMessage({ method: 'image', url: JSON.parse(props.message).location })
             showImageViewer(JSON.parse(props.message).location)
           }}>
-          <img src={ JSON.parse(props.message).location }/>
+          <img src={ JSON.parse(props.message).location } alt="message-thumbnail"/>
         </div>
       )}
       <div className="message-file">

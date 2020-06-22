@@ -5,34 +5,38 @@ export const addUsers = users => ({
 })
 
 export const clearUsers = () => ({
-  type: 'CLEAR_USERS',
+  type: 'CLEAR_USERS'
 })
 
 /* messages */
 export const addMessages = messages => ({
   type: 'ADD_MESSAGES',
   key: messages.key,
-  value: messages.value,
+  value: messages.value
 })
 
 export const deleteMessages = messages => ({
   type: 'DELETE_MESSAGES',
-  key: messages.key,  
+  key: messages.key
+})
+
+export const clearMessages = () => ({
+  type: 'CLEAR_MESSAGES'
 })
 
 /* settings */
 export const initSettings = settings => ({
   type: 'INIT_SETTINGS',
-  key: settings.key,
+  key: settings.key
 })
 
 export const signIn = settings => ({
   type: 'SIGN_IN',
-  key: settings.key,
+  key: settings.key
 })
 
 export const signOut = () => ({
-  type: 'SIGN_OUT',
+  type: 'SIGN_OUT'
 })
 
 export const selectedUser = user => ({
