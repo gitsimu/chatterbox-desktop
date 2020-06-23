@@ -4,6 +4,12 @@ import axios from 'axios'
 import Mockup from './Mockup'
 import { ChromePicker } from 'react-color'
 
+/* URL을 OS 기본 브라우저로 열기위한 shell
+ * https://github.com/electron/electron/blob/master/docs/api/shell.md#shellopenexternalurl
+ */
+const { shell } = require('electron')
+const storage = require('electron-json-storage')
+
 const Setting = ({ settings, ...props }) => {
   const database = props.database
   const info = database.ref(`/${settings.key}/config`)
@@ -15,6 +21,10 @@ const Setting = ({ settings, ...props }) => {
   const [profileImage, setProfileImage] = React.useState(null)
   const [themeColor, setThemeColor] = React.useState('#444c5d')
   const [themeColorPicker, showThemeColorPicker] = React.useState(false)
+
+  const [pushAlram, allowPushAlram] = React.useState(true)
+  const [audioBeep, allowAudioBeep] = React.useState(true)
+  const [autoSignin, allowAutoSignin] = React.useState(true)
 
   const [settingMenuState, setSettingMenuState] = React.useState(0)
   const isLoading = props.isLoading
@@ -32,6 +42,18 @@ const Setting = ({ settings, ...props }) => {
       setProfileImage(data.profileImage || null)
     })
   }, [info])
+
+  React.useEffect(() => {    
+    /* GET BASIC SETTINGS
+     * PUSH ALARM / AUDIO BEEP / AUTO SIGNIN
+     */
+    storage.getMany(['pushAlram', 'audioBeep', 'autoSignin'], (err, data) => {      
+      console.log('[Basic settings]', data)
+      allowPushAlram(typeof(data.pushAlram.allowed) === "undefined" ? true : data.pushAlram.allowed)
+      allowAudioBeep(typeof(data.audioBeep.allowed) === "undefined" ? true : data.audioBeep.allowed)
+      allowAutoSignin(typeof(data.autoSignin.allowed) === "undefined" ? true : data.autoSignin.allowed)
+    })
+  }, [])
 
   const handleFileInput = (e) => {
     const config = { headers: { 'content-type': 'multipart/form-data' } }
@@ -101,28 +123,88 @@ const Setting = ({ settings, ...props }) => {
         <div
           className={ settingMenuState === 0 ? "setting-list-tab active" : "setting-list-tab"}
           onClick={() => { setSettingMenuState(0) }}>
-          <div>채팅 설정</div>
-        </div>
-        <div className="setting-list-title">Etc</div>
-        <div
-          className="setting-list-tab"
-          onClick={() => { window.open("https://smlog.co.kr/notice_list.htm", "_blank") }}>
-          <div>새 소식</div>
-        </div>
-        <div
-          className="setting-list-tab"
-          onClick={() => { window.open("https://smlog.co.kr/faq_list.htm", "_blank") }}>
-          <div>고객센터</div>
+          <div>기본 설정</div>
         </div>
         <div
           className={ settingMenuState === 1 ? "setting-list-tab active" : "setting-list-tab"}
           onClick={() => { setSettingMenuState(1) }}>
+          <div>채팅 설정</div>
+        </div>
+        <div className="setting-list-title">Etc</div>
+        <div className="setting-list-tab"
+          onClick={() => {
+            if (typeof(shell) === "object") {
+              shell.openExternal('https://smlog.co.kr/member/member_join_check.htm')
+            }
+          }}>새 소식</div>
+        <div className="setting-list-tab"
+          onClick={() => {
+            if (typeof(shell) === "object") {
+              shell.openExternal('https://smlog.co.kr/member/id_pass.htm')
+            }
+          }}>고객센터</div>
+        <div
+          className={ settingMenuState === 2 ? "setting-list-tab active" : "setting-list-tab"}
+          onClick={() => { setSettingMenuState(2) }}>
           <div>버전 정보</div>
         </div>
       </div>
 
       <div className="setting-body card">
         <div className={ settingMenuState === 0 ? "setting-menu-0" : "setting-menu-0 hide" }>
+          <div className="setting-menu-header">
+            기본 설정
+          </div>
+          <div className="setting-menu-body setting-basic">
+            <div className="setting-checkbox-item">
+              <div className="setting-checkbox-item-title">
+                <label>
+                  <input type="checkbox"
+                    checked={pushAlram}
+                    onChange={(e) => {          
+                      // SET PUSH ALARM
+                      allowPushAlram(e.target.checked)
+                      storage.set('pushAlram', { allowed: e.target.checked})
+                    }}/>
+                  <span>푸시알람 설정</span>
+                </label>
+              </div>
+              <div className="setting-checkbox-item-description">새로운 메세지가 올 때 푸시알람을 띄워줍니다. 체크를 해제하면 알람이 오지 않습니다.</div>
+            </div>
+            <div className="setting-checkbox-item">
+              <div className="setting-checkbox-item-title">
+                <label>
+                  <input type="checkbox"
+                    checked={audioBeep}
+                    onChange={(e) => {    
+                      // SET AUDIO BEEP
+                      allowAudioBeep(e.target.checked)
+                      storage.set('audioBeep', { allowed: e.target.checked})                      
+                    }}/>
+                  <span>오디오 경고음</span>
+                </label>
+              </div>
+              <div className="setting-checkbox-item-description">새 푸시알람이 오거나 특정 작업을 실행할 때 시스템 경고음을 울립니다.</div>
+            </div>
+            <div className="setting-checkbox-item">
+              <div className="setting-checkbox-item-title">
+                <label>
+                  <input type="checkbox"
+                    checked={autoSignin}
+                    onChange={(e) => {    
+                      // SET AUTO SIGNIN
+                      allowAutoSignin(e.target.checked)
+                      storage.set('autoSignin', { allowed: e.target.checked})                      
+                    }}/>
+                  <span>자동 로그인</span>
+                </label>
+              </div>
+              <div className="setting-checkbox-item-description">첫 로그인 이후부터는 앱을 실행시킬 때 해당 계정으로 자동 로그인합니다.</div>
+              <div className="setting-checkbox-item-description">개인정보 보호를 위해 개인 PC에서만 사용하세요.</div>
+            </div>
+          </div>          
+        </div>
+        <div className={ settingMenuState === 1 ? "setting-menu-1" : "setting-menu-1 hide" }>
           <div className="setting-menu-header">
             채팅 설정
           </div>
@@ -140,9 +222,8 @@ const Setting = ({ settings, ...props }) => {
                 <div className="setting-input-item">
                   <span>테마색상</span>
                   <input type="text"
-                    value={themeColor}
-                    onChange={() => {}}
-                    onClick={() => {
+                    value={themeColor}                    
+                    onChange={() => {
                       showThemeColorPicker(!themeColorPicker)
                     }}/>
                   <div className="setting-color-sample" style={{ backgroundColor: themeColor }}></div>
@@ -201,7 +282,7 @@ const Setting = ({ settings, ...props }) => {
           </div>
         </div>
 
-        <div className={ settingMenuState === 1 ? "setting-menu-1" : "setting-menu-1 hide" }>
+        <div className={ settingMenuState === 2 ? "setting-menu-2" : "setting-menu-2 hide" }>
           <div className="setting-menu-header">
             버전 정보
           </div>
@@ -209,7 +290,7 @@ const Setting = ({ settings, ...props }) => {
           </div>
         </div>
 
-        <div className={ settingMenuState === 2 ? "setting-menu-2" : "setting-menu-2 hide" }>
+        <div className={ settingMenuState === 3 ? "setting-menu-3" : "setting-menu-3 hide" }>
         </div>
       </div>
     </div>

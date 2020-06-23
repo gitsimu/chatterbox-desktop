@@ -41,16 +41,16 @@ function App({ settings, signIn }) {
     storage.set('userData', { token: token, id: id, pw: pw }, () => {
       signIn({ key: token })
     })
-    // signIn({ key: token })
   }, [signIn])
 
   /* 첫 렌더링 시 local storage를 확인
    * id/pw/token 값이 존자해면 바로 로그인한다
    */
   React.useEffect(() => {
-    storage.get('userData', (err, data) => {
-      if (data && data.id && data.pw) {
-        signInProcess(data.id, data.pw)
+    storage.getMany(['userData', 'autoSignin'], (err, data) => {      
+      if (!data.autoSignin.allowed) return
+      else if (data.userData && data.userData.id && data.userData.pw) {
+        signInProcess(data.userData.id, data.userData.pw)
         console.log('storage data', data)
       }
     })

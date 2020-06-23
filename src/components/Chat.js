@@ -47,7 +47,7 @@ const Chat = ({ users, messages, settings, addMessages, deleteMessages, clearMes
 
   const sendMessage = React.useCallback((key, id, message, type, database) => {
     const messageId = Math.random().toString(36).substr(2, 9)
-    const lastMessage = (type === 2) ? JSON.parse(message).name : message
+    const lastMessage = (type === 2) ? JSON.parse(message).name : message.trim()
 
     database.ref(`/${key}/users/${id}`).update({
       state:1,
@@ -57,7 +57,7 @@ const Chat = ({ users, messages, settings, addMessages, deleteMessages, clearMes
     database.ref(`/${key}/messages/${id}/${messageId}`).update({
       id: messageId,
       userId: key,
-      message: message,
+      message: message.trim(),
       type: type,
       timestamp: new Date().getTime()
     })

@@ -85,19 +85,25 @@ function Main({ users, messages, settings, addUsers, clearUsers, selectedUser, s
               // https://snutiise.github.io/html5-desktop-api/
               const recent = database.ref(`/${settings.key}/recents`)
               recent.on('value', (snapshot) => {
-                const recentsData = snapshot.val()
-                const notification = new Notification('새 메세지', {
-                  body: recentsData.message,
-                })
+                // GET PUSH ALARM, AUDIO BEEP
+                storage.getMany(['pushAlram', 'audioBeep'], (err, data) => {           
+                  if (data.pushAlram.allowed) {
+                    const recentsData = snapshot.val()        
+                    const notification = new Notification('새 메세지', {
+                      body: recentsData.message,
+                      silent: !data.audioBeep.allowed
+                    })
 
-                notification.onclick = () => {
-                  const target = USERS.filter((u) => { return u.key === recentsData.userId})
-                  if (target.length > 0) {
-                    setScreenState(0)
-                    setTabState(target[0].value.state || 0)
-                    selectedUser(target[0])
+                    notification.onclick = () => {
+                      const target = USERS.filter((u) => { return u.key === recentsData.userId})
+                      if (target.length > 0) {
+                        setScreenState(0)
+                        setTabState(target[0].value.state || 0)
+                        selectedUser(target[0])
+                      }                          
+                    }
                   }
-                }
+                })                  
               })
             })
             .catch(error => {
