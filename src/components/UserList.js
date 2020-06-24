@@ -2,6 +2,8 @@ import React from 'react'
 import User from './User'
 import { connect } from 'react-redux'
 
+const { app } = window.require('electron').remote;
+
 const UserList = ({ users, ...props }) => {
   const tabState = props.tabState
   const setTabState = props.setTabState
@@ -9,6 +11,13 @@ const UserList = ({ users, ...props }) => {
   const [countWait, setCountWait] = React.useState(0)
   const [countProgress, setCountProgress] = React.useState(0)
   const [countComplete, setCountComplete] = React.useState(0)
+
+  /* Dock badge (macOS only)*/
+  React.useEffect(() => {
+    if (countWait && countWait !== 0) {
+      app.dock.setBadge(String(countWait))
+    }
+  }, [countWait])
 
   React.useEffect(() => {
     setCountWait(users.filter((f) => {

@@ -25,7 +25,7 @@ function App({ settings, signIn }) {
     simmplelineLink.href = "https://cdnjs.cloudflare.com/ajax/libs/simple-line-icons/2.4.1/css/simple-line-icons.min.css"
     simmplelineLink.rel = "stylesheet"
     simmplelineLink.type = "text/css"
-    document.querySelector('body').appendChild(simmplelineLink)
+    document.querySelector('body').appendChild(simmplelineLink)    
   }, [])
 
   const signInProcess = React.useCallback((id, pw) => {
