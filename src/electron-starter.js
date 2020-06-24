@@ -1,10 +1,13 @@
-const { app, BrowserWindow } = require('electron')
+const { app, BrowserWindow, ipcMain } = require('electron')
+const { autoUpdater } = require('electron-updater')
+
 const url = require('url')
 const path = require('path')
+let win
 
 function createWindow () {
   // 브라우저 창을 생성합니다.
-  const win = new BrowserWindow({
+  win = new BrowserWindow({
     width: 1024,
     height: 600,
     minWidth: 1024,
@@ -26,6 +29,10 @@ function createWindow () {
   })
   win.loadURL(startUrl)
   win.openDevTools()
+
+  win.once('ready-to-show', () => {
+    autoUpdater.checkForUpdatesAndNotify()
+  })
 }
 
 // ipcMain.on('ondragstart', (event, filePath) => {
@@ -56,3 +63,14 @@ app.on('activate', () => {
     createWindow()
   }
 })
+
+ipcMain.on('app_version', (event) => {
+  event.sender.send('app_version', { version: app.getVersion() })
+})
+
+autoUpdater.on('update-available', () => {
+  win.webContents.send('update_available');
+});
+autoUpdater.on('update-downloaded', () => {
+  win.webContents.send('update_downloaded');
+});

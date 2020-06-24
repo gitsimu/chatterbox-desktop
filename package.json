@@ -8,6 +8,7 @@
     "@testing-library/user-event": "^7.1.2",
     "axios": "^0.19.2",
     "electron-json-storage": "^4.1.8",
+    "electron-updater": "^4.3.1",
     "firebase": "^7.15.0",
     "foreman": "^3.0.1",
     "react": "^16.13.1",
@@ -33,12 +34,14 @@
     "build:linux64": "electron-builder --linux --x64",
     "build:win": "npm run build:win32 && npm run build:win64",
     "build:win32": "electron-builder --win --ia32",
-    "build:win64": "electron-builder --win --x64"
+    "build:win64": "electron-builder --win --x64",
+    "build": "electron-builder build --mac --win --publish never",
+    "deploy": "electron-builder build --mac --win --publish always"
   },
   "homepage": ".",
   "build": {
     "productName": "SmartLog",
-    "appId": "com.electron.smlog",
+    "appId": "com.smlog.chatterbox",
     "asar": true,
     "extends": null,
     "protocols": {
@@ -99,5 +102,9 @@
     "electron": "^9.0.3",
     "electron-builder": "^22.7.0",
     "react-app-rewired": "^2.1.6"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gitsimu/chatterbox-desktop.git"
   }
 }

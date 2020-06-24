@@ -14,9 +14,8 @@ const UserList = ({ users, ...props }) => {
 
   /* Dock badge (macOS only)*/
   React.useEffect(() => {
-    if (countWait && countWait !== 0) {
-      app.dock.setBadge(String(countWait))
-    }
+    const badgeText = (countWait && countWait !== 0) ? String(countWait) : ''
+    app.dock.setBadge(badgeText)
   }, [countWait])
 
   React.useEffect(() => {

@@ -93,5 +93,9 @@ npm run dist        ( /dist/~.dmg )
 https://tinydew4.github.io/electron-ko/docs/api/dialog/
 https://steemit.com/utopian-io/@pckurdu/file-drag-and-drop-module-in-electron-with-text-editing-example
 
+## auto update
+https://medium.com/@johndyer24/creating-and-deploying-an-auto-updating-electron-app-for-mac-and-windows-using-electron-builder-6a3982c0cee6
+https://blog.naver.com/PostView.nhn?blogId=danaramm&logNo=221743906453&parentCategoryNo=&categoryNo=23&viewDate=&isShowPopularPosts=true&from=search
+
 ## JavaScript convention
 https://standardjs.com/rules-kokr.html
