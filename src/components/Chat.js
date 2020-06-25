@@ -197,8 +197,10 @@ const Chat = ({ users, messages, settings, addMessages, deleteMessages, clearMes
       clearMessages()
       Object.keys(CONNECTIONS).forEach((u, i) => {
         console.log('[Connection off]', CONNECTIONS[u])
-        CONNECTIONS[u].off()
-        delete CONNECTIONS[u]
+        if (CONNECTIONS[u]) {
+          CONNECTIONS[u].off()
+          delete CONNECTIONS[u]
+        }
       })
     }
   }, [clearMessages])

@@ -1,6 +1,6 @@
 {
   "name": "chatterbox-desktop",
-  "version": "1.0.6",
+  "version": "1.0.10",
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^4.2.4",
@@ -53,7 +53,8 @@
     "mac": {
       "target": [
         "default"
-      ]
+      ],
+      "icon": "./public/logo512.png"
     },
     "dmg": {
       "title": "SmartLog"

@@ -33,13 +33,15 @@
       #notification {
         position: fixed;
         z-index: 999;
-        background: #fff;
+        background: #fff7b2;
+        color: #494949;
         width: 100%;
         padding: 5px 10px;
-        font-size: 13px;
+        font-size: 12px;
         display: flex;
         box-shadow: 0 0 15px 5px #000;
         transition: 0.3s ease all;
+        user-select: none;
       }
       #notification.hidden{
         transform: translateY(-30px);
@@ -47,6 +49,13 @@
       }
       #notificationMessage {
         flex: 1;
+        display: flex;
+        align-items: center;
+      }
+      #notificationMessage > i {
+        padding: 0 8px 0 3px;
+        font-weight: bold;
+        font-size: 15px;
       }
       #notificationButton {
         display: flex;
@@ -67,9 +76,9 @@
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="notification" class="hidden">
-      <div id="notificationMessage">업데이트 알림</div>
+      <div id="notificationMessage"><i class="icon-cloud-download"></i></div>
       <div id="notificationButton">
-        <div id="notificationButtonRestart" class="hidden" onClick="restartApp()">재시작</div>
+        <div id="notificationButtonRestart" class="hidden" onClick="restartApp()">업데이트</div>
         <div id="notificationButtonClose" onClick="closeNotification()">닫기</div>
       </div>
     </div>
@@ -133,12 +142,12 @@
       const restartButton = document.getElementById('notificationButtonRestart')
       ipcRenderer.on('update_available', () => {        
         ipcRenderer.removeAllListeners('update_available')
-        notificationMessage.innerText = '새 업데이트를 다운로드 중입니다...'
+        notificationMessage.innerText = '새 업데이트가 있습니다. 업데이트 준비가 완료되면 다시 알려드립니다.'
         notification.classList.remove('hidden')
       })
       ipcRenderer.on('update_downloaded', () => {        
         ipcRenderer.removeAllListeners('update_downloaded')
-        notificationMessage.innerText = '새 업데이트가 준비되었습니다. 재시작을 눌러 업데이트 해주세요.'
+        notificationMessage.innerText = '새 업데이트를 설치할 준비가 되었습니다.'
         notification.classList.remove('hidden')
         restartButton.classList.remove('hidden')
       })

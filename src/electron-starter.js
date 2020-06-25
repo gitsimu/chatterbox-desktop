@@ -30,10 +30,14 @@ function createWindow () {
   win.loadURL(startUrl)
   win.openDevTools()
 
-  win.once('ready-to-show', () => {
-    autoUpdater.checkForUpdatesAndNotify()
-  })
+  // win.once('ready-to-show', () => {
+  //   autoUpdater.checkForUpdatesAndNotify()
+  // })
 }
+
+app.on('ready', () => {
+  autoUpdater.checkForUpdatesAndNotify()
+})
 
 // ipcMain.on('ondragstart', (event, filePath) => {
 //   event.sender.startDrag({
@@ -56,15 +60,12 @@ app.on('window-all-closed', () => {
   }
 })
 
-app.on('ready', () => {  
-  autoUpdater.checkForUpdatesAndNotify()
-})
-
 app.on('activate', () => {
   // macOS에서는 dock 아이콘이 클릭되고 다른 윈도우가 열려있지 않았다면
   // 앱에서 새로운 창을 다시 여는 것이 일반적입니다.
   if (BrowserWindow.getAllWindows().length === 0) {
     createWindow()
+    autoUpdater.checkForUpdatesAndNotify()
   }
 })
 

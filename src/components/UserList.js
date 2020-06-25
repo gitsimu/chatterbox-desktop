@@ -14,6 +14,7 @@ const UserList = ({ users, ...props }) => {
 
   /* Dock badge (macOS only)*/
   React.useEffect(() => {
+    if (process.platform !== 'darwin') return
     const badgeText = (countWait && countWait !== 0) ? String(countWait) : ''
     app.dock.setBadge(badgeText)
   }, [countWait])
