@@ -28,7 +28,7 @@ function createWindow () {
     slashes: true
   })
   win.loadURL(startUrl)
-  win.openDevTools()
+  // win.openDevTools()
 
   win.once('ready-to-show', () => {
     autoUpdater.checkForUpdatesAndNotify()
