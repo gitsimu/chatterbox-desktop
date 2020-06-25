@@ -28,9 +28,51 @@
     <!-- <link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;800&display=swap" rel="stylesheet"> -->
     <!-- <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;900&display=swap" rel="stylesheet"> -->
     <title>ChatterBox</title>
+
+    <style>
+      #notification {
+        position: fixed;
+        z-index: 999;
+        background: #fff;
+        width: 100%;
+        padding: 5px 10px;
+        font-size: 13px;
+        display: flex;
+        box-shadow: 0 0 15px 5px #000;
+        transition: 0.3s ease all;
+      }
+      #notification.hidden{
+        transform: translateY(-30px);
+        opacity: 0;
+      }
+      #notificationMessage {
+        flex: 1;
+      }
+      #notificationButton {
+        display: flex;
+        color: #0D47A1;
+      }
+      #notificationButton > div {
+        padding: 0 10px;
+        cursor: pointer;
+      }
+      #notificationButton > div:hover {
+        text-decoration: underline;
+      }
+      #notificationButton .hidden {
+        display: none;
+      }
+    </style>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="notification" class="hidden">
+      <div id="notificationMessage">업데이트 알림</div>
+      <div id="notificationButton">
+        <div id="notificationButtonRestart" class="hidden" onClick="restartApp()">재시작</div>
+        <div id="notificationButtonClose" onClick="closeNotification()">닫기</div>
+      </div>
+    </div>
     <div id="root"></div>
     <!--
       This HTML file is a template.
@@ -85,6 +127,28 @@
         // version.innerText = 'Version ' + arg.version;
         document.title = 'Version ' + arg.version;
       });
+
+      const notification = document.getElementById('notification')
+      const notificationMessage = document.getElementById('notificationMessage')
+      const restartButton = document.getElementById('notificationButtonRestart')
+      ipcRenderer.on('update_available', () => {        
+        ipcRenderer.removeAllListeners('update_available')
+        notificationMessage.innerText = '새 업데이트를 다운로드 중입니다...'
+        notification.classList.remove('hidden')
+      })
+      ipcRenderer.on('update_downloaded', () => {        
+        ipcRenderer.removeAllListeners('update_downloaded')
+        notificationMessage.innerText = '새 업데이트가 준비되었습니다. 재시작을 눌러 업데이트 해주세요.'
+        notification.classList.remove('hidden')
+        restartButton.classList.remove('hidden')
+      })
+
+      function closeNotification() {
+        notification.classList.add('hidden')
+      }
+      function restartApp() {
+        ipcRenderer.send('restart_app')
+      }
     </script>
   </body>
 </html>
