@@ -28,7 +28,7 @@ function createWindow () {
     slashes: true
   })
   win.loadURL(startUrl)
-  // win.openDevTools()
+  win.openDevTools()
 
   win.once('ready-to-show', () => {
     autoUpdater.checkForUpdatesAndNotify()
@@ -54,6 +54,10 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit()
   }
+})
+
+app.on('ready', () => {  
+  autoUpdater.checkForUpdatesAndNotify()
 })
 
 app.on('activate', () => {
