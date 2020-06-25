@@ -221,13 +221,22 @@ div, input, textarea {
   border-radius: 5px;
 }
 .chat-body:empty:after {
-  content: '';
-  color: rgba(117, 124, 140, 1);
+  content: "\e04a";
+  font-family: 'simple-line-icons';
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  font-size: 50px;
+  
+  color: rgba(117, 124, 140, 0.1);
   position: absolute;
   left: 50%;
   top: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 16px;
+  transform: translate(-50%, -50%);  
 }
 /* .chat-options {
 } */
@@ -782,7 +791,7 @@ div, input, textarea {
 .setting-menu-body {
   display: flex;
   flex-direction: row;
-  align-items: center;
+  align-items: flex-start;
   /* align-items: center; */
   padding: 20px;
   height: 100%;
@@ -853,6 +862,7 @@ div, input, textarea {
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
+  max-width: 400px;
 }
 .setting-items {
   flex: 1;
@@ -886,8 +896,7 @@ div, input, textarea {
 }
 
 .setting-basic.setting-menu-body {
-  flex-direction: column;
-  align-items: flex-start;  
+  flex-direction: column;  
 } 
 .setting-checkbox-item {
   padding: 5px;

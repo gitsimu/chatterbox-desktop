@@ -460,7 +460,7 @@ const Setting = ({ settings, ...props }) => {
                 </div>
               </div>
             </div>
-            <div style={{ flex: 1, marginLeft: 20 }}>
+            <div style={{ flex: 1, marginLeft: 20, maxWidth: 400 }}>
               <div className="setting-input-item">
                 <span>제목</span>
                 <input value={title}

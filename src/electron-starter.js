@@ -11,7 +11,7 @@ function createWindow () {
     width: 1024,
     height: 600,
     minWidth: 1024,
-    minHeight: 600,
+    minHeight: 600,    
     webPreferences: {
       nodeIntegration: true,
       enableRemoteModule: true

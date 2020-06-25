@@ -30,6 +30,9 @@
     <title>ChatterBox</title>
 
     <style>
+      #root {
+        background: rgba(34, 37, 43, 1);
+      }
       #notification {
         position: fixed;
         z-index: 999;
@@ -94,47 +97,13 @@
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
 
-    <!-- file drag n drop sample -->
-    <!-- <div href="#" id="drag" style="width: 100%; padding: 20px;">item</div>
-    <script type="text/javascript" charset="utf-8">
-      const {ipcRenderer} = require('electron');
-      document.getElementById('drag').ondragstart = (event) => {
-        event.preventDefault()
-        ipcRenderer.send('ondragstart', '/path/to/item')
-        console.log('dragg')
-      }
-
-      document.getElementById('drag').addEventListener('dragover', (e) => {
-        e.preventDefault()
-        e.stopPropagation()
-        console.log('dragover')
-      })
-
-      var path;
-      document.getElementById('drag').addEventListener('drop', (e) => {
-        e.preventDefault()
-        e.stopPropagation();
-
-        for (let f of e.dataTransfer.files) {
-          console.log('the files you dragged: ', f)
-          path = f.path;
-        }
-
-        ipcRenderer.send('ondragstart', path)
-      })
-
-      ipcRenderer.on('startDrag', (e, data) => {
-        console.log('ipc data', data);
-      })
-    </script> -->
     <script>
       const { ipcRenderer } = require('electron');      
 
       ipcRenderer.send('app_version');
       ipcRenderer.on('app_version', (event, arg) => {
-        ipcRenderer.removeAllListeners('app_version');
-        // version.innerText = 'Version ' + arg.version;
-        document.title = 'Version ' + arg.version;
+        ipcRenderer.removeAllListeners('app_version');        
+        document.title = 'v' + arg.version;
       });
 
       const notification = document.getElementById('notification')

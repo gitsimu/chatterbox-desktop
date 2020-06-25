@@ -69,33 +69,37 @@ This section has moved here: https://facebook.github.io/create-react-app/docs/tr
 
 
 ## react-color
-https://casesandberg.github.io/react-color/
+https://casesandberg.github.io/react-color/   
 
 ## electron guide
-https://kyuhyuk.kr/article/electron/2020/02/14/Electron-React
-https://gist.github.com/hymm/b621cf64a781cadb92db9312c0956e31
-https://finbits.io/blog/electron-create-react-app-electron-builder/
+https://kyuhyuk.kr/article/electron/2020/02/14/Electron-React   
+https://gist.github.com/hymm/b621cf64a781cadb92db9312c0956e31   
+https://finbits.io/blog/electron-create-react-app-electron-builder/   
 
 ## electron packaging
-https://github.com/electron-userland/electron-builder#cli-usage
-https://suwoni-codelab.com/electron/2017/04/17/Electron-distribution/
-https://github.com/electron-userland/electron-builder/issues/2030 <- [ERROR] Application entry file "build/electron.js" in th...
-https://stackoverflow.com/questions/54591664/reactjs-neterr-file-not-found <- [ERROR] blank screen issue
-
-npm run react-build
-npm run build:win   ( /dist/~.exe )
-npm run dist        ( /dist/~.dmg )
-...
+https://github.com/electron-userland/electron-builder#cli-usage   
+https://suwoni-codelab.com/electron/2017/04/17/Electron-distribution/   
+https://github.com/electron-userland/electron-builder/issues/2030 <- [ERROR] Application entry file "build/electron.js" in th...   
+https://stackoverflow.com/questions/54591664/reactjs-neterr-file-not-found <- [ERROR] blank screen issue   
 
 ## react-app-rewired
+https://www.npmjs.com/package/react-app-rewired   
 
 ## file drag n drop
-https://tinydew4.github.io/electron-ko/docs/api/dialog/
-https://steemit.com/utopian-io/@pckurdu/file-drag-and-drop-module-in-electron-with-text-editing-example
+https://tinydew4.github.io/electron-ko/docs/api/dialog/   
+https://steemit.com/utopian-io/@pckurdu/file-drag-and-drop-module-in-electron-with-text-editing-example   
 
 ## auto update
-https://medium.com/@johndyer24/creating-and-deploying-an-auto-updating-electron-app-for-mac-and-windows-using-electron-builder-6a3982c0cee6
-https://blog.naver.com/PostView.nhn?blogId=danaramm&logNo=221743906453&parentCategoryNo=&categoryNo=23&viewDate=&isShowPopularPosts=true&from=search
+https://medium.com/@johndyer24/creating-and-deploying-an-auto-updating-electron-app-for-mac-and-windows-using-electron-builder-6a3982c0cee6   
+https://blog.naver.com/PostView.nhn?blogId=danaramm&logNo=221743906453&parentCategoryNo=&categoryNo=23&viewDate=&isShowPopularPosts=true&from=search   
 
 ## JavaScript convention
-https://standardjs.com/rules-kokr.html
+https://standardjs.com/rules-kokr.html   
+
+
+## App build & deploy
+    1. change version `package.json`
+    2. `npm run react-build`
+    3. `npm run deploy`
+    4. go to repository on GitHub, and click the "Releases" tab
+    5. click on "Edit", and then "Publish" to finalize the release
