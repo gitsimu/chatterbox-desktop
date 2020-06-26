@@ -222,8 +222,7 @@ div, input, textarea {
 }
 .chat-body:empty:after {
   content: "\e04a";
-  font-family: 'simple-line-icons';
-  speak: none;
+  font-family: 'simple-line-icons';  
   font-style: normal;
   font-weight: normal;
   font-variant: normal;
@@ -540,7 +539,7 @@ div, input, textarea {
 }
 .message .message-inner {
   display: inline-block;
-  padding: 8px 12px;
+  padding: 6px 12px;
   border-radius: 10px;
   font-size: 13px;
 
@@ -757,7 +756,7 @@ div, input, textarea {
 }
 .setting-list-tab {
   padding: 15px 25px;
-  font-size: 14px;
+  font-size: 13px;
   /* font-weight: bold; */
   background: rgba(0, 0, 0, 0);
   cursor: pointer;
@@ -826,13 +825,22 @@ div, input, textarea {
 .setting-working-time-title {
   padding-right: 10px !important;
 }
-.setting-working-time select {
+.setting-working-time select,
+.setting-checkbox-item-title select {
   background: rgba(27, 29, 35, 1);
   color: #fff;
   border-radius: 5px;
   border: none;
   outline: none;
   padding: 5px 10px;
+}
+.setting-checkbox-item-title select {
+  margin-left: 10px;
+  min-width: 100px;
+}
+.setting-checkbox-item-title .setting-checkbox-item-description {
+  display: inline-block;
+  font-weight: normal;
 }
 .setting-working-message {
   margin: 0 !important;
@@ -1136,7 +1144,7 @@ div, input, textarea {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0,0,0,0.2);
+  background: rgba(0,0,0,0.1);
 }
 #loading > div {
   display: inline-block;

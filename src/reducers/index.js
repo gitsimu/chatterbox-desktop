@@ -6,5 +6,5 @@ import settings from './settings'
 export default combineReducers({
   users,
   messages,
-  settings,
+  settings
 })

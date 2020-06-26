@@ -14,6 +14,7 @@ import Memo from './Memo'
 import Info from './Info'
 import Setting from './Setting'
 import '../css/style.css'
+import '../css/theme.scss'
 import '../js/global.js'
 import * as script from '../js/script.js'
 
@@ -24,6 +25,7 @@ function Main({ users, messages, settings, addUsers, clearUsers, selectedUser, s
   const [screenState, setScreenState] = React.useState(0)
   const [tabState, setTabState] = React.useState(0)
   const [imageViewer, showImageViewer] = React.useState(null)
+  
   const isLoading = props.isLoading
 
   if (!firebase.apps.length) {
@@ -117,7 +119,7 @@ function Main({ users, messages, settings, addUsers, clearUsers, selectedUser, s
         alert('인증 서버에서 연결을 거부하였습니다.')
       })
 
-    return () => { chat.off() }
+    // return () => { chat.off() }
   }, [addUsers, clearUsers, database, isLoading, selectedUser, settings.key])
 
   return (

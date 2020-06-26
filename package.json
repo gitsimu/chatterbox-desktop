@@ -1,6 +1,6 @@
 {
   "name": "chatterbox-desktop",
-  "version": "1.0.11",
+  "version": "1.0.18",
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^4.2.4",
@@ -11,6 +11,7 @@
     "electron-updater": "^4.3.1",
     "firebase": "^7.15.0",
     "foreman": "^3.0.1",
+    "node-sass": "^4.14.1",
     "react": "^16.13.1",
     "react-color": "^2.18.1",
     "react-dom": "^16.13.1",
@@ -66,7 +67,7 @@
         "nsis",
         "portable"
       ],
-      "icon": "./public/icon01_256.png"
+      "icon": "./public/icon01_256.ico"
     },
     "linux": {
       "target": [
@@ -79,7 +80,8 @@
     },
     "nsis": {
       "oneClick": false,
-      "allowToChangeInstallationDirectory": true
+      "allowToChangeInstallationDirectory": true,
+      "useZip": true
     },
     "directories": {
       "buildResources": "resources/installer/",

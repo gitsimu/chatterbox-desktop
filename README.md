@@ -93,6 +93,9 @@ https://steemit.com/utopian-io/@pckurdu/file-drag-and-drop-module-in-electron-wi
 https://medium.com/@johndyer24/creating-and-deploying-an-auto-updating-electron-app-for-mac-and-windows-using-electron-builder-6a3982c0cee6   
 https://blog.naver.com/PostView.nhn?blogId=danaramm&logNo=221743906453&parentCategoryNo=&categoryNo=23&viewDate=&isShowPopularPosts=true&from=search   
 
+## NSIS crashes on Windows 7
+https://github.com/electron-userland/electron-builder/issues/2518
+
 ## JavaScript convention
 https://standardjs.com/rules-kokr.html   
 

@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain } = require('electron')
+const { app, BrowserWindow, ipcMain, globalShortcut } = require('electron')
 const { autoUpdater } = require('electron-updater')
 
 const url = require('url')
@@ -6,7 +6,7 @@ const path = require('path')
 let win
 
 function createWindow () {
-  // 브라우저 창을 생성합니다.
+  /* 브라우저 창을 생성합니다. */
   win = new BrowserWindow({
     width: 1024,
     height: 600,
@@ -14,73 +14,70 @@ function createWindow () {
     minHeight: 600,    
     webPreferences: {
       nodeIntegration: true,
-      enableRemoteModule: true
-      // nodeIntegrationInWorker: true
+      enableRemoteModule: true      
     }
   })
   win.removeMenu()
 
-  // React를 빌드할 경우 결과물은 build 폴더에 생성되기 때문에 loadURL 부분을 아래와 같이 작성합니다.
+  /* React를 빌드할 경우 결과물은 build 폴더에 생성되기 때문에 loadURL 부분을 아래와 같이 작성합니다. */
   const startUrl = process.env.ELECTRON_START_URL || url.format({
-    pathname: path.join(__dirname, '/../build/index.html'),
-    // pathname: path.join(__dirname, "index.html"),
+    pathname: path.join(__dirname, '/../build/index.html'),    
     protocol: 'file:',
     slashes: true
   })
   win.loadURL(startUrl)
-  win.openDevTools()
-
-  // win.once('ready-to-show', () => {
-  //   autoUpdater.checkForUpdatesAndNotify()
-  // })
 }
+
+/* developer tool을 여는 단축키 지정 (command + P) */
+app.whenReady().then(() => {
+  globalShortcut.register('CommandOrControl+P', () => {
+    win.openDevTools()
+  })
+})
 
 app.on('ready', () => {
   autoUpdater.checkForUpdatesAndNotify()
 })
 
-// ipcMain.on('ondragstart', (event, filePath) => {
-//   event.sender.startDrag({
-//     file: filePath,
-//     icon: 'https://chatter-box-bucket.s3.ap-northeast-2.amazonaws.com/chatterbox/c1cd7759-9784-4fac-a667-3685d6b2e4a0/NaverBand.png'
-//   })
-// })
-
-// 이 메소드는 Electron의 초기화가 완료되고
-// 브라우저 윈도우가 생성될 준비가 되었을때 호출된다.
-// 어떤 API는 이 이벤트가 나타난 이후에만 사용할 수 있습니다.
+/* 이 메소드는 Electron의 초기화가 완료되고
+ * 브라우저 윈도우가 생성될 준비가 되었을때 호출
+ * 어떤 API는 이 이벤트가 나타난 이후에만 사용할 수 있습니다. */
 app.whenReady().then(createWindow)
 
-// 모든 윈도우가 닫히면 종료된다.
+/* 모든 윈도우가 닫히면 종료된다. */
 app.on('window-all-closed', () => {
-  // macOS에서는 사용자가 명확하게 Cmd + Q를 누르기 전까지는
-  // 애플리케이션이나 메뉴 바가 활성화된 상태로 머물러 있는 것이 일반적입니다.
+  /* macOS에서는 사용자가 명확하게 Cmd + Q를 누르기 전까지는
+   * 애플리케이션이나 메뉴 바가 활성화된 상태로 머물러 있는 것이 일반적입니다. */
   if (process.platform !== 'darwin') {
     app.quit()
   }
 })
 
 app.on('activate', () => {
-  // macOS에서는 dock 아이콘이 클릭되고 다른 윈도우가 열려있지 않았다면
-  // 앱에서 새로운 창을 다시 여는 것이 일반적입니다.
+  /* macOS에서는 dock 아이콘이 클릭되고 다른 윈도우가 열려있지 않았다면
+   * 앱에서 새로운 창을 다시 여는 것이 일반적입니다. */
   if (BrowserWindow.getAllWindows().length === 0) {
     createWindow()
     autoUpdater.checkForUpdatesAndNotify()
   }
 })
 
+/* 앱 버전 확인 */
 ipcMain.on('app_version', (event) => {
   event.sender.send('app_version', { version: app.getVersion() })
 })
 
+/* 업데이트가 가능한 상태인지 확인 */
 autoUpdater.on('update-available', () => {
   win.webContents.send('update_available')
 })
 
+/* 업데이트파일 다운로드 완료 */
 autoUpdater.on('update-downloaded', () => {
   win.webContents.send('update_downloaded')
 })
 
+/* 앱 재시작 후 설치 */
 ipcMain.on('restart_app', () => {
   autoUpdater.quitAndInstall()
 })

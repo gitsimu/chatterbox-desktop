@@ -36,7 +36,7 @@ const Setting = ({ settings, ...props }) => {
   const [pushAlram, allowPushAlram] = React.useState(true)
   const [audioBeep, allowAudioBeep] = React.useState(true)
   const [autoSignin, allowAutoSignin] = React.useState(true)
-  
+  const [mainTheme, setMainTheme] = React.useState('light')
 
   const [workingDay, setWorkingDay] = React.useState(initWorkingDay)
 
@@ -64,11 +64,12 @@ const Setting = ({ settings, ...props }) => {
     /* GET BASIC SETTINGS
      * PUSH ALARM / AUDIO BEEP / AUTO SIGNIN
      */
-    storage.getMany(['pushAlram', 'audioBeep', 'autoSignin'], (err, data) => {
+    storage.getMany(['pushAlram', 'audioBeep', 'autoSignin', 'mainTheme'], (err, data) => {
       console.log('[Basic settings]', data)
       allowPushAlram(typeof(data.pushAlram.allowed) === "undefined" ? true : data.pushAlram.allowed)
       allowAudioBeep(typeof(data.audioBeep.allowed) === "undefined" ? true : data.audioBeep.allowed)
       allowAutoSignin(typeof(data.autoSignin.allowed) === "undefined" ? true : data.autoSignin.allowed)
+      setMainTheme(typeof(data.mainTheme.type) === "undefined" ? 'light' : data.mainTheme.type)
     })
   }, [])
 
@@ -176,12 +177,12 @@ const Setting = ({ settings, ...props }) => {
         <div
           className={ settingMenuState === 0 ? "setting-list-tab active" : "setting-list-tab"}
           onClick={() => { setSettingMenuState(0) }}>
-          <div>기본 설정</div>
+          <div>기본설정</div>
         </div>
         <div
           className={ settingMenuState === 1 ? "setting-list-tab active" : "setting-list-tab"}
           onClick={() => { setSettingMenuState(1) }}>
-          <div>채팅 설정</div>
+          <div>채팅설정</div>
         </div>
         <div className="setting-list-title">Etc</div>
         <div className="setting-list-tab"
@@ -209,6 +210,23 @@ const Setting = ({ settings, ...props }) => {
             기본 설정
           </div>
           <div className="setting-menu-body setting-basic">
+            <div className="setting-checkbox-item">
+              <div className="setting-checkbox-item-title">
+                <span>테마</span>
+                <select 
+                  value={mainTheme} 
+                  onChange={(e) => {
+                    // SET MAIN THEME
+                    setMainTheme(e.target.value)
+                    storage.set('mainTheme', { type: e.target.value })
+                    console.log('theme change', e.target.value)
+                  }}>
+                  <option value="chatterbox-theme-light">Light</option>
+                  <option value="chatterbox-theme-dark">Dark</option>
+                </select>
+                <div className="setting-checkbox-item-description">앱을 재시작하면 변경된 테마가 적용됩니다.</div>
+              </div>              
+            </div>
             <div className="setting-checkbox-item">
               <div className="setting-checkbox-item-title">
                 <label>

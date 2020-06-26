@@ -332,7 +332,7 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch => ({
   addMessages: m => dispatch(addMessages(m)),
   deleteMessages: m => dispatch(deleteMessages(m)),
-  clearMessages: m => dispatch(clearMessages()),
+  clearMessages: () => dispatch(clearMessages()),
   selectedUser: u => dispatch(selectedUser(u))
 })
 

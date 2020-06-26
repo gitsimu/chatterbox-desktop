@@ -15,9 +15,11 @@ const storage = require('electron-json-storage')
  */
 const { shell } = require('electron')
 
-function App({ settings, signIn }) {
-  let id, pw
+function App({ settings, signIn }) {  
+  const [id, setId] = React.useState('')
+  const [pw, setPw] = React.useState('')
   const [loading, isLoading] = React.useState(false)
+  const [mainTheme, setMainTheme] = React.useState('chatterbox-theme-light')
 
   /* simpleline icons */
   React.useEffect(() => {
@@ -25,7 +27,14 @@ function App({ settings, signIn }) {
     simmplelineLink.href = "https://cdnjs.cloudflare.com/ajax/libs/simple-line-icons/2.4.1/css/simple-line-icons.min.css"
     simmplelineLink.rel = "stylesheet"
     simmplelineLink.type = "text/css"
-    document.querySelector('body').appendChild(simmplelineLink)    
+    document.querySelector('body').appendChild(simmplelineLink)
+
+    /* Main theme */
+    storage.get('mainTheme', (err, data) => {           
+      if (data.type) {
+        setMainTheme(data.type)
+      }
+    })
   }, [])
 
   const signInProcess = React.useCallback((id, pw) => {
@@ -57,7 +66,7 @@ function App({ settings, signIn }) {
   }, [signInProcess])
 
   return (
-    <>
+    <div id="container" className={mainTheme}>
     { !settings.key ? (
       <div className="app">
         <div className="app-container card">
@@ -68,24 +77,25 @@ function App({ settings, signIn }) {
           <div className="app-input">
             <div className="app-input-item">
               <span>아이디</span>
-              <input type="text" ref={node => id = node}/>
+              <input type="text" value={id} onChange={e => setId(e.target.value)}/>
             </div>
             <div className="app-input-item">
               <span>비밀번호</span>
               <input type="password"
-                ref={node => pw = node}
+                value={pw} 
+                onChange={e => setPw(e.target.value)}
                 onKeyPress={(e) => {
                   if (e.key === 'Enter') {
                     e.preventDefault()
-                    signInProcess(id.value, pw.value)
+                    signInProcess(id, pw)
                   }
                 }}/>
             </div>
           </div>
           <div
-            className="app-button-login"
+            className={(id !== '' && pw !== '') ? "app-button-login active" : "app-button-login"}
             onClick={() => {
-              signInProcess(id.value, pw.value)
+              signInProcess(id, pw)
             }}>
             <div>로그인</div>
           </div>
@@ -113,7 +123,7 @@ function App({ settings, signIn }) {
     { loading && (
       <div id="loading"><div></div></div>
     )}
-    </>
+    </div>
   )
 }
 
