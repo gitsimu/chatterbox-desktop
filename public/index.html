@@ -35,19 +35,20 @@
       }
       #notification {
         position: fixed;
+        bottom: 0;
         z-index: 999;
-        background: #fff7b2;
-        color: #494949;
+        background: #0d47a1;
+        color: #fff;        
         width: 100%;
-        padding: 5px 10px;
+        padding: 10px 15px;
         font-size: 12px;
         display: flex;
-        box-shadow: 0 0 15px 5px rgba(0,0,0,0.3);
-        transition: 0.3s ease all;
+        box-shadow: 0 0 15px 5px rgba(0,0,0,.3);
+        transition: .3s ease all;
         user-select: none;
       }
       #notification.hidden{
-        transform: translateY(-30px);
+        transform: translateY(30px);
         opacity: 0;
       }
       #notificationMessage {
@@ -62,10 +63,11 @@
       }
       #notificationButton {
         display: flex;
-        color: #0D47A1;
+        color: #fff;
       }
       #notificationButton > div {
         padding: 0 10px;
+        margin: 0 3px;
         cursor: pointer;
       }
       #notificationButton > div:hover {

@@ -7,7 +7,7 @@ import { ChromePicker } from 'react-color'
 /* URL을 OS 기본 브라우저로 열기위한 shell
  * https://github.com/electron/electron/blob/master/docs/api/shell.md#shellopenexternalurl
  */
-const { shell } = require('electron')
+const { shell, ipcRenderer } = require('electron')
 const storage = require('electron-json-storage')
 const initWorkingDay = {
   isInit: true,
@@ -41,6 +41,10 @@ const Setting = ({ settings, ...props }) => {
   const [workingDay, setWorkingDay] = React.useState(initWorkingDay)
 
   const [settingMenuState, setSettingMenuState] = React.useState(0)
+
+  const [version, setVersion] = React.useState('0.0.0')
+  const [versionState, setVersionState] = React.useState(0)
+
   const isLoading = props.isLoading
   
   /* by firebase */
@@ -70,6 +74,18 @@ const Setting = ({ settings, ...props }) => {
       allowAudioBeep(typeof(data.audioBeep.allowed) === "undefined" ? true : data.audioBeep.allowed)
       allowAutoSignin(typeof(data.autoSignin.allowed) === "undefined" ? true : data.autoSignin.allowed)
       setMainTheme(typeof(data.mainTheme.type) === "undefined" ? 'light' : data.mainTheme.type)
+    })
+
+    ipcRenderer.send('app_version');
+    ipcRenderer.on('app_version', (event, arg) => {
+      ipcRenderer.removeAllListeners('app_version')
+      setVersion(arg.version)
+    })
+    ipcRenderer.on('update_available', () => {
+      setVersionState(1)
+    })
+    ipcRenderer.on('update_downloaded', () => {
+      setVersionState(2)
     })
   }, [])
 
@@ -200,7 +216,7 @@ const Setting = ({ settings, ...props }) => {
         <div
           className={ settingMenuState === 2 ? "setting-list-tab active" : "setting-list-tab"}
           onClick={() => { setSettingMenuState(2) }}>
-          <div>버전 정보</div>
+          <div>서비스 정보</div>
         </div>
       </div>
 
@@ -447,8 +463,9 @@ const Setting = ({ settings, ...props }) => {
                 <div className="setting-input-item">
                   <span>테마색상</span>
                   <input type="text"
-                    value={themeColor}                    
-                    onChange={() => {
+                    value={themeColor}
+                    onChange={() => {}}              
+                    onClick={() => {
                       showThemeColorPicker(!themeColorPicker)
                     }}/>
                   <div className="setting-color-sample" style={{ backgroundColor: themeColor }}></div>
@@ -471,9 +488,10 @@ const Setting = ({ settings, ...props }) => {
                       <div>새 이미지 업로드</div>
                       <input type="file" onChange={e => handleFileInput(e)}/>
                     </label>
-                    <div
-                      className="setting-profile-image-remove"
+                    { profileImage !== null && (
+                      <div className="setting-profile-image-remove"
                       onClick={() => { handleFileRemove() }}>이미지 삭제</div>
+                    )}                     
                   </div>
                 </div>
               </div>
@@ -509,9 +527,25 @@ const Setting = ({ settings, ...props }) => {
 
         <div className={ settingMenuState === 2 ? "setting-menu-2" : "setting-menu-2 hide" }>
           <div className="setting-menu-header">
-            버전 정보
+            서비스 정보
           </div>
           <div className="setting-menu-body">
+            <div className="setting-data-item">
+              <div className="setting-data-item-key">버전</div>
+              <div className="setting-data-item-value">
+                { version }
+                { versionState === 0 && ( 
+                  <div className="setting-data-item-description">최신 버전 사용 중</div>
+                )}
+                { versionState === 1 && ( 
+                  <div className="setting-data-item-description">새 업데이트가 있습니다. 업데이트를 준비 중입니다.</div>
+                )}
+                { versionState === 2 && ( 
+                  <div className="setting-data-item-description">새 업데이트를 설치할 준비가 되었습니다.</div>
+                )}
+              </div>
+            </div>
+            <div className="setting-data-item"></div>       
           </div>
         </div>
 

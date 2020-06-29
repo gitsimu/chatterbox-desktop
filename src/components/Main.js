@@ -26,6 +26,7 @@ function Main({ users, messages, settings, addUsers, clearUsers, selectedUser, s
   const [tabState, setTabState] = React.useState(0)
   const [imageViewer, showImageViewer] = React.useState(null)
   
+  const Alert = props.Alert
   const isLoading = props.isLoading
 
   if (!firebase.apps.length) {
@@ -110,17 +111,17 @@ function Main({ users, messages, settings, addUsers, clearUsers, selectedUser, s
             })
             .catch(error => {
               isLoading(false)
-              alert('인증에 실패하였습니다.')
+              Alert('인증에 실패하였습니다.')
             })
         }
       })
       .catch(error => {
         isLoading(false)
-        alert('인증 서버에서 연결을 거부하였습니다.')
+        Alert('인증 서버에서 연결을 거부하였습니다.')
       })
 
     // return () => { chat.off() }
-  }, [addUsers, clearUsers, database, isLoading, selectedUser, settings.key])
+  }, [addUsers, clearUsers, database, isLoading, selectedUser, settings.key, Alert])
 
   return (
     <div className="App">
@@ -174,6 +175,7 @@ function Main({ users, messages, settings, addUsers, clearUsers, selectedUser, s
                 <Chat
                   database={database}
                   tabState={tabState}
+                  Alert={Alert}
                   setTabState={setTabState}
                   showImageViewer={showImageViewer}/>
               )}
@@ -182,8 +184,8 @@ function Main({ users, messages, settings, addUsers, clearUsers, selectedUser, s
             </div>
           </div>
           <div className="container-right">
-            <Memo database={database}/>
-            <Info database={database}/>
+            <Memo database={database} Alert={Alert}/>
+            <Info database={database} Alert={Alert}/>
           </div>
         </div>
         <div className={ screenState === 1 ? "container-screen-1" : "container-screen-1 hide" }>

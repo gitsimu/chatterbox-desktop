@@ -12,6 +12,7 @@ const Chat = ({ users, messages, settings, addMessages, deleteMessages, clearMes
   const database = props.database
   const setTabState = props.setTabState
   const target = settings.selectedUser
+  const Alert = props.Alert
 
   const [optionDialog, showOptionDialog] = React.useState(false)
   const [infoDialog, showInfoDialog] = React.useState(false)
@@ -83,10 +84,10 @@ const Chat = ({ users, messages, settings, addMessages, deleteMessages, clearMes
     const fileExtension = target.name.split('.').pop().toLowerCase()
 
     if (MAX_FILE_SIZE < fileSize) {
-      alert('한 번에 업로드 할 수 있는 최대 파일 크기는 5MB 입니다.')
+      Alert('한 번에 업로드 할 수 있는 최대 파일 크기는 5MB 입니다.')
       return
     } else if (ALLOW_FILE_EXTENSIONS.indexOf(fileExtension) === -1) {
-      alert('지원하지 않는 파일 형식입니다.')
+      Alert('지원하지 않는 파일 형식입니다.')
       return
     }
 
@@ -112,7 +113,7 @@ const Chat = ({ users, messages, settings, addMessages, deleteMessages, clearMes
           throw err
         }
       })
-  }, [database, key, sendMessage, userid])
+  }, [database, key, sendMessage, userid, Alert])
 
   React.useEffect(() => {
     console.log(selectedEmoji)
@@ -280,7 +281,7 @@ const Chat = ({ users, messages, settings, addMessages, deleteMessages, clearMes
               setTabState(2)
               showOptionDialog(false)
               showInfoDialog(true)
-              alert('이 대화가 종료처리 되었습니다.')
+              Alert('이 대화가 종료처리 되었습니다.')
             }}>
             <i className='icon-power'></i>대화 종료하기
           </div>
@@ -296,7 +297,7 @@ const Chat = ({ users, messages, settings, addMessages, deleteMessages, clearMes
               CONNECTIONS[userid].off()
               delete CONNECTIONS[userid]
 
-              alert('이 대화가 삭제처리 되었습니다.')
+              Alert('이 대화가 삭제처리 되었습니다.')
             }}>
             <i className='icon-trash'></i>대화 삭제하기
           </div>

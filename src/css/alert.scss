@@ -1,0 +1,57 @@
+div#Alert {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    z-index: 999;
+
+    & .alert-dialog {
+        background: #26292f;
+        color: #fff;
+        font-size: 14px;
+        padding: 15px;
+        min-width: 350px;
+        border: 1px solid #333;
+        border-top: none;
+        border-bottom-left-radius: 3px;
+        border-bottom-right-radius: 3px;
+        transition: 0.3s ease all;
+        animation: showAlert .2s ease-in-out;
+        box-shadow: 0 0 15px 5px rgba(0,0,0,0.2);
+    }
+    & .alert-message {
+        margin-bottom: 10px;
+        padding: 0 10px;
+        font-weight: bold;
+        font-size: 13px;
+    }
+    & .alert-buttons {
+        display: flex;
+        justify-content: flex-end;
+
+        & > div {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 3px;
+            transition: 0.2s ease all;
+            cursor: pointer;            
+        }
+        & > div:hover {
+            background: rgba(0, 0, 0, 0.4);
+        }
+    }
+}
+
+@keyframes showAlert {
+    0% {opacity:0; transform: translateY(-100px)}
+    100% {opacity:1; transform: translateY(0)}
+}
+@-webkit-keyframes showAlert {
+    0% {opacity:0; transform: translateY(-100px)}
+    100% {opacity:1; transform: translateY(0)}
+}

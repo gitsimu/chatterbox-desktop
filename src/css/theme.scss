@@ -155,7 +155,7 @@
   }
   
   .message-form > form {
-    border: none;
+    border: 1px solid #f1f1f1;
   }
   .message-addon,
   .message-input,
@@ -267,5 +267,11 @@
     background: #fff;
     color: #494949;
     border: 1px solid #eee;
+  }
+  .setting-data-item {
+    color: #000;
+  }
+  .setting-data-item-description {
+    color: #555;
   }
 }

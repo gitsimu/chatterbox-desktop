@@ -6,6 +6,7 @@ import { signIn } from '../actions'
 
 import Main from './Main'
 import '../css/App.css'
+import '../css/alert.scss'
 
 /* 내부 스토리지 관리 */
 const storage = require('electron-json-storage')
@@ -20,7 +21,9 @@ function App({ settings, signIn }) {
   const [pw, setPw] = React.useState('')
   const [loading, isLoading] = React.useState(false)
   const [mainTheme, setMainTheme] = React.useState('chatterbox-theme-light')
-
+  const [alertDialog, showAlertDialog] = React.useState(null)
+  const [signInRequired, setSignInRequired] = React.useState(false)
+  
   /* simpleline icons */
   React.useEffect(() => {
     let simmplelineLink = document.createElement("link")
@@ -37,12 +40,29 @@ function App({ settings, signIn }) {
     })
   }, [])
 
+  const Alert = React.useCallback((message) => {
+    const alertHtml = 
+      <div id="Alert">
+        <div id="AlertBody" className="alert-dialog">
+          <div className="alert-top">
+            <div id="AlertMessage" className="alert-message">{message}</div>
+          </div>
+          <div className="alert-bottom">
+            <div className="alert-buttons">
+              <div onClick={() => showAlertDialog(null)}>OK</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    showAlertDialog(alertHtml)
+  }, [])
+
   const signInProcess = React.useCallback((id, pw) => {
     if (!id || id === '') {
-      alert('아이디를 입력해주세요.')
+      Alert('아이디를 입력해주세요.')
       return
     } else if (!pw || pw === '') {
-      alert('비밀번호를 입력해주세요.')
+      Alert('비밀번호를 입력해주세요.')
       return
     }
 
@@ -50,24 +70,29 @@ function App({ settings, signIn }) {
     storage.set('userData', { token: token, id: id, pw: pw }, () => {
       signIn({ key: token })
     })
-  }, [signIn])
+  }, [signIn, Alert])
 
   /* 첫 렌더링 시 local storage를 확인
    * id/pw/token 값이 존자해면 바로 로그인한다
    */
   React.useEffect(() => {
-    storage.getMany(['userData', 'autoSignin'], (err, data) => {      
-      if (!data.autoSignin.allowed) return
-      else if (data.userData && data.userData.id && data.userData.pw) {
+    storage.getMany(['userData', 'autoSignin'], (err, data) => {            
+      if (data.autoSignin.allowed 
+        && data.userData 
+        && data.userData.id 
+        && data.userData.pw) {
+        setSignInRequired(false)
         signInProcess(data.userData.id, data.userData.pw)
         console.log('storage data', data)
+      } else {
+        setSignInRequired(true)
       }
     })
   }, [signInProcess])
 
   return (
     <div id="container" className={mainTheme}>
-    { !settings.key ? (
+    { (!settings.key) ? (
       <div className="app">
         <div className="app-container card">
           <div className="app-title">
@@ -117,12 +142,15 @@ function App({ settings, signIn }) {
         </div>
       </div>
     ) : (
-      <Main isLoading={isLoading}/>
+      <Main isLoading={isLoading} Alert={Alert}/>
     )}
 
     { loading && (
       <div id="loading"><div></div></div>
     )}
+
+    { alertDialog && (alertDialog)}
+      
     </div>
   )
 }

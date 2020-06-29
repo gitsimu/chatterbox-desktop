@@ -4,6 +4,7 @@ import { connect } from 'react-redux'
 const Info = ({ users, settings, ...props }) => {
   const key = settings.key
   const database = props.database
+  const Alert = props.Alert
 
   const i = settings.selectedUser
   const [info, setInfo] = React.useState(i)
@@ -33,7 +34,7 @@ const Info = ({ users, settings, ...props }) => {
       case 'nickname':
         if (nickname.trim().length === 0) { return }
         else if (nickname.trim().length > 30) {
-          alert('닉네임의 허용 길이는 최대 30자 입니다.')
+          Alert('닉네임의 허용 길이는 최대 30자 입니다.')
           return
         }
 
@@ -43,7 +44,7 @@ const Info = ({ users, settings, ...props }) => {
       case 'mobile':
         if (mobile.trim().length === 0) { return }
         else if (mobile.trim().length > 30) {
-          alert('연락처의 허용 길이는 최대 30자 입니다.')
+          Alert('연락처의 허용 길이는 최대 30자 입니다.')
           return
         }
 
@@ -53,7 +54,7 @@ const Info = ({ users, settings, ...props }) => {
       case 'email':
         if (mobile.trim().length === 0) { return }
         else if (mobile.trim().length > 50) {
-          alert('이메일의 허용 길이는 최대 50자 입니다.')
+          Alert('이메일의 허용 길이는 최대 50자 입니다.')
           return
         }
 
@@ -67,7 +68,7 @@ const Info = ({ users, settings, ...props }) => {
 
     if (data) {
       database.ref(`/${key}/users/${settings.selectedUser.key}`).update(data)
-      alert('변경되었습니다.')
+      Alert('변경되었습니다.')
     }
   }
 
