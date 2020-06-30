@@ -15,6 +15,7 @@ div#Alert {
         color: #fff;
         font-size: 14px;
         padding: 15px;
+        padding-bottom: 10px;
         min-width: 350px;
         border: 1px solid #333;
         border-top: none;
@@ -42,7 +43,7 @@ div#Alert {
             cursor: pointer;            
         }
         & > div:hover {
-            background: rgba(0, 0, 0, 0.4);
+            background: rgb(76, 77, 82);
         }
     }
 }

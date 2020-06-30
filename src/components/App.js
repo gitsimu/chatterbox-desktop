@@ -66,8 +66,7 @@ function App({ settings, signIn }) {
 
     const token = 'c1cd7759-9784-4fac-a667-3685d6b2e4a0'
     storage.set('userData', { token: token, id: id, pw: pw }, () => {
-      signIn({ key: token })
-      isSignInRequired(false)
+      signIn({ key: token })      
     })
   }, [signIn, Alert])
 
@@ -75,14 +74,13 @@ function App({ settings, signIn }) {
    * id/pw/token 값이 존자해면 바로 로그인한다
    */
   React.useEffect(() => {    
-    storage.getMany(['userData', 'autoSignin'], (err, data) => {            
+    storage.getMany(['userData', 'autoSignin'], (err, data) => {      
       if (data.autoSignin.allowed 
         && data.userData 
         && data.userData.id 
         && data.userData.pw) {
-        isSignInRequired(false)
         signInProcess(data.userData.id, data.userData.pw)
-        console.log('storage data', data)
+        isSignInRequired(false)
       } else {
         isSignInRequired(true)
       }
@@ -91,7 +89,7 @@ function App({ settings, signIn }) {
 
   return (
     <div id="container" className={mainTheme}>
-    { signInRequired && (
+    { (!settings.key && signInRequired) && (
       <div className="app">
         <div className="app-container card">
           <div className="app-title">
@@ -139,10 +137,10 @@ function App({ settings, signIn }) {
         <div className="app-copyright">
           COPYRIGHT (C) Creative Soft. All Rights reserved.
         </div>
-      </div>
+      </div>    
     )}
-
-    {(!signInRequired && settings.key) && (
+    
+    {(settings.key && !signInRequired) && (
       <Main isLoading={isLoading} Alert={Alert}/>
     )}
 

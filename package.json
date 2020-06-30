@@ -62,7 +62,7 @@
       "icon": "./public/icon01_512.png"
     },
     "win": {
-      "target": [        
+      "target": [
         "nsis"
       ],
       "icon": "./public/icon01_256.ico"
