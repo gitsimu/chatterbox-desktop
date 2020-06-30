@@ -2,7 +2,7 @@ const initialState = {
   key: '',
   smlogKey: '',
   selectedUser: {},
-};
+}
 
 const settings = (state = initialState, action) => {
   switch (action.type) {
@@ -15,14 +15,14 @@ const settings = (state = initialState, action) => {
       return {
         ...state,
         selectedUser: action.user,
-      };
+      }
     case 'SIGN_IN':
       return {
         ...state,
         key: action.key,
-      };
+      }
     case 'SIGN_OUT':
-      return initialState;
+      return initialState
     default:
       return state
   }

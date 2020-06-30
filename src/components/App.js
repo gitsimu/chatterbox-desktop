@@ -1,6 +1,4 @@
 import React from 'react'
-// import axios from 'axios'
-
 import { connect } from 'react-redux'
 import { signIn } from '../actions'
 
@@ -22,7 +20,7 @@ function App({ settings, signIn }) {
   const [loading, isLoading] = React.useState(false)
   const [mainTheme, setMainTheme] = React.useState('chatterbox-theme-light')
   const [alertDialog, showAlertDialog] = React.useState(null)
-  const [signInRequired, setSignInRequired] = React.useState(false)
+  const [signInRequired, isSignInRequired] = React.useState(false)
   
   /* simpleline icons */
   React.useEffect(() => {
@@ -69,30 +67,31 @@ function App({ settings, signIn }) {
     const token = 'c1cd7759-9784-4fac-a667-3685d6b2e4a0'
     storage.set('userData', { token: token, id: id, pw: pw }, () => {
       signIn({ key: token })
+      isSignInRequired(false)
     })
   }, [signIn, Alert])
 
-  /* 첫 렌더링 시 local storage를 확인
+  /* 첫 렌더링 시/로그아웃 시 local storage를 확인
    * id/pw/token 값이 존자해면 바로 로그인한다
    */
-  React.useEffect(() => {
+  React.useEffect(() => {    
     storage.getMany(['userData', 'autoSignin'], (err, data) => {            
       if (data.autoSignin.allowed 
         && data.userData 
         && data.userData.id 
         && data.userData.pw) {
-        setSignInRequired(false)
+        isSignInRequired(false)
         signInProcess(data.userData.id, data.userData.pw)
         console.log('storage data', data)
       } else {
-        setSignInRequired(true)
+        isSignInRequired(true)
       }
     })
-  }, [signInProcess])
+  }, [signInProcess, settings.key])
 
   return (
     <div id="container" className={mainTheme}>
-    { (!settings.key) ? (
+    { signInRequired && (
       <div className="app">
         <div className="app-container card">
           <div className="app-title">
@@ -141,7 +140,9 @@ function App({ settings, signIn }) {
           COPYRIGHT (C) Creative Soft. All Rights reserved.
         </div>
       </div>
-    ) : (
+    )}
+
+    {(!signInRequired && settings.key) && (
       <Main isLoading={isLoading} Alert={Alert}/>
     )}
 
