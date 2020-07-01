@@ -96,6 +96,10 @@ https://blog.naver.com/PostView.nhn?blogId=danaramm&logNo=221743906453&parentCat
 ## NSIS crashes on Windows 7
 https://github.com/electron-userland/electron-builder/issues/2518
 
+## Electron-dl (file download)
+https://github.com/sindresorhus/electron-dl   
+https://stackoverflow.com/questions/46102851/electron-download-a-file-to-a-specific-location   
+
 ## JavaScript convention
 https://standardjs.com/rules-kokr.html   
 

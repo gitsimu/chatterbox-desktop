@@ -2,10 +2,19 @@ import React from 'react'
 import { connect } from 'react-redux'
 import * as script from '../js/script.js'
 
+const { ipcRenderer } = require('electron')
+
 const ChatMessage = ({ users, settings, ...props }) => {
   const isMyself = props.opponent !== props.userId
-  const isSameUser = (props.prev && (props.prev.userId === props.userId))
+  const isSameUser = (props.prev && (props.prev.userId === props.userId))  
   const showImageViewer = props.showImageViewer
+
+  // React.useEffect(() => {
+  //   ipcRenderer.on("download-progress", (event, progress) => {
+  //     console.log(progress.progress); // Progress in fraction, between 0 and 1      
+  //     setDownloadProgress((parseInt(progress.progress.percent * 100)) + '%')
+  //   })
+  // }, [])
 
   const skipDate = () => {
     if (!props.prev) {
@@ -15,6 +24,17 @@ const ChatMessage = ({ users, settings, ...props }) => {
       const curDate = script.timestampToDay(props.timestamp)
 
       return (prevDate === curDate)
+    }
+  }
+
+  const skipTime = () => {
+    if (!props.next)  {
+      return false
+    } else {
+      const nextTime = script.timestampToTime(props.next.timestamp, true)
+      const curTime = script.timestampToTime(props.timestamp, true)
+
+      return (nextTime === curTime)
     }
   }
 
@@ -43,14 +63,20 @@ const ChatMessage = ({ users, settings, ...props }) => {
         <div className="message-file-size">파일크기 : { script.bytesToSize(JSON.parse(props.message).size) }</div>
         <div className="message-file-expire">유효기간 : { expired } 까지</div>
         <div
-          className="message-file-save"
-          onClick={() => {
-            setTimeout(() => {
-              window.open(JSON.parse(props.message).location)
-            }, 100)
-          }}>
-          저장하기
-        </div>
+            className="message-file-save"
+            onClick={() => {
+              // setTimeout(() => {
+              //   window.open(JSON.parse(props.message).location)
+              // }, 100)
+              
+              // const directory = process.platform === 'darwin' ? 'Downloads' : 'C:\\Downloads'
+              ipcRenderer.send("download", {
+                url: JSON.parse(props.message).location,              
+              })
+            }}>
+            저장하기
+          </div>
+        
       </div>
     </div>
   }
@@ -67,7 +93,9 @@ const ChatMessage = ({ users, settings, ...props }) => {
 
       { isMyself ? (
         <div className="message myself">
-          <div className="message-time">{ script.timestampToTime(props.timestamp, true) }</div>
+          { !skipTime() && (
+            <div className="message-time">{ script.timestampToTime(props.timestamp, true) }</div>
+          )}
           { messageInner }
         </div>
       ) : (
@@ -88,7 +116,9 @@ const ChatMessage = ({ users, settings, ...props }) => {
             )}
             <div className="message-bottom">
               { messageInner }
-              <div className="message-time">{ script.timestampToTime(props.timestamp, true) }</div>
+              { !skipTime() && (
+                <div className="message-time">{ script.timestampToTime(props.timestamp, true) }</div>
+              )}              
             </div>
           </div>
         </div>

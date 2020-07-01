@@ -5,6 +5,8 @@ import axios from 'axios'
 import { connect } from 'react-redux'
 import { addMessages, deleteMessages, clearMessages, selectedUser } from '../actions'
 
+const { ipcRenderer } = require('electron')
+
 const CONNECTIONS = {}
 const Chat = ({ users, messages, settings, addMessages, deleteMessages, clearMessages, selectedUser, ...props }) => {
   const key = settings.key
@@ -208,6 +210,16 @@ const Chat = ({ users, messages, settings, addMessages, deleteMessages, clearMes
     }
   }, [clearMessages])
 
+  React.useEffect(() => {
+    ipcRenderer.on('download-complete', (event, file) => {      
+      Alert('다운로드가 완료되었습니다.')
+    })
+
+    return () => {
+      ipcRenderer.removeAllListeners('download-complete')
+    }
+  }, [Alert])
+
   return (
     <>
       <div className='messages card' ref={body}>        
@@ -219,9 +231,9 @@ const Chat = ({ users, messages, settings, addMessages, deleteMessages, clearMes
               target={target}
               key={m.id}
               prev={messages[userid][i - 1]}
+              next={messages[userid][i + 1]}
               {...m}
-              {...props}
-              />
+              {...props}/>
             })
         }
        

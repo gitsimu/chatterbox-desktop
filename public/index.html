@@ -99,13 +99,13 @@
     -->
 
     <script>
-      const { ipcRenderer } = require('electron');      
+      const { ipcRenderer } = require('electron')
 
-      ipcRenderer.send('app_version');
+      ipcRenderer.send('app_version')
       ipcRenderer.on('app_version', (event, arg) => {
-        ipcRenderer.removeAllListeners('app_version');        
+        ipcRenderer.removeAllListeners('app_version')    
         document.title = 'v' + arg.version;
-      });
+      })
 
       const notification = document.getElementById('notification')
       const notificationMessage = document.getElementById('notificationMessage')

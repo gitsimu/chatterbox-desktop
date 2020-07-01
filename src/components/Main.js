@@ -90,10 +90,11 @@ function Main({ users, messages, settings, addUsers, clearUsers, selectedUser, s
               recent.on('value', (snapshot) => {
                 // GET PUSH ALARM, AUDIO BEEP
                 storage.getMany(['pushAlram', 'audioBeep'], (err, data) => {           
-                  if (data.pushAlram.allowed) {
+                  if (data.pushAlram.allowed) {                    
                     const recentsData = snapshot.val()        
+                    const message = recentsData.type === 2 ? JSON.parse(recentsData.message).name : recentsData.message
                     const notification = new Notification('새 메세지', {
-                      body: recentsData.message,
+                      body: message,
                       silent: !data.audioBeep.allowed
                     })
 
@@ -157,6 +158,7 @@ function Main({ users, messages, settings, addUsers, clearUsers, selectedUser, s
                 }
               })
               signOut()
+              props.isSignInRequired(true)
             }}>
             <i className="icon-power"></i>
             <div className="tooltip">로그아웃</div>

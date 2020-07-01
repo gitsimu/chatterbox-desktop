@@ -13,6 +13,7 @@ const storage = require('electron-json-storage')
  * https://github.com/electron/electron/blob/master/docs/api/shell.md#shellopenexternalurl
  */
 const { shell } = require('electron')
+const { ipcRenderer } = require('electron')
 
 function App({ settings, signIn }) {  
   const [id, setId] = React.useState('')
@@ -20,7 +21,7 @@ function App({ settings, signIn }) {
   const [loading, isLoading] = React.useState(false)
   const [mainTheme, setMainTheme] = React.useState('chatterbox-theme-light')
   const [alertDialog, showAlertDialog] = React.useState(null)
-  const [signInRequired, isSignInRequired] = React.useState(false)
+  const [signInRequired, isSignInRequired] = React.useState(null)
   
   /* simpleline icons */
   React.useEffect(() => {
@@ -36,6 +37,19 @@ function App({ settings, signIn }) {
         setMainTheme(data.type)
       }
     })
+
+    ipcRenderer.on('download_complete', (event, file) => {
+      ipcRenderer.removeAllListeners('download_complete')
+      console.log('download_complete', file); // Full file path
+    });
+
+    ipcRenderer.on("download progress", (event, progress) => {
+      console.log(progress); // Progress in fraction, between 0 and 1
+      const progressInPercentages = progress * 100; // With decimal point and a bunch of numbers
+      const cleanProgressInPercentages = Math.floor(progress * 100); // Without decimal point
+      console.log('progressInPercentages', progressInPercentages) 
+      console.log('cleanProgressInPercentages', cleanProgressInPercentages) 
+    });
   }, [])
 
   const Alert = React.useCallback((message) => {
@@ -55,40 +69,55 @@ function App({ settings, signIn }) {
     showAlertDialog(alertHtml)
   }, [])
 
-  const signInProcess = React.useCallback((id, pw) => {
+  const signInProcess = React.useCallback(async (id, pw) => {
     if (!id || id === '') {
       Alert('아이디를 입력해주세요.')
       return
     } else if (!pw || pw === '') {
       Alert('비밀번호를 입력해주세요.')
       return
-    }
+    }    
 
-    const token = 'c1cd7759-9784-4fac-a667-3685d6b2e4a0'
+    // const token = 'c1cd7759-9784-4fac-a667-3685d6b2e4a0'
+    isLoading(true)
+    const token = await getUserToken()
     storage.set('userData', { token: token, id: id, pw: pw }, () => {
-      signIn({ key: token })      
+      signIn({ key: token })
+      isLoading(false)
     })
   }, [signIn, Alert])
 
-  /* 첫 렌더링 시/로그아웃 시 local storage를 확인
+  const getUserToken = () => {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        resolve('c1cd7759-9784-4fac-a667-3685d6b2e4a0')
+      }, 1000)
+    })
+  }
+
+  /* 첫 렌더링 시 local storage를 확인
    * id/pw/token 값이 존자해면 바로 로그인한다
    */
   React.useEffect(() => {    
-    storage.getMany(['userData', 'autoSignin'], (err, data) => {      
+    storage.getMany(['userData', 'autoSignin'], async (err, data) => {      
       if (data.autoSignin.allowed 
         && data.userData 
         && data.userData.id 
-        && data.userData.pw) {
-        signInProcess(data.userData.id, data.userData.pw)
-        isSignInRequired(false)
+        && data.userData.pw) {        
+        await signInProcess(data.userData.id, data.userData.pw)
       } else {
         isSignInRequired(true)
       }
     })
-  }, [signInProcess, settings.key])
+  }, [signInProcess])
+
+  // React.useEffect(() => {
+  //   isSignInRequired(!settings.key || settings.key === '')
+  // }, [settings.key])
 
   return (
     <div id="container" className={mainTheme}>
+    
     { (!settings.key && signInRequired) && (
       <div className="app">
         <div className="app-container card">
@@ -139,9 +168,9 @@ function App({ settings, signIn }) {
         </div>
       </div>    
     )}
-    
-    {(settings.key && !signInRequired) && (
-      <Main isLoading={isLoading} Alert={Alert}/>
+
+    {(settings.key) && (
+      <Main isLoading={isLoading} Alert={Alert} isSignInRequired={isSignInRequired}/>
     )}
 
     { loading && (

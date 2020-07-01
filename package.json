@@ -1,12 +1,13 @@
 {
   "name": "chatterbox-desktop",
-  "version": "1.0.24",
+  "version": "1.0.25",
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
     "axios": "^0.19.2",
+    "electron-dl": "^3.0.1",
     "electron-json-storage": "^4.1.8",
     "electron-updater": "^4.3.1",
     "firebase": "^7.15.0",

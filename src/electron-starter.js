@@ -1,5 +1,6 @@
 const { app, BrowserWindow, ipcMain, globalShortcut } = require('electron')
 const { autoUpdater } = require('electron-updater')
+const { download } = require('electron-dl')
 
 const url = require('url')
 const path = require('path')
@@ -80,4 +81,15 @@ autoUpdater.on('update-downloaded', () => {
 /* 앱 재시작 후 설치 */
 ipcMain.on('restart_app', () => {
   autoUpdater.quitAndInstall()
+})
+
+/* 파일 다운로드 */ 
+ipcMain.on('download', (event, info) => {  
+  download(BrowserWindow.getFocusedWindow(), info.url, {
+    saveAs: true,
+    onProgress: progress => {
+      event.sender.send("download-progress", { progress, info });
+    }
+  })
+    .then(dl => event.sender.send('download-complete', dl.getSavePath()))
 })
