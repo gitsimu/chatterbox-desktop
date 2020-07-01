@@ -110,6 +110,7 @@
       const notification = document.getElementById('notification')
       const notificationMessage = document.getElementById('notificationMessage')
       const restartButton = document.getElementById('notificationButtonRestart')
+      
       ipcRenderer.on('update_available', () => {
         ipcRenderer.removeAllListeners('update_available')
         notificationMessage.innerText = '새 업데이트가 있습니다. 업데이트 준비가 완료되면 다시 알려드립니다.'

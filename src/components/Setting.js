@@ -37,13 +37,9 @@ const Setting = ({ settings, ...props }) => {
   const [audioBeep, allowAudioBeep] = React.useState(true)
   const [autoSignin, allowAutoSignin] = React.useState(true)
   const [mainTheme, setMainTheme] = React.useState('light')
-
   const [workingDay, setWorkingDay] = React.useState(initWorkingDay)
-
   const [settingMenuState, setSettingMenuState] = React.useState(0)
-
   const [version, setVersion] = React.useState('0.0.0')
-  const [versionState, setVersionState] = React.useState(0)
 
   const isLoading = props.isLoading
   
@@ -80,12 +76,6 @@ const Setting = ({ settings, ...props }) => {
     ipcRenderer.on('app_version', (event, arg) => {
       ipcRenderer.removeAllListeners('app_version')
       setVersion(arg.version)
-    })
-    ipcRenderer.on('update_available', () => {
-      setVersionState(1)
-    })
-    ipcRenderer.on('update_downloaded', () => {
-      setVersionState(2)
     })
   }, [])
 
@@ -533,16 +523,7 @@ const Setting = ({ settings, ...props }) => {
             <div className="setting-data-item">
               <div className="setting-data-item-key">버전</div>
               <div className="setting-data-item-value">
-                { version }
-                { versionState === 0 && ( 
-                  <div className="setting-data-item-description">최신 버전 사용 중</div>
-                )}
-                { versionState === 1 && ( 
-                  <div className="setting-data-item-description">새 업데이트가 있습니다. 업데이트를 준비 중입니다.</div>
-                )}
-                { versionState === 2 && ( 
-                  <div className="setting-data-item-description">새 업데이트를 설치할 준비가 되었습니다.</div>
-                )}
+                { version }                
               </div>
             </div>
             <div className="setting-data-item"></div>       

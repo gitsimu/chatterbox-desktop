@@ -150,7 +150,8 @@
   }
   .message-file .message-file-save {
     color: #0080F7;
-    border-top: 1px solid #f1f1f1;
+    border-top: none;
+    margin-top: 0;
   }
   
   .message-form > form {
