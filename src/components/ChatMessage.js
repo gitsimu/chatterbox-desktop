@@ -2,11 +2,11 @@ import React from 'react'
 import { connect } from 'react-redux'
 import * as script from '../js/script.js'
 
-const { ipcRenderer } = require('electron')
+const {ipcRenderer, shell} = require('electron')
 
-const ChatMessage = ({ users, settings, ...props }) => {
+const ChatMessage = ({users, settings, ...props}) => {
   const isMyself = props.opponent !== props.userId
-  const isSameUser = (props.prev && (props.prev.userId === props.userId))  
+  const isSameUser = (props.prev && (props.prev.userId === props.userId))
   const showImageViewer = props.showImageViewer
 
   // React.useEffect(() => {
@@ -19,75 +19,113 @@ const ChatMessage = ({ users, settings, ...props }) => {
   const skipDate = () => {
     if (!props.prev) {
       return false
-    } else {
-      const prevDate = script.timestampToDay(props.prev.timestamp)
-      const curDate = script.timestampToDay(props.timestamp)
-
-      return (prevDate === curDate)
     }
+
+    const prevDate = script.timestampToDay(props.prev.timestamp)
+    const curDate = script.timestampToDay(props.timestamp)
+
+    return (prevDate === curDate)
   }
 
   const skipTime = () => {
-    if (!props.next)  {
+    if (!props.next) {
       return false
-    } else {
-      const nextTime = script.timestampToTime(props.next.timestamp, true)
-      const curTime = script.timestampToTime(props.timestamp, true)
-
-      return (nextTime === curTime)
     }
+
+    const nextTime = script.timestampToTime(props.next.timestamp, true)
+    const curTime = script.timestampToTime(props.timestamp, true)
+
+    return (nextTime === curTime)
   }
 
   let messageInner
   if (props.type === 1) {
-    messageInner = <div className="message-inner">{ props.message }</div>
+    const URL_PATTERN = /(https?:\/\/)?([ㄱ-힣-a-zA-Z0-9_.]{2,256})\.([a-z]{2,4})\b([-a-zA-Z0-9@:%_+.~#?&/=]*)?/
+
+    if (!URL_PATTERN.test(props.message)) {
+      messageInner = (<div className="message-inner">{props.message}</div>)
+    } else {
+      const messageArr = []
+      let tempMessage = props.message
+      {
+        let matched
+        while (matched = tempMessage.match(URL_PATTERN)) {
+          messageArr.push(tempMessage.slice(0, matched.index))
+          messageArr.push(matched[0])
+
+          tempMessage = tempMessage.slice(matched.index + matched[0].length)
+        }
+        if (tempMessage.length) messageArr.push(tempMessage)
+      }
+
+      messageInner = (
+        <div className="message-inner">
+          {messageArr.map((m, i) => (
+            (i % 2 === 1)
+              ? <a key={i} href={m} className="message-url" onClick={(event) => {
+                let url = !m.startsWith('http')
+                  ? `https://${m}`
+                  : m
+                event.preventDefault()
+                shell.openExternal(url).then(r => {})
+              }}>{m}</a>
+              : m
+          ))}
+        </div>
+      )
+    }
   } else {
     const images = ['jpg', 'png', 'gif', 'jpeg', 'bmp']
     const extension = JSON.parse(props.message).location.split('.').pop()
     const expired = script.timestampToDay(props.timestamp, 1, 0)
 
     messageInner =
-    <div>
-      {( extension && images.indexOf(extension) > -1) && (
-        <div
-          className="message-thumbnail"
-          onClick={() => {
-            // window.parent.postMessage({ method: 'image', url: JSON.parse(props.message).location })
-            showImageViewer(JSON.parse(props.message).location)
-          }}>
-          <img src={ JSON.parse(props.message).location } alt="message-thumbnail"/>
-        </div>
-      )}
-      <div className="message-file">
-        <div className="message-file-name">{ JSON.parse(props.message).name }</div>
-        <div className="message-file-size">파일크기 : { script.bytesToSize(JSON.parse(props.message).size) }</div>
-        <div className="message-file-expire">유효기간 : { expired } 까지</div>
-        <div
+      <div>
+        {(extension && images.indexOf(extension) > -1) && (
+          <div
+            className="message-thumbnail"
+            onClick={() => {
+              // window.parent.postMessage({ method: 'image', url: JSON.parse(props.message).location })
+              showImageViewer(JSON.parse(props.message).location)
+            }}>
+            <img src={JSON.parse(props.message).location}
+                 alt="message-thumbnail"/>
+          </div>
+        )}
+        <div className="message-file">
+          <div className="message-file-name">{JSON.parse(
+            props.message).name}</div>
+          <div className="message-file-size">파일크기 : {script.bytesToSize(
+            JSON.parse(props.message).size)}</div>
+          <div className="message-file-expire">유효기간 : {expired} 까지</div>
+          <div
             className="message-file-save"
             onClick={() => {
               // setTimeout(() => {
               //   window.open(JSON.parse(props.message).location)
               // }, 100)
-              
+
               // const directory = process.platform === 'darwin' ? 'Downloads' : 'C:\\Downloads'
-              ipcRenderer.send("download", {
-                url: JSON.parse(props.message).location,              
+              ipcRenderer.send('download', {
+                url: JSON.parse(props.message).location
               })
             }}>
             저장하기
           </div>
-        
+
+        </div>
       </div>
-    </div>
   }
 
   return (
     <>
-      { !skipDate() && (
-        <div className="message-date"><span>{script.timestampToDay(props.timestamp)}</span></div>
+      {!skipDate() && (
+        <div className="message-date">
+          <span>{script.timestampToDay(props.timestamp)}</span>
+        </div>
       )}
 
-      { (!isSameUser || !skipDate()) && (
+      {(!isSameUser || !skipDate()) && (
         <div className="margin-top-15"></div>
       )}
 
@@ -118,7 +156,7 @@ const ChatMessage = ({ users, settings, ...props }) => {
               { messageInner }
               { !skipTime() && (
                 <div className="message-time">{ script.timestampToTime(props.timestamp, true) }</div>
-              )}              
+              )}
             </div>
           </div>
         </div>

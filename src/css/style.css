@@ -608,6 +608,11 @@ div, input, textarea {
   color: #fff;
 }
 
+.message.myself .message-inner .message-url{
+  color: #fff;
+}
+
+
 .margin-top-15 {
   margin-top: 10px;
 }
@@ -1353,4 +1358,20 @@ div:hover > .tooltip {
   cursor: pointer;
   right: 20px;
   top: 20px;
+}
+
+.image-viewer-save {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  right: 20px;
+  top: 70px;
+  color: #fff;
+  border: none;
+  outline: none;
+  font-size: 33px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

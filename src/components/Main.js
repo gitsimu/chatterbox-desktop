@@ -4,6 +4,7 @@ import * as firebase from "firebase/app"
 import "firebase/auth"
 import "firebase/database"
 import axios from 'axios'
+import { ipcRenderer } from 'electron'
 
 import { connect } from 'react-redux'
 import { addUsers, clearUsers, selectedUser, signOut } from '../actions'
@@ -25,7 +26,7 @@ function Main({ users, messages, settings, addUsers, clearUsers, selectedUser, s
   const [screenState, setScreenState] = React.useState(0)
   const [tabState, setTabState] = React.useState(0)
   const [imageViewer, showImageViewer] = React.useState(null)
-  
+
   const Alert = props.Alert
   const isLoading = props.isLoading
 
@@ -34,94 +35,117 @@ function Main({ users, messages, settings, addUsers, clearUsers, selectedUser, s
   }
   const database = firebase.database()
 
+  // esc로 ImageViewer 닫기
+  React.useEffect(() => {
+    const onEscCloseViewer = event => {
+      if (event.code !== 'Escape') return
+
+      showImageViewer(null)
+    }
+
+    if (imageViewer !== null) {
+      document.addEventListener('keydown', onEscCloseViewer)
+    } else {
+      document.removeEventListener('keydown', onEscCloseViewer)
+    }
+
+    return () => {
+      document.removeEventListener('keydown', onEscCloseViewer)
+    }
+  }, [imageViewer, showImageViewer])
+
   React.useEffect(() => {
     let chat
     // simpleline icons
-    let simplelineLink = document.createElement("link")
-    simplelineLink.href = "https://cdnjs.cloudflare.com/ajax/libs/simple-line-icons/2.4.1/css/simple-line-icons.min.css"
-    simplelineLink.rel = "stylesheet"
-    simplelineLink.type = "text/css"
+    let simplelineLink = document.createElement('link')
+    simplelineLink.href = 'https://cdnjs.cloudflare.com/ajax/libs/simple-line-icons/2.4.1/css/simple-line-icons.min.css'
+    simplelineLink.rel = 'stylesheet'
+    simplelineLink.type = 'text/css'
     document.querySelector('body').appendChild(simplelineLink)
 
-    isLoading(true)
-
     // firebase
-    getFirebaseAuthToken(settings.key)
-      .then(res => {
-        const data = res.data
-        if (data.result === 'success') {
-          firebase.auth().signInWithCustomToken(data.token)
-            .then(success => {
-              isLoading(false)
+    Promise.resolve()
+      .then(() => { isLoading(true) })
+      .then(() => {
+        return getFirebaseAuthToken(settings.key)
+          .catch(() => { throw { message: '인증 서버에서 연결을 거부하였습니다.' } })
+      })
+      .then(({ data }) => {
+        if (data.result !== 'success') {throw { } }
 
-              chat = database.ref(`/${settings.key}/users`).orderByChild('timestamp')
-              chat.on('value', (snapshot) => {
-                clearUsers()
+        return firebase.auth().signInWithCustomToken(data.token)
+            .catch(() => { throw { message: '인증에 실패하였습니다.' } })
+      })
+      .then(() => {
+        chat = database.ref(`/${settings.key}/users`)
+          .orderByChild('timestamp')
+        chat.on('value', (snapshot) => {
+          clearUsers()
 
-                let items = []
-                snapshot.forEach((childSnapshot) => {
-                  items.push(childSnapshot)
-                })
+          let items = []
+          snapshot.forEach((childSnapshot) => {
+            items.push(childSnapshot)
+          })
 
-                items.reverse().forEach((childSnapshot) => { // order by desc
-                  const k = childSnapshot.key
-                  const v = childSnapshot.val()
-                  const code = script.guestCodeGenerator(k)
-                  const user = {
-                    key: k,
-                    value: v,
-                    guestCode: (v && v.nickname) ? v.nickname : code.guestCode,
-                    colorCode: code.colorCode,
-                  }
+          items.reverse().forEach((childSnapshot) => { // order by desc
+            const k = childSnapshot.key
+            const v = childSnapshot.val()
+            const code = script.guestCodeGenerator(k)
+            const user = {
+              key: k,
+              value: v,
+              guestCode: (v && v.nickname)
+                ? v.nickname
+                : code.guestCode,
+              colorCode: code.colorCode
+            }
 
-                  addUsers(user)
+            addUsers(user)
 
-                  /* notification onClick 시 redux store에 있는 객체 접근을 하면 빈 값으로 나옴
-                   * USERS 라는 전역변수를 별도로 두어 onClick 시 해당 유저를 찾을 수 있도록 함
-                   */
-                  USERS.push(user)
-                })
+            /* notification onClick 시 redux store에 있는 객체 접근을 하면 빈 값으로 나옴
+             * USERS 라는 전역변수를 별도로 두어 onClick 시 해당 유저를 찾을 수 있도록 함
+             */
+            USERS.push(user)
+          })
+        })
+
+        // https://www.electronjs.org/docs/tutorial/notifications?q=Notification
+        // https://www.electronjs.org/docs/api/notification
+        // https://snutiise.github.io/html5-desktop-api/
+        const recent = database.ref(`/${settings.key}/recents`)
+        recent.on('value', (snapshot) => {
+          // GET PUSH ALARM, AUDIO BEEP
+          storage.getMany(['pushAlram', 'audioBeep'], (err, data) => {
+            if (data.pushAlram.allowed) {
+              const recentsData = snapshot.val()
+              const message = recentsData.type === 2
+                ? JSON.parse(recentsData.message).name
+                : recentsData.message
+              const notification = new Notification('새 메세지', {
+                body: message,
+                silent: !data.audioBeep.allowed
               })
 
-              // https://www.electronjs.org/docs/tutorial/notifications?q=Notification
-              // https://www.electronjs.org/docs/api/notification
-              // https://snutiise.github.io/html5-desktop-api/
-              const recent = database.ref(`/${settings.key}/recents`)
-              recent.on('value', (snapshot) => {
-                // GET PUSH ALARM, AUDIO BEEP
-                storage.getMany(['pushAlram', 'audioBeep'], (err, data) => {           
-                  if (data.pushAlram.allowed) {                    
-                    const recentsData = snapshot.val()        
-                    const message = recentsData.type === 2 ? JSON.parse(recentsData.message).name : recentsData.message
-                    const notification = new Notification('새 메세지', {
-                      body: message,
-                      silent: !data.audioBeep.allowed
-                    })
-
-                    notification.onclick = () => {
-                      const target = USERS.filter((u) => { return u.key === recentsData.userId})
-                      if (target.length > 0) {
-                        setScreenState(0)
-                        setTabState(target[0].value.state || 0)
-                        selectedUser(target[0])
-                      }                          
-                    }
-                  }
-                })                  
-              })
-            })
-            .catch(error => {
-              isLoading(false)
-              Alert('인증에 실패하였습니다.')
-            })
-        }
+              notification.onclick = () => {
+                const target = USERS.filter(
+                  (u) => { return u.key === recentsData.userId})
+                if (target.length > 0) {
+                  setScreenState(0)
+                  setTabState(target[0].value.state || 0)
+                  selectedUser(target[0])
+                }
+              }
+            }
+          })
+        })
       })
-      .catch(error => {
-        isLoading(false)
-        Alert('인증 서버에서 연결을 거부하였습니다.')
-      })
+      .catch(({ messages }) => {
+        if (!messages) return
 
-    // return () => { chat.off() }
+        Alert(messages)
+      })
+      .finally(() => isLoading(false))
+
   }, [addUsers, clearUsers, database, isLoading, selectedUser, settings.key, Alert])
 
   return (
@@ -202,7 +226,14 @@ function Main({ users, messages, settings, addUsers, clearUsers, selectedUser, s
       { imageViewer !== null && (
         <div className="image-viewer">
           <div className="image-viewer-close"
-            onClick={() => showImageViewer(null)}></div>
+               onClick={() => showImageViewer(null)}>
+          </div>
+          <div className="image-viewer-save"
+               onClick={() => ipcRenderer.send('download', {
+                 url: imageViewer
+               })}>
+            <i className="icon-arrow-down-circle"></i>
+          </div>
           <img src={imageViewer} alt="imageViewer"/>
         </div>
       )}
