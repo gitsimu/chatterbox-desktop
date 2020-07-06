@@ -46,29 +46,27 @@ const ChatMessage = ({users, settings, ...props}) => {
       messageInner = (<div className="message-inner">{props.message}</div>)
     } else {
       const messageArr = []
-      let tempMessage = props.message
-      {
-        let matched
-        while (matched = tempMessage.match(URL_PATTERN)) {
-          messageArr.push(tempMessage.slice(0, matched.index))
-          messageArr.push(matched[0])
+      let messageText = props.message
+      let matched
+      while ((matched = messageText.match(URL_PATTERN))) {
+        if(matched.index) messageArr.push(messageText.slice(0, matched.index))
 
-          tempMessage = tempMessage.slice(matched.index + matched[0].length)
-        }
-        if (tempMessage.length) messageArr.push(tempMessage)
+        messageArr.push({ text : matched[0]})
+        messageText = messageText.slice(matched.index + matched[0].length)
       }
+      if (messageText.length) messageArr.push(messageText)
 
       messageInner = (
         <div className="message-inner">
           {messageArr.map((m, i) => (
-            (i % 2 === 1)
-              ? <a key={i} href={m} className="message-url" onClick={(event) => {
-                let url = !m.startsWith('http')
-                  ? `https://${m}`
-                  : m
+            typeof m === 'object'
+              ? <a key={i} href={m.text} className="message-url" onClick={(event) => {
+                let url = !m.text.startsWith('http')
+                  ? `https://${m.text}`
+                  : m.text
                 event.preventDefault()
-                shell.openExternal(url).then(r => {})
-              }}>{m}</a>
+                shell.openExternal(url)
+              }}>{m.text}</a>
               : m
           ))}
         </div>

@@ -35,6 +35,7 @@ function Main({ users, messages, settings, addUsers, clearUsers, selectedUser, s
   }
   const database = firebase.database()
 
+
   // esc로 ImageViewer 닫기
   React.useEffect(() => {
     const onEscCloseViewer = event => {
@@ -68,13 +69,13 @@ function Main({ users, messages, settings, addUsers, clearUsers, selectedUser, s
       .then(() => { isLoading(true) })
       .then(() => {
         return getFirebaseAuthToken(settings.key)
-          .catch(() => { throw { message: '인증 서버에서 연결을 거부하였습니다.' } })
+          .catch(() => { throw new Error('인증 서버에서 연결을 거부하였습니다.')})
       })
       .then(({ data }) => {
-        if (data.result !== 'success') {throw { } }
+        if (data.result !== 'success') { throw new Error() }
 
         return firebase.auth().signInWithCustomToken(data.token)
-            .catch(() => { throw { message: '인증에 실패하였습니다.' } })
+          .catch(() => { throw new Error('인증에 실패하였습니다.')})
       })
       .then(() => {
         chat = database.ref(`/${settings.key}/users`)
