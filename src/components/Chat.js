@@ -1,9 +1,11 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 import ChatMessage from './ChatMessage'
 import EmojiContainer from './EmojiContainer'
 import axios from 'axios'
 import { connect } from 'react-redux'
-import { addMessages, deleteMessages, clearMessages, selectedUser } from '../actions'
+import { addMessages, clearMessages, deleteMessages, selectedUser } from '../actions'
+import PreviewContainer from './PreviewContainer'
+import useImagePreview from '../hooks/useImagePreview'
 
 const { ipcRenderer } = require('electron')
 
@@ -23,6 +25,7 @@ const Chat = ({ users, messages, settings, addMessages, deleteMessages, clearMes
   const [loading, isLoading] = React.useState(false)
   const [refresh, doRefresh] = React.useState(null)
   const [fileDropLayer, showFileDropLayer] = React.useState(false)
+  const [imagePreview, imageFile, setImageFile] = useImagePreview()
   const body = React.useRef(null)
 
   let form, input
@@ -32,24 +35,28 @@ const Chat = ({ users, messages, settings, addMessages, deleteMessages, clearMes
       body.current.scrollTop = body.current.scrollHeight
     }
   }
-  
-  const firebaseConnect = React.useCallback((userid) => {
-    if (userid && !messages[userid]) { // 최초 1회만 연결
-      isLoading(true)
-      const database = props.database
-      const chat = database.ref(`/${settings.key}/messages/${userid}`).orderByChild('timestamp').limitToLast(50)
-      chat.on('child_added', (snapshot) => {
-        const value = snapshot.val()
-        addMessages({ key: userid, value: value })
-        doRefresh(refresh !== value.id ? value.id : null)
-        setTimeout(() => {
-          scrollToBottom()
-          isLoading(false)
-        }, 10)
-      })
 
-      CONNECTIONS[userid] = chat
-    }
+  const firebaseConnect = React.useCallback((userid) => {
+    // 최초 1회만 연결
+    if (!userid || messages[userid]) { return }
+
+    isLoading(true)
+    const database = props.database
+    const chat = database.ref(`/${settings.key}/messages/${userid}`)
+      .orderByChild('timestamp')
+      .limitToLast(50)
+    chat.on('child_added', (snapshot) => {
+      const value = snapshot.val()
+      addMessages({ key: userid, value: value })
+      doRefresh(refresh !== value.id
+        ? value.id
+        : null)
+      setTimeout(() => {
+        scrollToBottom()
+        isLoading(false)
+      }, 10)
+    })
+    CONNECTIONS[userid] = chat
   }, [messages, refresh, props.database, settings.key, addMessages])
 
   const sendMessage = React.useCallback((key, id, message, type, database) => {
@@ -76,26 +83,37 @@ const Chat = ({ users, messages, settings, addMessages, deleteMessages, clearMes
     showEmojiContainer(!emojiContainer)
   }
 
-  const handleFileInput = React.useCallback((e, file) => {
+  const checkFile = useCallback((target) => {
     const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
     const ALLOW_FILE_EXTENSIONS = [
       'jpg', 'jpeg', 'gif', 'bmp', 'png', 'tif', 'tiff', 'tga', 'psd', 'ai', // 이미지
-      'mp4', 'm4v', 'avi', 'asf', 'wmv', 'mkv', 'ts', 'mpg', 'mpeg', 'mov', 'flv', 'ogv', // 동영상
+      'mp4', 'm4v', 'avi', 'asf', 'wmv', 'mkv', 'ts', 'mpg', 'mpeg', 'mov',
+      'flv', 'ogv', // 동영상
       'mp3', 'wav', 'flac', 'tta', 'tak', 'aac', 'wma', 'ogg', 'm4a', // 음성
-      'doc', 'docx', 'hwp', 'txt', 'rtf', 'xml', 'pdf', 'wks', 'wps', 'xps', 'md', 'odf', 'odt', 'ods', 'odp', 'csv', 'tsv', 'xls', 'xlsx', 'ppt', 'pptx', 'pages', 'key', 'numbers', 'show', 'ce', // 문서
+      'doc', 'docx', 'hwp', 'txt', 'rtf', 'xml', 'pdf', 'wks', 'wps', 'xps',
+      'md', 'odf', 'odt', 'ods', 'odp', 'csv', 'tsv', 'xls', 'xlsx', 'ppt',
+      'pptx', 'pages', 'key', 'numbers', 'show', 'ce', // 문서
       'zip', 'gz', 'bz2', 'rar', '7z', 'lzh', 'alz']
 
-    const target = file || e.target.files[0]
     const fileSize = target.size
     const fileExtension = target.name.split('.').pop().toLowerCase()
 
     if (MAX_FILE_SIZE < fileSize) {
       Alert('한 번에 업로드 할 수 있는 최대 파일 크기는 5MB 입니다.')
-      return
-    } else if (ALLOW_FILE_EXTENSIONS.indexOf(fileExtension) === -1) {
-      Alert('지원하지 않는 파일 형식입니다.')
-      return
+      return false
     }
+
+    if (ALLOW_FILE_EXTENSIONS.indexOf(fileExtension) === -1) {
+      Alert('지원하지 않는 파일 형식입니다.')
+      return false
+    }
+
+    return true
+  }, [Alert])
+
+  const handleFileInput = React.useCallback((e, file) => {
+    const target = file || e.target.files[0]
+    if (!checkFile(target)) return
 
     isLoading(true)
     const config = { headers: { 'content-type': 'multipart/form-data' } }
@@ -106,23 +124,21 @@ const Chat = ({ users, messages, settings, addMessages, deleteMessages, clearMes
 
     return axios.post(`${global.serverAddress}/api/upload`, formData, config)
       .then(res => {
-        isLoading(false)
         if (res.data.result === 'success') {
           sendMessage(key, userid, JSON.stringify(res.data.file), 2, database)
           console.log('upload-success', res)
         }
       })
       .catch(err => {
-        isLoading(false)
         if (err) {
           console.log('upload-failure', err)
           throw err
         }
       })
-  }, [database, key, sendMessage, userid, Alert])
+      .finally(()=> {isLoading(false)})
+  }, [checkFile, database, key, sendMessage, userid])
 
   React.useEffect(() => {
-    console.log(selectedEmoji)
     if (input && selectedEmoji) {
       input.value = input.value + selectedEmoji.emoji
     }
@@ -148,7 +164,7 @@ const Chat = ({ users, messages, settings, addMessages, deleteMessages, clearMes
     const handleDragEnter = (e) => {
       e.preventDefault()
       e.stopPropagation()
-      if (e.dataTransfer) {
+      if (e.dataTransfer && e.dataTransfer.types[0] === 'Files') {
         showFileDropLayer(true)
       }
     }
@@ -211,33 +227,31 @@ const Chat = ({ users, messages, settings, addMessages, deleteMessages, clearMes
   }, [clearMessages])
 
   React.useEffect(() => {
-    ipcRenderer.on('download-complete', (event, file) => {      
-      Alert('다운로드가 완료되었습니다.')
-    })
-
-    return () => {
-      ipcRenderer.removeAllListeners('download-complete')
-    }
-  }, [Alert])
+    input.focus()
+    showEmojiContainer(false)
+    setImageFile(null)
+  }, [input, userid, showEmojiContainer, setImageFile])
 
   return (
     <>
-      <div className='messages card' ref={body}>        
-        { messages[userid] // 중복호출 예외처리
-          && messages[userid].map((m, i) => {
-            scrollToBottom()
-            return <ChatMessage
-              opponent={userid}
-              target={target}
-              key={m.id}
-              prev={messages[userid][i - 1]}
-              next={messages[userid][i + 1]}
-              {...m}
-              {...props}/>
-            })
+      <div className='messages card' ref={body}>
+        {messages[userid] // 중복호출 예외처리
+         && messages[userid].map((m, i) => {
+          scrollToBottom()
+          return <ChatMessage
+            opponent={userid}
+            target={target}
+            key={m.id}
+            prev={messages[userid][i - 1]}
+            next={messages[userid][i + 1]}
+            {...m}
+            {...props}/>
+        })
         }
-       
-        <div id='file-drop-layer' className={ fileDropLayer ? 'file-drop-layer active' : 'file-drop-layer' }>
+
+        <div id='file-drop-layer' className={fileDropLayer
+          ? 'file-drop-layer active'
+          : 'file-drop-layer'}>
           <div>
             <i className='icon-cloud-upload'></i>
             <div>여기에 파일을 드래그하면</div>
@@ -250,12 +264,22 @@ const Chat = ({ users, messages, settings, addMessages, deleteMessages, clearMes
           getState={emojiContainer}
           setState={showEmojiContainer}
           selectEmoji={selectEmoji}/>
+        <PreviewContainer
+          image={imagePreview}/>
         <form ref={node => form = node} onSubmit={e => {
           e.preventDefault()
-          if (!input.value.trim()) return
 
-          sendMessage(key, userid, input.value, 1, database)
-          input.value = ''
+          if (imageFile) {
+            handleFileInput(null, imageFile)
+              .then(() => {
+                setImageFile(null)
+              })
+          }
+
+          if (input.value.trim()) {
+            sendMessage(key, userid, input.value, 1, database)
+            input.value = ''
+          }
         }}>
           <div className='message-addon'>
             <label>
@@ -265,13 +289,30 @@ const Chat = ({ users, messages, settings, addMessages, deleteMessages, clearMes
             </label>
             <label>
               <i className='icon-emotsmile'
-                onClick={e => handleEmojiContainer(e)}></i>
+                 onClick={e => handleEmojiContainer(e)}></i>
             </label>
           </div>
           <textarea
             ref={node => input = node}
             className='message-input'
             placeholder='메세지를 입력해주세요.'
+            onBlur={() => {
+              setImageFile(null)
+            }}
+            onPaste={(e) => {
+              let item = e.clipboardData.items[0]
+              if (!item || !item.type || item.type.indexOf('image') !== 0) return
+
+              const imageFile = item.getAsFile()
+              if (checkFile(imageFile)) {
+                setImageFile(imageFile)
+              }
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Escape' && imageFile) {
+                setImageFile(null)
+              }
+            }}
             onKeyPress={(e) => {
               if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault()

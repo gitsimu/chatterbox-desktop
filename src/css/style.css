@@ -773,6 +773,48 @@ div, input, textarea {
 }
 
 
+/* IMAGE-PREVIEW */
+.preview-container {
+  position: absolute;
+  max-width: 280px;
+  max-height: 300px;
+  background: #ffffff;
+  bottom: 50px;
+  /* border-bottom: 1px solid #eee; */
+  border-radius: 10px;
+  overflow: auto;
+  padding: 10px;
+  padding-top: 0;
+  box-sizing: border-box;
+  transition: 0.2s ease all;
+  transform: translateY(100px);
+  opacity: 0;
+  visibility: hidden;
+  z-index: 9;
+  margin: 5px;
+}
+.preview-container.active {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  box-shadow: 0 0 15px 5px rgba(0, 0, 0, 0.1);
+}
+.preview-container img {
+  max-height: 225px;
+  max-width: 97%;
+  padding: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.preview-title {
+  color: #000000;
+  padding: 5px;
+  margin-top: 10px;
+  font-size: 20px;
+  font-weight: bold;
+  user-select: none;
+}
 
 /* SETTING SETTING SETTING SETTING SETTING */
 .setting {

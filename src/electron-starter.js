@@ -27,8 +27,6 @@ function createWindow () {
     slashes: true
   })
 
-
-  // win.openDevTools()
   win.loadURL(startUrl)
 }
 

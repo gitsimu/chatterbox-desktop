@@ -1,8 +1,8 @@
 import React from 'react'
 import FirebaseConfig from '../firebase.config'
-import * as firebase from "firebase/app"
-import "firebase/auth"
-import "firebase/database"
+import * as firebase from 'firebase/app'
+import 'firebase/auth'
+import 'firebase/database'
 import axios from 'axios'
 import { ipcRenderer } from 'electron'
 
@@ -36,24 +36,41 @@ function Main({ users, messages, settings, addUsers, clearUsers, selectedUser, s
   const database = firebase.database()
 
 
-  // esc로 ImageViewer 닫기
   React.useEffect(() => {
-    const onEscCloseViewer = event => {
-      if (event.code !== 'Escape') return
+    const onImageViewKey = (event) => {
+      if (event.code === 'KeyS' && event.ctrlKey) {
+        ipcRenderer.send('download', {
+          url: imageViewer
+        })
+        return
+      }
 
-      showImageViewer(null)
+      if (event.code === 'Escape') {
+        showImageViewer(null)
+      }
     }
 
     if (imageViewer !== null) {
-      document.addEventListener('keydown', onEscCloseViewer)
+      document.addEventListener('keydown', onImageViewKey)
     } else {
-      document.removeEventListener('keydown', onEscCloseViewer)
+      document.removeEventListener('keydown', onImageViewKey)
     }
 
     return () => {
-      document.removeEventListener('keydown', onEscCloseViewer)
+      document.removeEventListener('keydown', onImageViewKey)
     }
   }, [imageViewer, showImageViewer])
+
+
+  React.useEffect(() => {
+    ipcRenderer.on('download-complete', (event, file) => {
+      Alert('다운로드가 완료되었습니다.')
+    })
+
+    return () => {
+      ipcRenderer.removeAllListeners('download-complete')
+    }
+  }, [Alert])
 
   React.useEffect(() => {
     let chat
@@ -140,11 +157,7 @@ function Main({ users, messages, settings, addUsers, clearUsers, selectedUser, s
           })
         })
       })
-      .catch(({ messages }) => {
-        if (!messages) return
-
-        Alert(messages)
-      })
+      .catch(({ messages }) => messages && Alert(messages))
       .finally(() => isLoading(false))
 
   }, [addUsers, clearUsers, database, isLoading, selectedUser, settings.key, Alert])
@@ -244,7 +257,7 @@ function Main({ users, messages, settings, addUsers, clearUsers, selectedUser, s
 
 const getFirebaseAuthToken = async (uuid) => {
   const res = await axios.post(`${global.serverAddress}/api/auth`, { uuid: uuid })
-  return await res
+  return res
 }
 
 const mapStateToProps = state => ({
