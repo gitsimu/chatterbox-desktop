@@ -1,13 +1,12 @@
-import React, { useCallback } from 'react'
+import React, { useEffect } from 'react'
 import ChatMessage from './ChatMessage'
 import EmojiContainer from './EmojiContainer'
 import axios from 'axios'
 import { connect } from 'react-redux'
 import { addMessages, clearMessages, deleteMessages, selectedUser } from '../actions'
 import PreviewContainer from './PreviewContainer'
-import useImagePreview from '../hooks/useImagePreview'
-
-const { ipcRenderer } = require('electron')
+import useImageFile from '../hooks/useImageFile'
+import useInputByUser from '../hooks/useInputByUser'
 
 const CONNECTIONS = {}
 const Chat = ({ users, messages, settings, addMessages, deleteMessages, clearMessages, selectedUser, ...props }) => {
@@ -23,17 +22,16 @@ const Chat = ({ users, messages, settings, addMessages, deleteMessages, clearMes
   const [emojiContainer, showEmojiContainer] = React.useState(false)
   const [selectedEmoji, selectEmoji] = React.useState(null)
   const [loading, isLoading] = React.useState(false)
-  const [refresh, doRefresh] = React.useState(null)
+  // const [refresh, doRefresh] = React.useState(null)
   const [fileDropLayer, showFileDropLayer] = React.useState(false)
-  const [imagePreview, imageFile, setImageFile] = useImagePreview()
+  const [imageSrc, imageFile, setImageFile] = useImageFile()
+  const [input, setInputUser] = useInputByUser()
   const body = React.useRef(null)
 
-  let form, input
+  let form
 
   const scrollToBottom = () => {
-    if (body && body.current) {
-      body.current.scrollTop = body.current.scrollHeight
-    }
+    body.current.scrollTop = body.current.scrollHeight
   }
 
   const firebaseConnect = React.useCallback((userid) => {
@@ -48,16 +46,14 @@ const Chat = ({ users, messages, settings, addMessages, deleteMessages, clearMes
     chat.on('child_added', (snapshot) => {
       const value = snapshot.val()
       addMessages({ key: userid, value: value })
-      doRefresh(refresh !== value.id
-        ? value.id
-        : null)
+
       setTimeout(() => {
         scrollToBottom()
         isLoading(false)
       }, 10)
     })
     CONNECTIONS[userid] = chat
-  }, [messages, refresh, props.database, settings.key, addMessages])
+  }, [messages, props.database, settings.key, addMessages])
 
   const sendMessage = React.useCallback((key, id, message, type, database) => {
     const messageId = Math.random().toString(36).substr(2, 9)
@@ -83,7 +79,7 @@ const Chat = ({ users, messages, settings, addMessages, deleteMessages, clearMes
     showEmojiContainer(!emojiContainer)
   }
 
-  const checkFile = useCallback((target) => {
+  const checkFile = React.useCallback((target) => {
     const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
     const ALLOW_FILE_EXTENSIONS = [
       'jpg', 'jpeg', 'gif', 'bmp', 'png', 'tif', 'tiff', 'tga', 'psd', 'ai', // 이미지
@@ -138,12 +134,23 @@ const Chat = ({ users, messages, settings, addMessages, deleteMessages, clearMes
       .finally(()=> {isLoading(false)})
   }, [checkFile, database, key, sendMessage, userid])
 
+  // 채팅방 변경 init
   React.useEffect(() => {
-    if (input && selectedEmoji) {
-      input.value = input.value + selectedEmoji.emoji
+    setInputUser(userid)
+    input.current.focus()
+    showEmojiContainer(false)
+    setImageFile(null)
+  }, [input, userid, showEmojiContainer, setImageFile, setInputUser])
+
+  // select emoji
+  React.useEffect(() => {
+    if (selectedEmoji) {
+      input.current.value = input.current.value + selectedEmoji.emoji
+      input.current.focus()
     }
   }, [input, selectedEmoji])
 
+  // connect fire
   React.useEffect(() => {
     firebaseConnect(userid)
 
@@ -155,6 +162,7 @@ const Chat = ({ users, messages, settings, addMessages, deleteMessages, clearMes
     }, 10)
   }, [userid, target, firebaseConnect])
 
+  // file drag&drop
   React.useEffect(() => {
     const handleDragOver = (e) => {
       e.preventDefault()
@@ -191,7 +199,7 @@ const Chat = ({ users, messages, settings, addMessages, deleteMessages, clearMes
      * dragleave
      * drop
      */
-    if (body && body.current && key) {
+    if (key) {
       const chatBody = body.current
 
       /* 이벤트 할당 */
@@ -210,6 +218,7 @@ const Chat = ({ users, messages, settings, addMessages, deleteMessages, clearMes
     }
   }, [key, handleFileInput])
 
+  // chat off
   React.useEffect(() => {
     /* Sign out 등의 이유로 Chat 객체를 내릴 때
      * 연결되어있는 firebase connection을 모두 off 처리한다
@@ -225,12 +234,6 @@ const Chat = ({ users, messages, settings, addMessages, deleteMessages, clearMes
       })
     }
   }, [clearMessages])
-
-  React.useEffect(() => {
-    input.focus()
-    showEmojiContainer(false)
-    setImageFile(null)
-  }, [input, userid, showEmojiContainer, setImageFile])
 
   return (
     <>
@@ -265,20 +268,19 @@ const Chat = ({ users, messages, settings, addMessages, deleteMessages, clearMes
           setState={showEmojiContainer}
           selectEmoji={selectEmoji}/>
         <PreviewContainer
-          image={imagePreview}/>
+          image={imageSrc}/>
         <form ref={node => form = node} onSubmit={e => {
           e.preventDefault()
+          e.stopPropagation()
 
           if (imageFile) {
             handleFileInput(null, imageFile)
-              .then(() => {
-                setImageFile(null)
-              })
+            setImageFile(null)
           }
 
-          if (input.value.trim()) {
-            sendMessage(key, userid, input.value, 1, database)
-            input.value = ''
+          if (input.current.value.trim()) {
+            sendMessage(key, userid, input.current.value, 1, database)
+            input.current.value = ''
           }
         }}>
           <div className='message-addon'>
@@ -293,7 +295,7 @@ const Chat = ({ users, messages, settings, addMessages, deleteMessages, clearMes
             </label>
           </div>
           <textarea
-            ref={node => input = node}
+            ref={input}
             className='message-input'
             placeholder='메세지를 입력해주세요.'
             onBlur={() => {

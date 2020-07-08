@@ -7,13 +7,12 @@ import '../css/App.css'
 import '../css/alert.scss'
 
 /* 내부 스토리지 관리 */
-const storage = require('electron-json-storage')
+import storage from 'electron-json-storage'
 
 /* URL을 OS 기본 브라우저로 열기위한 shell
  * https://github.com/electron/electron/blob/master/docs/api/shell.md#shellopenexternalurl
  */
-const { shell } = require('electron')
-const { ipcRenderer } = require('electron')
+import { shell, ipcRenderer } from 'electron'
 
 function App({ settings, signIn }) {  
   const [id, setId] = React.useState('')

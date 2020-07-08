@@ -7,7 +7,7 @@ import axios from 'axios'
 import { ipcRenderer } from 'electron'
 
 import { connect } from 'react-redux'
-import { addUsers, clearUsers, selectedUser, signOut } from '../actions'
+import { clearUsers, initUsers, selectedUser, signOut } from '../actions'
 
 import UserList from './UserList'
 import Chat from './Chat'
@@ -22,7 +22,7 @@ import * as script from '../js/script.js'
 const storage = require('electron-json-storage')
 const USERS = []
 
-function Main({ users, messages, settings, addUsers, clearUsers, selectedUser, signOut, ...props }) {
+function Main({ users, messages, settings, initUsers, clearUsers, selectedUser, signOut, ...props }) {
   const [screenState, setScreenState] = React.useState(0)
   const [tabState, setTabState] = React.useState(0)
   const [imageViewer, showImageViewer] = React.useState(null)
@@ -86,11 +86,13 @@ function Main({ users, messages, settings, addUsers, clearUsers, selectedUser, s
       .then(() => { isLoading(true) })
       .then(() => {
         return getFirebaseAuthToken(settings.key)
+          .then(({data})=> {
+            if(data.result !== 'success') throw new Error()
+            return data
+          })
           .catch(() => { throw new Error('인증 서버에서 연결을 거부하였습니다.')})
       })
-      .then(({ data }) => {
-        if (data.result !== 'success') { throw new Error() }
-
+      .then((data) => {
         return firebase.auth().signInWithCustomToken(data.token)
           .catch(() => { throw new Error('인증에 실패하였습니다.')})
       })
@@ -99,17 +101,19 @@ function Main({ users, messages, settings, addUsers, clearUsers, selectedUser, s
           .orderByChild('timestamp')
         chat.on('value', (snapshot) => {
           clearUsers()
+          USERS.length = 0
 
           let items = []
           snapshot.forEach((childSnapshot) => {
             items.push(childSnapshot)
           })
 
-          items.reverse().forEach((childSnapshot) => { // order by desc
+          const users = items.reverse().map((childSnapshot) => { // order by desc
             const k = childSnapshot.key
             const v = childSnapshot.val()
             const code = script.guestCodeGenerator(k)
-            const user = {
+
+            return {
               key: k,
               value: v,
               guestCode: (v && v.nickname)
@@ -117,14 +121,14 @@ function Main({ users, messages, settings, addUsers, clearUsers, selectedUser, s
                 : code.guestCode,
               colorCode: code.colorCode
             }
-
-            addUsers(user)
-
-            /* notification onClick 시 redux store에 있는 객체 접근을 하면 빈 값으로 나옴
-             * USERS 라는 전역변수를 별도로 두어 onClick 시 해당 유저를 찾을 수 있도록 함
-             */
-            USERS.push(user)
           })
+
+          initUsers(users)
+
+          /* notification onClick 시 redux store에 있는 객체 접근을 하면 빈 값으로 나옴
+           * USERS 라는 전역변수를 별도로 두어 onClick 시 해당 유저를 찾을 수 있도록 함
+           */
+          USERS.push(users)
         })
 
         // https://www.electronjs.org/docs/tutorial/notifications?q=Notification
@@ -160,7 +164,7 @@ function Main({ users, messages, settings, addUsers, clearUsers, selectedUser, s
       .catch(({ messages }) => messages && Alert(messages))
       .finally(() => isLoading(false))
 
-  }, [addUsers, clearUsers, database, isLoading, selectedUser, settings.key, Alert])
+  }, [initUsers, clearUsers, database, isLoading, selectedUser, settings.key, Alert])
 
   return (
     <div className="App">
@@ -267,7 +271,7 @@ const mapStateToProps = state => ({
 })
 
 const mapDispatchToProps = dispatch => ({
-  addUsers: u => dispatch(addUsers(u)),
+  initUsers: u => dispatch(initUsers(u)),
   clearUsers: () => dispatch(clearUsers()),
   selectedUser: u => dispatch(selectedUser(u)),
   signOut: () => dispatch(signOut())

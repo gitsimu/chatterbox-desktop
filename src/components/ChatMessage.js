@@ -9,13 +9,6 @@ const ChatMessage = ({users, settings, ...props}) => {
   const isSameUser = (props.prev && (props.prev.userId === props.userId))
   const showImageViewer = props.showImageViewer
 
-  // React.useEffect(() => {
-  //   ipcRenderer.on("download-progress", (event, progress) => {
-  //     console.log(progress.progress); // Progress in fraction, between 0 and 1      
-  //     setDownloadProgress((parseInt(progress.progress.percent * 100)) + '%')
-  //   })
-  // }, [])
-
   const skipDate = () => {
     if (!props.prev) {
       return false
@@ -99,18 +92,12 @@ const ChatMessage = ({users, settings, ...props}) => {
           <div
             className="message-file-save"
             onClick={() => {
-              // setTimeout(() => {
-              //   window.open(JSON.parse(props.message).location)
-              // }, 100)
-
-              // const directory = process.platform === 'darwin' ? 'Downloads' : 'C:\\Downloads'
               ipcRenderer.send('download', {
                 url: JSON.parse(props.message).location
               })
             }}>
             저장하기
           </div>
-
         </div>
       </div>
   }

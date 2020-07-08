@@ -23,9 +23,9 @@ const dateString = () => {
   return `image_${month}${day}${hour}${minute}${seconds}${milliseconds}`
 }
 
-export default function useImagePreview () {
+export default function useImageFile () {
 
-  const [imagePreview, setImagePreview] = React.useState('')
+  const [imageSrc, setImagePreview] = React.useState('')
   const imageFile = React.useRef(null)
 
   const setImageFile = React.useCallback((inputFile) => {
@@ -43,7 +43,7 @@ export default function useImagePreview () {
     let reader = new FileReader()
     reader.onload = e => setImagePreview(e.target.result)
     reader.readAsDataURL(inputFile)
-  }, [setImagePreview])
+  }, [])
 
-  return [imagePreview, imageFile.current, setImageFile]
+  return [imageSrc, imageFile.current, setImageFile]
 }
