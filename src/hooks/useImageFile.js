@@ -24,14 +24,12 @@ const dateString = () => {
 }
 
 export default function useImageFile () {
-
   const [imageSrc, setImagePreview] = React.useState('')
   const imageFile = React.useRef(null)
 
   const setImageFile = React.useCallback((inputFile) => {
+    if (inputFile === null && imageFile.current === null) return
     if (inputFile === null) {
-      if(imageFile.current === null) return
-
       imageFile.current = null
       setImagePreview('')
       return

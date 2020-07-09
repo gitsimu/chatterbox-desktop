@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import ChatMessage from './ChatMessage'
 import EmojiContainer from './EmojiContainer'
 import axios from 'axios'
@@ -6,28 +6,26 @@ import { connect } from 'react-redux'
 import { addMessages, clearMessages, deleteMessages, selectedUser } from '../actions'
 import PreviewContainer from './PreviewContainer'
 import useImageFile from '../hooks/useImageFile'
-import useInputByUser from '../hooks/useInputByUser'
+import useUserInput from '../hooks/useUserInput'
 
 const CONNECTIONS = {}
-const Chat = ({ users, messages, settings, addMessages, deleteMessages, clearMessages, selectedUser, ...props }) => {
+const Chat = ({ users, settings, messagesAll, addMessages, deleteMessages, clearMessages, selectedUser, ...props }) => {
   const key = settings.key
   const userid = settings.selectedUser.key
   const database = props.database
   const setTabState = props.setTabState
   const target = settings.selectedUser
   const Alert = props.Alert
+  const messages = messagesAll[userid]
 
   const [optionDialog, showOptionDialog] = React.useState(false)
   const [infoDialog, showInfoDialog] = React.useState(false)
   const [emojiContainer, showEmojiContainer] = React.useState(false)
-  const [selectedEmoji, selectEmoji] = React.useState(null)
   const [loading, isLoading] = React.useState(false)
-  // const [refresh, doRefresh] = React.useState(null)
   const [fileDropLayer, showFileDropLayer] = React.useState(false)
-  const [imageSrc, imageFile, setImageFile] = useImageFile()
-  const [input, setInputUser] = useInputByUser()
   const body = React.useRef(null)
-
+  const [imageSrc, imageFile, setImageFile] = useImageFile()
+  const input = useUserInput(userid)
   let form
 
   const scrollToBottom = () => {
@@ -36,24 +34,23 @@ const Chat = ({ users, messages, settings, addMessages, deleteMessages, clearMes
 
   const firebaseConnect = React.useCallback((userid) => {
     // 최초 1회만 연결
-    if (!userid || messages[userid]) { return }
+    if (!userid || CONNECTIONS[userid]) { return }
 
     isLoading(true)
-    const database = props.database
-    const chat = database.ref(`/${settings.key}/messages/${userid}`)
+    const chat = database.ref(`/${key}/messages/${userid}`)
       .orderByChild('timestamp')
       .limitToLast(50)
+
     chat.on('child_added', (snapshot) => {
       const value = snapshot.val()
       addMessages({ key: userid, value: value })
 
       setTimeout(() => {
-        scrollToBottom()
         isLoading(false)
       }, 10)
     })
     CONNECTIONS[userid] = chat
-  }, [messages, props.database, settings.key, addMessages])
+  }, [database, key, addMessages])
 
   const sendMessage = React.useCallback((key, id, message, type, database) => {
     const messageId = Math.random().toString(36).substr(2, 9)
@@ -133,34 +130,21 @@ const Chat = ({ users, messages, settings, addMessages, deleteMessages, clearMes
       })
       .finally(()=> {isLoading(false)})
   }, [checkFile, database, key, sendMessage, userid])
+  const handleEmojiInput = React.useCallback((emoji)=>{
+    input.current.value += emoji.emoji
+    input.current.focus()
+  }, [input])
 
   // 채팅방 변경 init
   React.useEffect(() => {
-    setInputUser(userid)
+    firebaseConnect(target.key)
     input.current.focus()
+
+    showInfoDialog(target.value.state === 2)
     showEmojiContainer(false)
     setImageFile(null)
-  }, [input, userid, showEmojiContainer, setImageFile, setInputUser])
-
-  // select emoji
-  React.useEffect(() => {
-    if (selectedEmoji) {
-      input.current.value = input.current.value + selectedEmoji.emoji
-      input.current.focus()
-    }
-  }, [input, selectedEmoji])
-
-  // connect fire
-  React.useEffect(() => {
-    firebaseConnect(userid)
-
-    showInfoDialog((target && target.key === userid) && target.value.state === 2)
     showOptionDialog(false)
-
-    setTimeout(() => {
-      scrollToBottom()
-    }, 10)
-  }, [userid, target, firebaseConnect])
+  }, [input, target, showEmojiContainer, setImageFile, firebaseConnect])
 
   // file drag&drop
   React.useEffect(() => {
@@ -218,13 +202,17 @@ const Chat = ({ users, messages, settings, addMessages, deleteMessages, clearMes
     }
   }, [key, handleFileInput])
 
+  // scroll to bottom
+  React.useEffect(() => {
+    scrollToBottom()
+  }, [messages, userid])
+
   // chat off
   React.useEffect(() => {
     /* Sign out 등의 이유로 Chat 객체를 내릴 때
      * 연결되어있는 firebase connection을 모두 off 처리한다
      */
     return () => {
-      clearMessages()
       Object.keys(CONNECTIONS).forEach((u, i) => {
         console.log('[Connection off]', CONNECTIONS[u])
         if (CONNECTIONS[u]) {
@@ -238,20 +226,19 @@ const Chat = ({ users, messages, settings, addMessages, deleteMessages, clearMes
   return (
     <>
       <div className='messages card' ref={body}>
-        {messages[userid] // 중복호출 예외처리
-         && messages[userid].map((m, i) => {
-          scrollToBottom()
+        {messages // 중복호출 예외처리
+         && messages.map((m, i) => {
           return <ChatMessage
             opponent={userid}
+            onloadImage={scrollToBottom}
             target={target}
             key={m.id}
-            prev={messages[userid][i - 1]}
-            next={messages[userid][i + 1]}
+            prev={messages[i - 1]}
+            next={messages[i + 1]}
             {...m}
             {...props}/>
         })
         }
-
         <div id='file-drop-layer' className={fileDropLayer
           ? 'file-drop-layer active'
           : 'file-drop-layer'}>
@@ -266,7 +253,7 @@ const Chat = ({ users, messages, settings, addMessages, deleteMessages, clearMes
         <EmojiContainer
           getState={emojiContainer}
           setState={showEmojiContainer}
-          selectEmoji={selectEmoji}/>
+          selectEmoji={handleEmojiInput}/>
         <PreviewContainer
           image={imageSrc}/>
         <form ref={node => form = node} onSubmit={e => {
@@ -384,7 +371,7 @@ const Chat = ({ users, messages, settings, addMessages, deleteMessages, clearMes
 
 const mapStateToProps = state => ({
   users: state.users,
-  messages: state.messages,
+  messagesAll: state.messages,
   settings: state.settings
 })
 

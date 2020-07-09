@@ -1,20 +1,20 @@
-import React, { useCallback } from 'react'
+import React, { useEffect } from 'react'
 
-const useInputByUser = ()=>{
+const useUserInput = userid => {
   const input = React.useRef()
   const lastUser = React.useRef()
   const editing = React.useRef({})
 
-  const setInputUser = useCallback(userid => {
-    if(lastUser.current) {
+  useEffect(() => {
+    if (lastUser.current) {
       editing.current[lastUser.current] = input.current.value
     }
     input.current.value = editing.current[userid] || ''
 
     lastUser.current = userid
-  }, [])
+  }, [userid])
 
-  return [input, setInputUser]
+  return input
 }
 
-export default useInputByUser
+export default useUserInput

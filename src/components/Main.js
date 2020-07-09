@@ -22,7 +22,7 @@ import * as script from '../js/script.js'
 const storage = require('electron-json-storage')
 const USERS = []
 
-function Main({ users, messages, settings, initUsers, clearUsers, selectedUser, signOut, ...props }) {
+function Main({ users, settings, initUsers, clearUsers, selectedUser, signOut, ...props }) {
   const [screenState, setScreenState] = React.useState(0)
   const [tabState, setTabState] = React.useState(0)
   const [imageViewer, showImageViewer] = React.useState(null)
@@ -60,7 +60,6 @@ function Main({ users, messages, settings, initUsers, clearUsers, selectedUser, 
       document.removeEventListener('keydown', onImageViewKey)
     }
   }, [imageViewer, showImageViewer])
-
 
   React.useEffect(() => {
     ipcRenderer.on('download-complete', (event, file) => {
@@ -138,30 +137,29 @@ function Main({ users, messages, settings, initUsers, clearUsers, selectedUser, 
         recent.on('value', (snapshot) => {
           // GET PUSH ALARM, AUDIO BEEP
           storage.getMany(['pushAlram', 'audioBeep'], (err, data) => {
-            if (data.pushAlram.allowed) {
-              const recentsData = snapshot.val()
-              const message = recentsData.type === 2
-                ? JSON.parse(recentsData.message).name
-                : recentsData.message
-              const notification = new Notification('새 메세지', {
-                body: message,
-                silent: !data.audioBeep.allowed
-              })
+            if (!data.pushAlram.allowed) { return }
 
-              notification.onclick = () => {
-                const target = USERS.filter(
-                  (u) => { return u.key === recentsData.userId})
-                if (target.length > 0) {
-                  setScreenState(0)
-                  setTabState(target[0].value.state || 0)
-                  selectedUser(target[0])
-                }
+            const recentsData = snapshot.val()
+            const message = recentsData.type === 2
+              ? JSON.parse(recentsData.message).name
+              : recentsData.message
+            const notification = new Notification('새 메세지', {
+              body: message,
+              silent: !data.audioBeep.allowed
+            })
+            notification.onclick = () => {
+              const target = USERS.filter(
+                (u) => { return u.key === recentsData.userId})
+              if (target.length > 0) {
+                setScreenState(0)
+                setTabState(target[0].value.state || 0)
+                selectedUser(target[0])
               }
             }
           })
         })
       })
-      .catch(({ messages }) => messages && Alert(messages))
+      .catch((error) => error.messages && Alert(error.messages))
       .finally(() => isLoading(false))
 
   }, [initUsers, clearUsers, database, isLoading, selectedUser, settings.key, Alert])
@@ -260,13 +258,11 @@ function Main({ users, messages, settings, initUsers, clearUsers, selectedUser, 
 }
 
 const getFirebaseAuthToken = async (uuid) => {
-  const res = await axios.post(`${global.serverAddress}/api/auth`, { uuid: uuid })
-  return res
+  return await axios.post(`${global.serverAddress}/api/auth`, { uuid: uuid })
 }
 
 const mapStateToProps = state => ({
   users: state.users,
-  messages: state.messages,
   settings: state.settings
 })
 
