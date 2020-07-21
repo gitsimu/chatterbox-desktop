@@ -115,7 +115,7 @@ const Chat = ({ users, settings, messagesAll, addMessages, deleteMessages, clear
     formData.append('file', target)
     formData.append('key', key)
 
-    return axios.post(`${global.serverAddress}/api/upload`, formData, config)
+    return axios.post(`${global.server.chat}/api/upload`, formData, config)
       .then(res => {
         if (res.data.result === 'success') {
           sendMessage(key, userid, JSON.stringify(res.data.file), 2, database)

@@ -135,6 +135,7 @@ function Main({ users, settings, initUsers, clearUsers, selectedUser, signOut, .
         // https://snutiise.github.io/html5-desktop-api/
         const recent = database.ref(`/${settings.key}/recents`)
         recent.on('value', (snapshot) => {
+          if (!snapshot.val()) return
           // GET PUSH ALARM, AUDIO BEEP
           storage.getMany(['pushAlram', 'audioBeep'], (err, data) => {
             if (!data.pushAlram.allowed) { return }
@@ -258,7 +259,7 @@ function Main({ users, settings, initUsers, clearUsers, selectedUser, signOut, .
 }
 
 const getFirebaseAuthToken = async (uuid) => {
-  return await axios.post(`${global.serverAddress}/api/auth`, { uuid: uuid })
+  return await axios.post(`${global.server.chat}/api/auth`, { uuid: uuid })
 }
 
 const mapStateToProps = state => ({

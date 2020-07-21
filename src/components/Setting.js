@@ -88,7 +88,7 @@ const Setting = ({ settings, ...props }) => {
 
     isLoading(true)
 
-    return axios.post(global.serverAddress + '/api/upload', formData, config)
+    return axios.post(`${global.server.chat}/api/upload`, formData, config)
       .then(res => {
         console.log('upload-success', res)
         isLoading(false)
@@ -118,7 +118,7 @@ const Setting = ({ settings, ...props }) => {
     formData.append('filename', JSON.parse(profileImage).name)
     formData.append('key', settings.key)
 
-    return axios.post(global.serverAddress + '/api/remove', formData, config)
+    return axios.post(`${global.server.chat}/api/remove`, formData, config)
       .then(res => {
         console.log('upload-success', res)
         isLoading(false)

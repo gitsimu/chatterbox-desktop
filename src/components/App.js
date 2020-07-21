@@ -1,10 +1,10 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { signIn } from '../actions'
-
 import Main from './Main'
 import '../css/App.css'
 import '../css/alert.scss'
+import '../js/global.js'
 
 /* 내부 스토리지 관리 */
 import storage from 'electron-json-storage'
@@ -13,12 +13,14 @@ import storage from 'electron-json-storage'
  * https://github.com/electron/electron/blob/master/docs/api/shell.md#shellopenexternalurl
  */
 import { shell, ipcRenderer } from 'electron'
+const os = require('os')
 
 function App({ settings, signIn }) {  
   const [id, setId] = React.useState('')
   const [pw, setPw] = React.useState('')
   const [loading, isLoading] = React.useState(false)
   const [mainTheme, setMainTheme] = React.useState('chatterbox-theme-light')
+  const [deviceId, setDeviceId] = React.useState('')
   const [alertDialog, showAlertDialog] = React.useState(null)
   const [signInRequired, isSignInRequired] = React.useState(null)
   
@@ -30,10 +32,18 @@ function App({ settings, signIn }) {
     simmplelineLink.type = "text/css"
     document.querySelector('body').appendChild(simmplelineLink)
 
-    /* Main theme */
-    storage.get('mainTheme', (err, data) => {           
-      if (data.type) {
-        setMainTheme(data.type)
+    /* Main theme / device */
+    storage.getMany(['mainTheme', 'device'], (err, data) => {           
+      if (data.mainTheme.type) {
+        setMainTheme(data.mainTheme.type)
+      }
+      if (data.device.id) {
+        setDeviceId(data.device.id)
+      } else {
+        const newId = uuidv4()
+        storage.set('device', {id: newId}, () => {              
+          setDeviceId(newId)
+        })
       }
     })
 
@@ -68,47 +78,136 @@ function App({ settings, signIn }) {
     showAlertDialog(alertHtml)
   }, [])
 
+  const signInProcessByToken = React.useCallback(async (userName, userToken, key) => {
+    isLoading(true)
+    const req = {
+      method: 'login_pc_by_token',
+      login_member_id: userName,
+      login_token: userToken
+    }
+    checkAuthentication(req)
+      .then(async data => {
+        console.log('signInProcessByToken', req, data)
+        if (data.code === '1') {          
+          signIn({key: key})
+        } else {
+          initSignin()
+        }
+      })
+      .finally(() => {
+        isLoading(false)
+      })
+  }, [signIn])
+
   const signInProcess = React.useCallback(async (id, pw) => {
     if (!id || id === '') {
+      initSignin()
       Alert('아이디를 입력해주세요.')
       return
     } else if (!pw || pw === '') {
+      initSignin()
       Alert('비밀번호를 입력해주세요.')
       return
     }    
 
-    // const token = 'c1cd7759-9784-4fac-a667-3685d6b2e4a0'
     isLoading(true)
-    const token = await getUserToken()
-    storage.set('userData', { token: token, id: id, pw: pw }, () => {
-      signIn({ key: token })
-      isLoading(false)
-    })
-  }, [signIn, Alert])
 
-  const getUserToken = () => {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        resolve('c1cd7759-9784-4fac-a667-3685d6b2e4a0')
-      }, 1000)
+    const req = {
+      method: 'login_app',
+      member_id: id,
+      password: pw
+    }
+    checkAuthentication(req)
+      .then(async data => {
+        if (data.code === '1') {
+          const device = `${os.type()} ${os.release()} ${os.platform()}`
+          const loginToken = await initUserInfo(deviceId, data.member_id, data.chat_id, device)
+          const response = {
+            pc_id: deviceId,
+            userName: data.member_id,
+            userToken: data.member_token,
+            loginToken: loginToken,
+            sessionKey: data.sskey,
+            key: data.chat_id
+          }
+          storage.set('userData', response, () => {     
+            console.log('set userData', response)         
+            signIn(response)
+            isLoading(false)
+          })
+        } else {
+          Alert('사용자 정보가 없습니다.\n관리자에게 문의해주세요.')
+          initSignin()
+          isLoading(false)
+        }
+      })
+      .catch(err => {
+        Alert('로그인에 실패하였습니다.\n관리자에게 문의해주세요.')
+        initSignin()
+        isLoading(false)
+      })
+  }, [Alert, signIn, deviceId])
+
+  const checkAuthentication = async (req) => {
+    let body = ''
+    Object.keys(req).forEach((o, i) => {
+      body += `${o}=${Object.values(req)[i]}&`
     })
+
+    const postResponse = await fetch(`${global.server.auth}`, {
+      method: 'POST',
+      dataType: 'json',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+      },
+      body: body.slice(0, -1)
+    })
+  
+    const postData = await postResponse.json()
+    return postData
+  }
+
+  const initUserInfo = async (pc_id, member_id, chat_id, os) => {
+    const postResponse = await fetch(`${global.server.api}`, {
+      method: 'POST',
+      dataType: 'json',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+      },
+      body: `method=insert_user_pc_info&pc_id=${pc_id}&member_id=${member_id}&chat_id=${chat_id}&os=${os}&`
+    })
+  
+    const postData = await postResponse.text()
+    return postData
+  }
+
+  const uuidv4 = () => {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+      // eslint-disable-next-line no-mixed-operators
+      var r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 3 | 8);
+      return v.toString(16);
+    });
+  }
+
+  const initSignin = () => {
+    storage.remove('userData')
+    isLoading(false)
+    isSignInRequired(true)
   }
 
   /* 첫 렌더링 시 local storage를 확인
    * id/pw/token 값이 존자해면 바로 로그인한다
    */
   React.useEffect(() => {    
-    storage.getMany(['userData', 'autoSignin'], async (err, data) => {      
-      if (data.autoSignin.allowed 
-        && data.userData 
-        && data.userData.id 
-        && data.userData.pw) {        
-        await signInProcess(data.userData.id, data.userData.pw)
+    storage.getMany(['userData', 'autoSignin'], async (err, data) => {    
+      const d = data.userData
+      if (data.autoSignin.allowed && d && d.userName && d.loginToken) {                
+        await signInProcessByToken(d.userName, d.loginToken, d.key)
       } else {
         isSignInRequired(true)
       }
     })
-  }, [signInProcess])
+  }, [signInProcessByToken])
 
   // React.useEffect(() => {
   //   isSignInRequired(!settings.key || settings.key === '')
