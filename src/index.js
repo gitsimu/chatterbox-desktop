@@ -9,7 +9,7 @@ import App from './components/App'
 import * as serviceWorker from './serviceWorker'
 
 const rootElement = document.getElementById('root')
-const store = createStore(rootReducer)
+export const store = createStore(rootReducer)
 
 // dev only
 store.subscribe(() => { console.log('[store]',store.getState())})

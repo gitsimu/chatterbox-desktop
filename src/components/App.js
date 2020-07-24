@@ -5,6 +5,7 @@ import Main from './Main'
 import '../css/App.css'
 import '../css/alert.scss'
 import '../js/global.js'
+import * as smlog from '../js/smlog'
 
 /* 내부 스토리지 관리 */
 import storage from 'electron-json-storage'
@@ -85,19 +86,25 @@ function App({ settings, signIn }) {
       login_member_id: userName,
       login_token: userToken
     }
-    checkAuthentication(req)
+    smlog.AUTH(req)
       .then(async data => {
         console.log('signInProcessByToken', req, data)
-        if (data.code === '1') {          
-          signIn({key: key})
+        if (data.code === '1') {      
+          const response = {
+            pc_id: deviceId,
+            userName: data.member_id,
+            loginToken: userToken,
+            sessionToken: data.member_token,
+            sessionKey: data.sskey,
+            key: data.chat_id
+          }    
+          signIn(response)
         } else {
           initSignin()
         }
-      })
-      .finally(() => {
         isLoading(false)
       })
-  }, [signIn])
+  }, [deviceId, signIn])
 
   const signInProcess = React.useCallback(async (id, pw) => {
     if (!id || id === '') {
@@ -117,16 +124,16 @@ function App({ settings, signIn }) {
       member_id: id,
       password: pw
     }
-    checkAuthentication(req)
+    smlog.AUTH(req)
       .then(async data => {
         if (data.code === '1') {
           const device = `${os.type()} ${os.release()} ${os.platform()}`
-          const loginToken = await initUserInfo(deviceId, data.member_id, data.chat_id, device)
+          const loginToken = await initUserInfo(deviceId, data.chat_id, device, data.sskey, data.member_token, data.member_id)
           const response = {
             pc_id: deviceId,
-            userName: data.member_id,
-            userToken: data.member_token,
+            userName: data.member_id,            
             loginToken: loginToken,
+            sessionToken: data.member_token,
             sessionKey: data.sskey,
             key: data.chat_id
           }
@@ -148,33 +155,28 @@ function App({ settings, signIn }) {
       })
   }, [Alert, signIn, deviceId])
 
-  const checkAuthentication = async (req) => {
+  const initUserInfo = async (pc_id, chat_id, os, sskey, member_token, member_id) => {
     let body = ''
+    const req = {
+      method: 'insert_user_pc_info',
+      pc_id: pc_id,
+      chat_id: chat_id,
+      os: os,
+      sskey: sskey,
+      member_token: member_token,
+      member_id: member_id,
+    }
     Object.keys(req).forEach((o, i) => {
       body += `${o}=${Object.values(req)[i]}&`
     })
 
-    const postResponse = await fetch(`${global.server.auth}`, {
-      method: 'POST',
-      dataType: 'json',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
-      },
-      body: body.slice(0, -1)
-    })
-  
-    const postData = await postResponse.json()
-    return postData
-  }
-
-  const initUserInfo = async (pc_id, member_id, chat_id, os) => {
     const postResponse = await fetch(`${global.server.api}`, {
       method: 'POST',
       dataType: 'json',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
       },
-      body: `method=insert_user_pc_info&pc_id=${pc_id}&member_id=${member_id}&chat_id=${chat_id}&os=${os}&`
+      body: body.slice(0, -1)
     })
   
     const postData = await postResponse.text()

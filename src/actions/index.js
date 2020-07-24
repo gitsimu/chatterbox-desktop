@@ -37,7 +37,11 @@ export const initSettings = settings => ({
 
 export const signIn = settings => ({
   type: 'SIGN_IN',
-  key: settings.key
+  key: settings.key,
+  userName: settings.userName,
+  userToken: settings.userToken,
+  sessionToken: settings.sessionToken,
+  sessionKey: settings.sessionKey
 })
 
 export const signOut = () => ({
