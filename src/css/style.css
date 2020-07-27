@@ -73,7 +73,8 @@ div, input, textarea {
 .container-right {
   display: flex;
   flex-direction: column;
-  width: 300px;
+  width: 25%;
+  max-width: 500px;
   max-height: calc(100vh - 10px);
 }
 
@@ -110,7 +111,8 @@ div, input, textarea {
 .chat-list {
   display: flex;
   flex-direction: column;
-  width: 250px;
+  width: 30%;
+  max-width: 400px;
   max-height: calc(100vh - 10px);
   margin-right: 5px;
   overflow: auto;
@@ -134,7 +136,7 @@ div, input, textarea {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 10px;
+  padding: 10px 0;
   font-size: 12px;
   cursor: pointer;
   border-top: 3px solid transparent;
@@ -213,6 +215,7 @@ div, input, textarea {
 }
 .chat-user-message {
   color: #84d6ff;
+  max-width: 70%;
 }
 .chat-user-datetime {
   position: absolute;
@@ -398,6 +401,7 @@ div, input, textarea {
   margin-top: 15px;
 }
 .ad-click-history-title1 {
+  font-weight: bold;
   font-size: 14px;
   margin-bottom: 2px;
   padding: 0 5px;

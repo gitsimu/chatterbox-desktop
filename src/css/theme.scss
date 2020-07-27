@@ -9,7 +9,8 @@
   }
   .app div.card {
     background: #fff;
-    border: none;
+    border: 1px solid #f1f1f1;
+    // border: none;
   }
   .app-title {
     border-bottom: 1px solid #eee;
@@ -40,9 +41,8 @@
     pointer-events: none;
   }  
   .app-button-login div {
-    background: rgba(0, 128, 247, 0.5);
-    padding: 8px 12px;
-    font-size: 14px;    
+    background: rgba(0, 128, 247, 0.5);    
+    font-size: 14px;
   }
   .app-button-login.active div {
     background: #0080F7;
