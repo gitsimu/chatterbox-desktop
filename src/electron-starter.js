@@ -9,10 +9,10 @@ let win
 function createWindow () {
   /* 브라우저 창을 생성합니다. */
   win = new BrowserWindow({
-    width: 1024,
-    height: 600,
-    minWidth: 1024,
-    minHeight: 600,    
+    width: 1280,
+    height: 720,
+    minWidth: 1280,
+    minHeight: 720,    
     webPreferences: {
       nodeIntegration: true,
       enableRemoteModule: true      
