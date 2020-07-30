@@ -25,14 +25,7 @@ function App({ settings, signIn }) {
   const [alertDialog, showAlertDialog] = React.useState(null)
   const [signInRequired, isSignInRequired] = React.useState(null)
   
-  /* simpleline icons */
   React.useEffect(() => {
-    let simmplelineLink = document.createElement("link")
-    simmplelineLink.href = "https://cdnjs.cloudflare.com/ajax/libs/simple-line-icons/2.4.1/css/simple-line-icons.min.css"
-    simmplelineLink.rel = "stylesheet"
-    simmplelineLink.type = "text/css"
-    document.querySelector('body').appendChild(simmplelineLink)
-
     /* Main theme / device */
     storage.getMany(['mainTheme', 'device'], (err, data) => {           
       if (data.mainTheme.type) {
@@ -227,7 +220,7 @@ function App({ settings, signIn }) {
           {/* <div className="app-title">
             로그인
           </div> */}
-          <img src="/logo_smlog.png" alt="logo_smlog" style={{height: 50, marginBottom: 20}}></img>
+          <img src="./logo_smlog.png" alt="logo_smlog" style={{height: 50, marginBottom: 20}}></img>
           <div className="app-input">
             <div className="app-input-item">
               <span>아이디</span>

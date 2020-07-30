@@ -21,7 +21,7 @@ const Info = ({ users, settings, ...props }) => {
 
       const ip = i.value.ip
       const svid = i.value.svid
-      console.log('smlog info', ip, svid)
+      console.log('smlog info', i.value)
       
       if (ip && svid) {
         const req = {
@@ -186,17 +186,26 @@ const Info = ({ users, settings, ...props }) => {
           {/* smlog data */}
           {smlogData && (
             <>
-              {/* IP */}
-              <div className="chat-info-item">
-                <span>IP</span>
-                <div className="chat-info-item-smlog">
-                  <img 
-                    src={`https://smlog.co.kr/img/flag/${smlogData.info.ip_country}`}
-                    title={smlogData.info.ip_city_isp} alt=""
-                  />
-                  {smlogData.info.ip}
+              {/* IP / Device */}
+              {i.value.muid === '' ? (  
+                <div className="chat-info-item">
+                  <span>IP</span>
+                  <div className="chat-info-item-smlog">
+                    <img 
+                      src={`https://smlog.co.kr/img/flag/${smlogData.info.ip_country}`}
+                      title={smlogData.info.ip_city_isp} alt=""
+                    />
+                    {smlogData.info.ip}
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div className="chat-info-item">
+                  <span>단말기 세션</span>
+                  <div className="chat-info-item-smlog">
+                    {i.value.muid}
+                  </div>
+                </div>
+              )}
               {/* 총 클릭수 */}
               <div className="chat-info-item">
                 <span>클릭수</span>

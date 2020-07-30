@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import axios from 'axios'
 import Mockup from './Mockup'
 import { ChromePicker } from 'react-color'
+import * as smlog from '../js/smlog'
 
 /* URL을 OS 기본 브라우저로 열기위한 shell
  * https://github.com/electron/electron/blob/master/docs/api/shell.md#shellopenexternalurl
@@ -21,9 +22,16 @@ const initWorkingDay = {
   endBreak: '0000',
   message: '',
 }
+const initConfig = {
+  title: '채팅 상담',
+  subTitle: '보통 몇 분 내에 응답합니다',
+  nickname: 'Manager',
+  firstMessage: '방문해주셔서 감사합니다.\n궁금한 내용을 편하게 남겨주세요.'
+}  
 
 const Setting = ({ settings, ...props }) => {
   const database = props.database
+  const Alert = props.Alert
 
   const [title, setTitle] = React.useState('')
   const [subTitle, setSubTitle] = React.useState('')
@@ -38,26 +46,44 @@ const Setting = ({ settings, ...props }) => {
   const [autoSignin, allowAutoSignin] = React.useState(true)
   const [mainTheme, setMainTheme] = React.useState('light')
   const [workingDay, setWorkingDay] = React.useState(initWorkingDay)
+  const [missedMessage, setMissedMessage] = React.useState('')
   const [settingMenuState, setSettingMenuState] = React.useState(0)
   const [version, setVersion] = React.useState('0.0.0')
 
+  const [domains, setDomains] = React.useState([])
+
   const isLoading = props.isLoading
   
-  /* by firebase */
   React.useEffect(() => {
+    /* by firebase */
     database.ref(`/${settings.key}/config`).once('value', function(snapshot) {
       const data = snapshot.val()
-      if (!data) return
+      if (data) {
+        setTitle(data.title)
+        setSubTitle(data.subTitle)
+        setNickname(data.nickname)
+        setFirstMessage(data.firstMessage)
+        setThemeColor(data.themeColor)
+        setProfileImage(data.profileImage || null)
+        setWorkingDay(data.workingDay || initWorkingDay)
+        setMissedMessage(data.workingDay.message)
+      } else {
+        setTitle(initConfig.title)
+        setSubTitle(initConfig.subTitle)
+        setNickname(initConfig.nickname)
+        setFirstMessage(initConfig.firstMessage)
+      }
+    })
 
-      setTitle(data.title)
-      setSubTitle(data.subTitle)
-      setNickname(data.nickname)
-      setFirstMessage(data.firstMessage)
-      setThemeColor(data.themeColor)
-      setProfileImage(data.profileImage || null)
-      setWorkingDay(data.workingDay || initWorkingDay)      
-    })    
-  }, [database, settings.key])
+    /* use chat */
+    smlog.API({
+      method: 'domains_data',
+      username: settings.userName
+    }).then(({data}) => {
+      console.log('domains', data)
+      setDomains(data)
+    })
+  }, [database, settings.key, settings.userName])
 
   /* by storage */
   React.useEffect(() => {
@@ -81,12 +107,26 @@ const Setting = ({ settings, ...props }) => {
 
   /* file upload handler */
   const handleFileInput = (e) => {
+    const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
+    const ALLOW_FILE_EXTENSIONS = ['jpg', 'jpeg', 'gif', 'bmp', 'png']
+
+    const target = e.target.files[0]
+    const fileSize = target.size
+    const fileExtension = target.name.split('.').pop().toLowerCase()
+
+    if (MAX_FILE_SIZE < fileSize) {
+      Alert('한 번에 업로드 할 수 있는 최대 파일 크기는 5MB 입니다.')
+      return
+    } else if (ALLOW_FILE_EXTENSIONS.indexOf(fileExtension) === -1) {
+      Alert('지원하지 않는 파일 형식입니다.')
+      return
+    }
+
+    isLoading(true)
     const config = { headers: { 'content-type': 'multipart/form-data' } }
     const formData = new FormData()
     formData.append('file', e.target.files[0])
     formData.append('key', settings.key)
-
-    isLoading(true)
 
     return axios.post(`${global.server.chat}/api/upload`, formData, config)
       .then(res => {
@@ -139,6 +179,16 @@ const Setting = ({ settings, ...props }) => {
       nickname: nickname.trim(),
       firstMessage: firstMessage.trim(),
       themeColor: themeColor
+    })
+  }
+
+  const updateUseChat = (svid, use) => {
+    smlog.API({
+      method: 'update_chat_state',
+      svid: svid,
+      is_use_chat: use ? 1 : 0
+    }).then(({code}) => {
+      console.log('updateUseChat', code)
     })
   }
 
@@ -216,6 +266,7 @@ const Setting = ({ settings, ...props }) => {
             기본 설정
           </div>
           <div className="setting-menu-body setting-basic">
+            {/* Theme */}
             <div className="setting-checkbox-item">
               <div className="setting-checkbox-item-title">
                 <span>테마</span>
@@ -233,6 +284,39 @@ const Setting = ({ settings, ...props }) => {
                 <div className="setting-checkbox-item-description">앱을 재시작하면 변경된 테마가 적용됩니다.</div>
               </div>              
             </div>
+            {/* Use chat */}
+            <div className="setting-checkbox-item">
+              <div className="setting-checkbox-item-title">
+                <span>채팅기능 사용</span>
+              </div>
+              <div 
+                className="setting-checkbox-item-description" 
+                style={{paddingTop: 5, paddingBottom: 10}}>
+                  채팅기능을 사용할 도메인에 체크해주세요. 체크를 해제하면 채팅 아이콘이 나타나지 않습니다.
+              </div>
+              {domains.length > 0 ? 
+                (
+                  domains.map((item, index) => {
+                    return (
+                      <div className="domains" key={index}>
+                        <label>
+                          <input 
+                            type="checkbox" 
+                            defaultChecked={item.use_chat === '1'}
+                            onClick={(e) => {
+                              item.sid && updateUseChat(item.sid ,e.target.checked)
+                            }}/>
+                          <div className="domain-text">{item.s_domain}</div>
+                        </label>
+                      </div>
+                    )
+                  })
+                ) : (
+                  <div className="domains-empty">사용 중인 도메인이 없습니다.</div>
+                )
+              }
+            </div>
+            {/* Push */}
             <div className="setting-checkbox-item">
               <div className="setting-checkbox-item-title">
                 <label>
@@ -248,6 +332,7 @@ const Setting = ({ settings, ...props }) => {
               </div>
               <div className="setting-checkbox-item-description">새로운 메세지가 올 때 푸시알람을 띄워줍니다. 체크를 해제하면 알람이 오지 않습니다.</div>
             </div>
+            {/* Audio */}
             <div className="setting-checkbox-item">
               <div className="setting-checkbox-item-title">
                 <label>
@@ -263,6 +348,7 @@ const Setting = ({ settings, ...props }) => {
               </div>
               <div className="setting-checkbox-item-description">새 푸시알람이 오거나 특정 작업을 실행할 때 시스템 경고음을 울립니다.</div>
             </div>
+            {/* Auto login */}
             <div className="setting-checkbox-item">
               <div className="setting-checkbox-item-title">
                 <label>
@@ -279,6 +365,7 @@ const Setting = ({ settings, ...props }) => {
               <div className="setting-checkbox-item-description">첫 로그인 이후부터는 앱을 실행시킬 때 해당 계정으로 자동 로그인합니다.</div>
               <div className="setting-checkbox-item-description">개인정보 보호를 위해 개인 PC에서만 사용하세요.</div>
             </div>
+            {/* Working day */}
             <div className="setting-checkbox-item">
               <div className="setting-checkbox-item-title">
                 <label>
@@ -428,7 +515,12 @@ const Setting = ({ settings, ...props }) => {
                   </div>
                   <div className="setting-working-message">
                     <div className="setting-working-message-title">부재중 메세지 (최대 200자)</div>
-                    <textarea ref={node => message = node} value={workingDay.message} onChange={() => {}} onBlur={(e) => {onChangeWorkingDay(e)}}></textarea>
+                    <textarea 
+                      ref={node => message = node}
+                      value={missedMessage}
+                      onChange={(e) => {setMissedMessage(e.target.value)}}
+                      onBlur={(e) => {onChangeWorkingDay(e)}}>
+                    </textarea>
                   </div>
                 </div>
               )}
@@ -462,7 +554,10 @@ const Setting = ({ settings, ...props }) => {
                   <div className={themeColorPicker ? "setting-color-picker active" : "setting-color-picker"}>
                     <ChromePicker
                       color={themeColor}
-                      onChange={(color) => { setThemeColor(color.hex) }}/>
+                      onChange={(color) => { 
+                        const _color = color.rgb.a === 1 ? color.hex : `rgba(${color.rgb.r}, ${color.rgb.g}, ${color.rgb.b}, ${color.rgb.a})`
+                        setThemeColor(_color) 
+                      }}/>
                     <div className="empty-background"
                       onClick={() => {
                         updateUserInfo()
@@ -516,7 +611,7 @@ const Setting = ({ settings, ...props }) => {
         </div>
 
         <div className={ settingMenuState === 2 ? "setting-menu-2" : "setting-menu-2 hide" }>
-          <div className="setting-menu-header">
+          {/* <div className="setting-menu-header">
             서비스 정보
           </div>
           <div className="setting-menu-body">
@@ -527,9 +622,16 @@ const Setting = ({ settings, ...props }) => {
               </div>
             </div>
             <div className="setting-data-item"></div>       
+          </div> */}
+          <div className="setting-service-info">
+            <div>
+              <img src="icon01_256.png" alt="setting-logo" />
+              <div className="setting-service-info-title">Smartlog Desktop</div>
+              <div className="setting-service-info-text1">Version {version}</div>
+              <div className="setting-service-info-text3">COPYRIGHT (C) Creative Soft. All Rights reserved.</div>
+            </div>
           </div>
         </div>
-
         <div className={ settingMenuState === 3 ? "setting-menu-3" : "setting-menu-3 hide" }>
         </div>
       </div>

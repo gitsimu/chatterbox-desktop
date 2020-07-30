@@ -1,6 +1,6 @@
 {
   "name": "chatterbox-desktop",
-  "version": "1.0.30",
+  "version": "1.0.33",
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^4.2.4",
@@ -42,7 +42,7 @@
   },
   "homepage": ".",
   "build": {
-    "productName": "SmartLog",
+    "productName": "SmartLog Desktop",
     "appId": "com.smlog.chatterbox",
     "asar": true,
     "extends": null,

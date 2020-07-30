@@ -73,12 +73,6 @@ function Main({ users, settings, initUsers, clearUsers, selectedUser, signOut, .
 
   React.useEffect(() => {
     let chat
-    // simpleline icons
-    let simplelineLink = document.createElement('link')
-    simplelineLink.href = 'https://cdnjs.cloudflare.com/ajax/libs/simple-line-icons/2.4.1/css/simple-line-icons.min.css'
-    simplelineLink.rel = 'stylesheet'
-    simplelineLink.type = 'text/css'
-    document.querySelector('body').appendChild(simplelineLink)
 
     // firebase
     Promise.resolve()
@@ -141,20 +135,27 @@ function Main({ users, settings, initUsers, clearUsers, selectedUser, signOut, .
             if (!data.pushAlram.allowed) { return }
 
             const recentsData = snapshot.val()
-            const message = recentsData.type === 2
-              ? JSON.parse(recentsData.message).name
-              : recentsData.message
-            const notification = new Notification('새 메세지', {
-              body: message,
-              silent: !data.audioBeep.allowed
-            })
-            notification.onclick = () => {
-              const target = USERS.filter(
-                (u) => { return u.key === recentsData.userId})
-              if (target.length > 0) {
-                setScreenState(0)
-                setTabState(target[0].value.state || 0)
-                selectedUser(target[0])
+            if (recentsData) {
+              const timestamp = recentsData.timestamp
+              const timelimit = new Date().getTime() - (60 * 1000)
+
+              if (!timestamp || timelimit > timestamp ) return
+
+              const message = recentsData.type === 2
+                ? JSON.parse(recentsData.message).name
+                : recentsData.message
+              const notification = new Notification('새 메세지', {
+                body: message,
+                silent: !data.audioBeep.allowed
+              })
+              notification.onclick = () => {
+                const target = USERS.filter(
+                  (u) => { return u.key === recentsData.userId})
+                if (target.length > 0) {
+                  setScreenState(0)
+                  setTabState(target[0].value.state || 0)
+                  selectedUser(target[0])
+                }
               }
             }
           })
@@ -237,6 +238,7 @@ function Main({ users, settings, initUsers, clearUsers, selectedUser, signOut, .
         <div className={ screenState === 2 ? "container-screen-2" : "container-screen-2 hide" }>
           <Setting
             database={database}
+            Alert={Alert}
             isLoading={isLoading}/>
         </div>
       </div>

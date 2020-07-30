@@ -26,8 +26,8 @@
     -->
     <!-- <link href="https://fonts.googleapis.com/css2?family=Comfortaa&family=Nanum+Gothic:wght@400;800&display=swap" rel="stylesheet"> -->
     <!-- <link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;800&display=swap" rel="stylesheet"> -->
-    <!-- <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;900&display=swap" rel="stylesheet"> -->
-    <title>ChatterBox</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/simple-line-icons/2.4.1/css/simple-line-icons.min.css" rel="stylesheet">
+    <title>Smartlog Desktop</title>
 
     <style>
       #root {
@@ -99,12 +99,13 @@
     -->
 
     <script>
+      const logoUrl = '%PUBLIC_URL%/logo_smlog.png'
       const { ipcRenderer } = require('electron')
 
       ipcRenderer.send('app_version')
       ipcRenderer.on('app_version', (event, arg) => {
         ipcRenderer.removeAllListeners('app_version')    
-        document.title = 'v' + arg.version;
+        // document.title = 'v' + arg.version;
       })
 
       const notification = document.getElementById('notification')

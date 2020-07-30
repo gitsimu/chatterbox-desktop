@@ -1,9 +1,10 @@
-const { app, BrowserWindow, ipcMain, globalShortcut } = require('electron')
+const { app, BrowserWindow, ipcMain, globalShortcut, Menu } = require('electron')
 const { autoUpdater } = require('electron-updater')
 const { download } = require('electron-dl')
 
 const url = require('url')
 const path = require('path')
+const menuTemplate = require('./electron-menu');
 let win
 
 function createWindow () {
@@ -36,6 +37,11 @@ app.whenReady().then(() => {
     win.openDevTools()
   })
 })
+
+if (process.platform === 'darwin') {
+  const menu = Menu.buildFromTemplate(menuTemplate);
+  Menu.setApplicationMenu(menu)
+}
 
 app.on('ready', () => {
   autoUpdater.checkForUpdatesAndNotify()

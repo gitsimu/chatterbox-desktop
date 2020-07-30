@@ -130,6 +130,11 @@ const Chat = ({ users, settings, messagesAll, addMessages, deleteMessages, clear
       })
       .finally(()=> {isLoading(false)})
   }, [checkFile, database, key, sendMessage, userid])
+
+  const handleFileInputClear = (e) => {
+    e.target.value = ''
+  }
+
   const handleEmojiInput = React.useCallback((emoji)=>{
     input.current.value += emoji.emoji
     input.current.focus()
@@ -274,6 +279,7 @@ const Chat = ({ users, settings, messagesAll, addMessages, deleteMessages, clear
             <label>
               <i className='icon-paper-clip'></i>
               <input type='file'
+                onClick={e => handleFileInputClear(e)}
                 onChange={e => handleFileInput(e)}/>
             </label>
             <label>

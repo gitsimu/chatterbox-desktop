@@ -637,6 +637,7 @@ div, input, textarea {
   padding: 6px 12px;
   border-radius: 10px;
   font-size: 13px;
+  max-width: 70%;
 
   text-align: left !important;
   white-space: pre-line !important;
@@ -1172,6 +1173,7 @@ div, input, textarea {
 }
 .setting-color-picker input {
   background: transparent;
+  padding: 0;
 }
 .empty-background {
   position: fixed;
@@ -1309,7 +1311,7 @@ div, input, textarea {
     align-items: flex-end;
 }
 .setting .message.opponent .message-inner {
-    background-color: #f0f3f3;
+    background-color: #f0f3f3 !important;
     color: #222;
 }
 .setting .message .message-inner {
@@ -1509,4 +1511,61 @@ div:hover > .tooltip {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.setting-service-info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  font-size: 0;
+  user-select: none;
+}
+.setting-service-info > div {
+  text-align: center;
+  background: #fff;
+  padding: 40px 60px;
+  border: 1px solid #eee;
+  border-radius: 5px;
+}
+.setting-service-info img {
+  width: 100px;
+  margin-bottom: 10px;
+}
+.setting-service-info-title {
+  font-weight: bold;
+  font-size: 16px;
+  padding: 5px;
+}
+.setting-service-info-text1 {
+  font-size: 14px;
+  padding: 5px;
+  color: '#494949';
+}
+.setting-service-info-text2 {
+  font-size: 12px;
+  padding: 5px;
+  color: '#494949';
+}
+.setting-service-info-text3 {
+  font-size: 14px;
+  padding: 5px;
+  color: #999;
+  font-size: 12px;
+}
+
+.domains {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 5px 28px;
+  color: #555;
+}
+.domains:hover {
+  color: #000;
+}
+.domain-text {
+  font-size: 14px;
+  margin-left: 5px;
 }
