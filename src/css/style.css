@@ -679,6 +679,9 @@ div, input, textarea {
   height: 25px;
   border-radius: 5px;
 }
+.message .message-body {
+  width: 100%;
+}
 
 /* .message.opponent {
 } */

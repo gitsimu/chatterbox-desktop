@@ -132,7 +132,7 @@ function Main({ users, settings, initUsers, clearUsers, selectedUser, signOut, .
           if (!snapshot.val()) return
           // GET PUSH ALARM, AUDIO BEEP
           storage.getMany(['pushAlram', 'audioBeep'], (err, data) => {
-            if (!data.pushAlram.allowed) { return }
+            if (data.pushAlram.allowed === false) { return }
 
             const recentsData = snapshot.val()
             if (recentsData) {
@@ -146,7 +146,7 @@ function Main({ users, settings, initUsers, clearUsers, selectedUser, signOut, .
                 : recentsData.message
               const notification = new Notification('새 메세지', {
                 body: message,
-                silent: !data.audioBeep.allowed
+                silent: data.audioBeep.allowed !== false
               })
               notification.onclick = () => {
                 const target = USERS.filter(

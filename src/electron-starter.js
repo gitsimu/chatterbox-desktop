@@ -5,7 +5,9 @@ const { download } = require('electron-dl')
 const url = require('url')
 const path = require('path')
 const menuTemplate = require('./electron-menu');
+const gotTheLock = app.requestSingleInstanceLock()
 let win
+let tray
 
 function createWindow () {
   /* 브라우저 창을 생성합니다. */
@@ -38,6 +40,46 @@ function createWindow () {
   win.loadURL(startUrl)
 }
 
+/* 하나의 프로세스만 실행 */
+if (!gotTheLock) {
+  app.quit()
+} else {
+  app.on('second-instance', (event, commandLine, workingDirectory) => {
+    // Someone tried to run a second instance, we should focus our window.
+    if (win) {
+      if (win.isMinimized()) win.restore()
+      win.show()
+      win.focus()
+    }
+  })
+
+  // Create myWindow, load the rest of the app, etc...
+  app.on('ready', () => {
+    /* Application User Model ID */
+    app.setAppUserModelId('com.smlog.chatterbox')
+  
+    autoUpdater.checkForUpdatesAndNotify()
+    tray = new Tray(path.join(__dirname, '/../build/icon.png'))
+    const contextMenu = Menu.buildFromTemplate([
+      {label: `Smartlog Desktop (${app.getVersion()})`,
+        click: function() {
+          win.show()
+        } 
+      },
+      {type: 'separator'},
+      {label: 'Exit',
+        click: function() {
+          win.close()
+          app.quit()
+          app.exit()
+        }
+      }
+    ])
+    tray.setToolTip('Smartlog Desktop')
+    tray.setContextMenu(contextMenu)
+  })
+}
+
 /* developer tool을 여는 단축키 지정 (command + P) */
 app.whenReady().then(() => {
   globalShortcut.register('CommandOrControl+P', () => {
@@ -46,36 +88,9 @@ app.whenReady().then(() => {
 })
 
 if (process.platform === 'darwin') {
-  const menu = Menu.buildFromTemplate(menuTemplate);
+  const menu = Menu.buildFromTemplate(menuTemplate(app))
   Menu.setApplicationMenu(menu)
 }
-
-let tray
-app.on('ready', () => {
-  /* Application User Model ID */
-  app.setAppUserModelId('com.smlog.chatterbox')
-  // app.setAppUserModelId(process.execPath)
-
-  autoUpdater.checkForUpdatesAndNotify()
-  tray = new Tray(path.join(__dirname, '/../build/icon.png'))
-  const contextMenu = Menu.buildFromTemplate([
-    {label: `Smartlog Desktop (${app.getVersion()})`,
-      click: function() {
-        win.show()
-      } 
-    },
-    {type: 'separator'},
-    {label: 'Exit',
-      click: function() {
-        win.close()
-        app.quit()
-        app.exit()
-      }
-    }
-  ])
-  tray.setToolTip('Smartlog Desktop')
-  tray.setContextMenu(contextMenu)
-})
 
 /* 이 메소드는 Electron의 초기화가 완료되고
  * 브라우저 윈도우가 생성될 준비가 되었을때 호출
