@@ -330,7 +330,7 @@ const Chat = ({ users, settings, messagesAll, addMessages, deleteMessages, clear
             <div className='message-option-complete'
               onClick={() => {
                 database.ref(`/${key}/users/${userid}`).update({ state: 2 })
-                setTabState(2)
+                // setTabState(2)
                 showOptionDialog(false)
                 showInfoDialog(true)
                 Alert('이 대화가 종료처리 되었습니다.')

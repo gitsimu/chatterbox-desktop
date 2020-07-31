@@ -274,4 +274,33 @@
   .setting-data-item-description {
     color: #555;
   }
+
+  .chat-info-item > div.chat-info-item-smlog,
+  .ad-click-history-title1,
+  .ad-click-history-date,
+  .ad-click-history-item > div {
+    color: #000;
+  }
+  .ad-click-history-title2 {
+    color: #888;
+  }
+  .ad-click-history-item > span {
+    color: #777;
+  }
+  .ad-click-history-list {
+    border-color: #eee;
+  }
+
+  .setting-service-info > div {
+    background: #fff;
+    border: 1px solid #eee;
+    color: #000;
+  }
+
+  .domains {
+    color: #555;
+  }
+  .domains:hover {
+    color: #000;
+  }
 }

@@ -220,7 +220,7 @@ function App({ settings, signIn }) {
           {/* <div className="app-title">
             로그인
           </div> */}
-          <img src="./logo_smlog.png" alt="logo_smlog" style={{height: 50, marginBottom: 20}}></img>
+          <img src="./logo_smlog.png" alt="logo_smlog" style={{height: 50, marginTop: 20, marginBottom: 20}}></img>
           <div className="app-input">
             <div className="app-input-item">
               <span>아이디</span>

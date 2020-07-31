@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, globalShortcut, Menu } = require('electron')
+const { app, BrowserWindow, ipcMain, globalShortcut, Menu, Tray } = require('electron')
 const { autoUpdater } = require('electron-updater')
 const { download } = require('electron-dl')
 
@@ -20,6 +20,13 @@ function createWindow () {
     }
   })
   win.removeMenu()
+
+  win.on('close', function (event) {
+    if(!app.isQuiting){
+        event.preventDefault()
+        win.hide()
+    }
+  })
 
   /* React를 빌드할 경우 결과물은 build 폴더에 생성되기 때문에 loadURL 부분을 아래와 같이 작성합니다. */
   const startUrl = process.env.ELECTRON_START_URL || url.format({
@@ -43,8 +50,31 @@ if (process.platform === 'darwin') {
   Menu.setApplicationMenu(menu)
 }
 
+let tray
 app.on('ready', () => {
+  /* Application User Model ID */
+  app.setAppUserModelId('com.smlog.chatterbox')
+  // app.setAppUserModelId(process.execPath)
+
   autoUpdater.checkForUpdatesAndNotify()
+  tray = new Tray(path.join(__dirname, '/../build/icon.png'))
+  const contextMenu = Menu.buildFromTemplate([
+    {label: `Smartlog Desktop (${app.getVersion()})`,
+      click: function() {
+        win.show()
+      } 
+    },
+    {type: 'separator'},
+    {label: 'Exit',
+      click: function() {
+        win.close()
+        app.quit()
+        app.exit()
+      }
+    }
+  ])
+  tray.setToolTip('Smartlog Desktop')
+  tray.setContextMenu(contextMenu)
 })
 
 /* 이 메소드는 Electron의 초기화가 완료되고

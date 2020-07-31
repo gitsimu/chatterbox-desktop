@@ -215,7 +215,7 @@ div, input, textarea {
 }
 .chat-user-message {
   color: #84d6ff;
-  max-width: 70%;
+  max-width: 130px;
 }
 .chat-user-datetime {
   position: absolute;
@@ -340,6 +340,7 @@ div, input, textarea {
 }
 .chat-info-item input {
   padding: 5px 10px;
+  padding-right: 40px;
   width: 100%;
   outline: none;
   border: none;
@@ -347,7 +348,6 @@ div, input, textarea {
   background: transparent;
   color: #fff;
   border-radius: 5px;
-  margin-top: 3px;
   resize: none;
 }
 .chat-info-item input:hover {
@@ -377,8 +377,13 @@ div, input, textarea {
   font-size: 12px;
   white-space: pre;
   position: absolute;
-  top: -16px;
-  right: 3px;
+  top: 0;
+  right: 5px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* background: rgba(27, 29, 35, 1); */
 }
 .chat-info-item > div.chat-info-item-input div.chat-info-item-save:hover {
   text-decoration: underline;
@@ -392,6 +397,7 @@ div, input, textarea {
   align-items: center;
   padding: 5px 7px;
   font-size: 13px;
+  color: #eee;
 }
 .chat-info-item > div.chat-info-item-smlog img {
   margin-right: 5px;
@@ -405,15 +411,16 @@ div, input, textarea {
   font-size: 14px;
   margin-bottom: 2px;
   padding: 0 5px;
+  color: rgb(141, 152, 177);
 }
 .ad-click-history-title2 {
-  color: #888;
+  color: #bbb;
   font-size: 12px;
   margin-bottom: 10px;
   padding: 0 5px;
 }
 .ad-click-history-list {
-  border-top: 1px solid #eee;
+  border-top: 1px solid rgb(27, 33, 41);
   padding: 15px 5px;
 }
 .ad-click-history-item {
@@ -424,12 +431,13 @@ div, input, textarea {
 }
 .ad-click-history-item > span {
   user-select: none;
-  color: #777;
+  color: rgb(141, 152, 177);
 }
 .ad-click-history-item > div {
   padding: 5px 7px;
   flex: 1;
   text-align: right;
+  color: #eee;
 }
 .ad-click-history-date {
   position: relative;
@@ -438,6 +446,7 @@ div, input, textarea {
   font-size: 13px;
   font-weight: bold;
   margin-bottom: 5px;
+  color: #bbb;
 }
 .ad-click-history-badge {
   font-size: 12px;
@@ -828,7 +837,6 @@ div, input, textarea {
   border-radius: 10px;
   overflow: auto;
   padding: 10px;
-  padding-top: 0;
   box-sizing: border-box;
   transition: 0.2s ease all;
   transform: translateY(100px);
@@ -1524,10 +1532,11 @@ div:hover > .tooltip {
 }
 .setting-service-info > div {
   text-align: center;
-  background: #fff;
+  background: rgba(0,0,0,0.2);
   padding: 40px 60px;
-  border: 1px solid #eee;
+  border: 1px solid #282c34;
   border-radius: 5px;
+  color: rgb(141, 152, 177);
 }
 .setting-service-info img {
   width: 100px;
@@ -1560,10 +1569,10 @@ div:hover > .tooltip {
   flex-direction: row;
   align-items: center;
   padding: 5px 28px;
-  color: #555;
+  color: rgb(141, 152, 177);
 }
 .domains:hover {
-  color: #000;
+  color: #fff;
 }
 .domain-text {
   font-size: 14px;
