@@ -6,8 +6,10 @@ const url = require('url')
 const path = require('path')
 const menuTemplate = require('./electron-menu');
 const gotTheLock = app.requestSingleInstanceLock()
+const isMac = process.platform === 'darwin'
 let win
 let tray
+let willQuitApp = false
 
 function createWindow () {
   /* 브라우저 창을 생성합니다. */
@@ -24,9 +26,9 @@ function createWindow () {
   win.removeMenu()
 
   win.on('close', function (event) {
-    if(!app.isQuiting){
-        event.preventDefault()
-        win.hide()
+    if(!willQuitApp){
+      event.preventDefault()
+      win.hide()
     }
   })
 
@@ -42,6 +44,7 @@ function createWindow () {
 
 /* 하나의 프로세스만 실행 */
 if (!gotTheLock) {
+  willQuitApp = true
   app.quit()
 } else {
   app.on('second-instance', (event, commandLine, workingDirectory) => {
@@ -52,8 +55,16 @@ if (!gotTheLock) {
       win.focus()
     }
   })
-
-  // Create myWindow, load the rest of the app, etc...
+  app.on('before-quit', () => willQuitApp = true)
+  app.on('activate', () => {
+    if (win) {
+      if (win.isMinimized()) win.restore()
+      win.show()
+      win.focus()
+      willQuitApp = false
+    }
+  })
+  
   app.on('ready', () => {
     /* Application User Model ID */
     app.setAppUserModelId('com.smlog.chatterbox')
@@ -87,7 +98,7 @@ app.whenReady().then(() => {
   })
 })
 
-if (process.platform === 'darwin') {
+if (isMac) {
   const menu = Menu.buildFromTemplate(menuTemplate(app))
   Menu.setApplicationMenu(menu)
 }
@@ -132,6 +143,7 @@ autoUpdater.on('update-downloaded', () => {
 
 /* 앱 재시작 후 설치 */
 ipcMain.on('restart_app', () => {
+  willQuitApp = true
   autoUpdater.quitAndInstall()
 })
 
