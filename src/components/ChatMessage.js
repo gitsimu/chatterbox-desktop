@@ -79,7 +79,7 @@ const ChatMessage = ({ settings, ...props }) => {
 
     return (
       <div>
-        {(extension && images.indexOf(extension) > -1) && (
+        {(extension && images.indexOf(extension.toLowerCase()) > -1) && (
           <div
             className="message-thumbnail"
             onClick={() => {

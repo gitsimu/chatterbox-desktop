@@ -9,6 +9,7 @@ import useImageFile from '../hooks/useImageFile'
 import useUserInput from '../hooks/useUserInput'
 
 const CONNECTIONS = {}
+const PAGE_SIZE = 50
 const Chat = ({ users, settings, messagesAll, addMessages, deleteMessages, clearMessages, selectedUser, ...props }) => {
   const key = settings.key
   const userid = settings.selectedUser.key
@@ -28,6 +29,8 @@ const Chat = ({ users, settings, messagesAll, addMessages, deleteMessages, clear
   const input = useUserInput(userid)
   let form
 
+  const [scrollTop, setScrollTop] = React.useState(null)
+
   const scrollToBottom = () => {
     body.current.scrollTop = body.current.scrollHeight
   }
@@ -39,7 +42,7 @@ const Chat = ({ users, settings, messagesAll, addMessages, deleteMessages, clear
     isLoading(true)
     const chat = database.ref(`/${key}/messages/${userid}`)
       .orderByChild('timestamp')
-      .limitToLast(50)
+      .limitToLast(PAGE_SIZE)
 
     chat.on('child_added', (snapshot) => {
       const value = snapshot.val()
@@ -49,8 +52,31 @@ const Chat = ({ users, settings, messagesAll, addMessages, deleteMessages, clear
         isLoading(false)
       }, 10)
     })
-    CONNECTIONS[userid] = chat
+    CONNECTIONS[userid] = {ref: chat, page: 1}
   }, [database, key, addMessages])
+
+  const paging = React.useCallback(() => {
+    if (!CONNECTIONS[userid]) return
+    CONNECTIONS[userid].ref.off()
+    
+    isLoading(true)
+    deleteMessages({ key: userid })
+
+    const page = CONNECTIONS[userid].page + 1
+    const chat = database.ref(`/${key}/messages/${userid}`)
+      .orderByChild('timestamp')
+      .limitToLast(PAGE_SIZE * page)
+
+    chat.on('child_added', (snapshot) => {
+      const value = snapshot.val()
+      addMessages({ key: userid, value: value })
+  
+      setTimeout(() => {
+        isLoading(false)
+      }, 10)
+    })
+    CONNECTIONS[userid] = {ref: chat, page: page}
+  }, [addMessages, database, deleteMessages, key, userid])
 
   const sendMessage = React.useCallback((key, id, message, type, database) => {
     const messageId = Math.random().toString(36).substr(2, 9)
@@ -149,6 +175,7 @@ const Chat = ({ users, settings, messagesAll, addMessages, deleteMessages, clear
     showEmojiContainer(false)
     setImageFile(null)
     showOptionDialog(false)
+    setScrollTop(null)
   }, [input, target, showEmojiContainer, setImageFile, firebaseConnect])
 
   // file drag&drop
@@ -182,11 +209,18 @@ const Chat = ({ users, settings, messagesAll, addMessages, deleteMessages, clear
       }
     }
 
-    /* 파일 드래그&드랍 지원 이벤트
+    const handleScroll = (e) => {
+      const chatBody = body.current
+      setScrollTop(chatBody.scrollHeight - (chatBody.scrollTop + chatBody.clientHeight))
+      // console.log('scroll', chatBody.scrollHeight - (chatBody.scrollTop + chatBody.clientHeight))
+    }
+
+    /* 파일 드래그&드랍 지원 이벤트, 스크롤 이벤트
      * dragover
      * dragenter
      * dragleave
      * drop
+     * scroll
      */
     if (key) {
       const chatBody = body.current
@@ -196,6 +230,7 @@ const Chat = ({ users, settings, messagesAll, addMessages, deleteMessages, clear
       document.getElementById('file-drop-layer').addEventListener('dragover', handleDragOver)
       document.getElementById('file-drop-layer').addEventListener('dragleave', handleDragLeave)
       document.getElementById('file-drop-layer').addEventListener('drop', handleDrop)
+      chatBody.addEventListener('scroll', handleScroll)
 
       /* 이벤트 해제 */
       return () => {
@@ -203,6 +238,7 @@ const Chat = ({ users, settings, messagesAll, addMessages, deleteMessages, clear
         document.getElementById('file-drop-layer').removeEventListener('dragover', handleDragOver)
         document.getElementById('file-drop-layer').removeEventListener('dragleave', handleDragLeave)
         document.getElementById('file-drop-layer').removeEventListener('drop', handleDrop)
+        chatBody.removeEventListener('scroll', handleScroll)
       }
     }
   }, [key, handleFileInput])
@@ -221,7 +257,7 @@ const Chat = ({ users, settings, messagesAll, addMessages, deleteMessages, clear
       Object.keys(CONNECTIONS).forEach((u, i) => {
         console.log('[Connection off]', CONNECTIONS[u])
         if (CONNECTIONS[u]) {
-          CONNECTIONS[u].off()
+          CONNECTIONS[u].ref.off()
           delete CONNECTIONS[u]
         }
       })
@@ -231,8 +267,36 @@ const Chat = ({ users, settings, messagesAll, addMessages, deleteMessages, clear
   return (
     <>
       <div className='messages card' ref={body}>
-        {messages // 중복호출 예외처리
-         && messages.map((m, i) => {
+        {/* 이전 메세지 (paging) */}
+        {CONNECTIONS[userid] 
+        && messages
+        && messages.length >= PAGE_SIZE * CONNECTIONS[userid].page
+        && (
+          <div className="more-button">
+            <div onClick={paging}>
+              <i className="icon-arrow-up"></i>
+              이전 메세지
+            </div>
+          </div>
+        )}
+        {/* 최하단으로 스크롤 */}
+        {messages 
+        && scrollTop >= 100 
+        && (
+          <div className="scroll-bottom-button" onClick={scrollToBottom}>
+            <div>
+              <div className="scroll-bottom-button-message">
+                <span>{messages[messages.length - 1].userId !== key ? target.guestCode : '나'} : </span>{messages[messages.length - 1].message}
+              </div>
+              <div className="scroll-bottom-button-icon">
+                {/* <img src="down-arrow.png" alt="scroll-bottom" /> */}
+                <i className="icon-arrow-down"></i>
+              </div>
+            </div>
+          </div>
+        )}
+        {/* 메세지 */}
+        {messages && messages.map((m, i) => {
           return <ChatMessage
             opponent={userid}
             onloadImage={scrollToBottom}
@@ -242,8 +306,7 @@ const Chat = ({ users, settings, messagesAll, addMessages, deleteMessages, clear
             next={messages[i + 1]}
             {...m}
             {...props}/>
-        })
-        }
+        })}
         <div id='file-drop-layer' className={fileDropLayer
           ? 'file-drop-layer active'
           : 'file-drop-layer'}>
@@ -347,7 +410,7 @@ const Chat = ({ users, settings, messagesAll, addMessages, deleteMessages, clear
               deleteMessages({ key: userid })
               selectedUser({})
               /* connections */
-              CONNECTIONS[userid].off()
+              CONNECTIONS[userid].ref.off()
               delete CONNECTIONS[userid]
 
               Alert('이 대화가 삭제처리 되었습니다.')
