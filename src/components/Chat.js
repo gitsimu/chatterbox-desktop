@@ -285,13 +285,13 @@ const Chat = ({ users, settings, messagesAll, addMessages, deleteMessages, clear
         && (
           <div className="scroll-bottom-button" onClick={scrollToBottom}>
             <div>
-              <div className="scroll-bottom-button-message">
+              <i className="icon-arrow-down"></i>
+              {/* <div className="scroll-bottom-button-message">
                 <span>{messages[messages.length - 1].userId !== key ? target.guestCode : '나'} : </span>{messages[messages.length - 1].message}
               </div>
               <div className="scroll-bottom-button-icon">
-                {/* <img src="down-arrow.png" alt="scroll-bottom" /> */}
                 <i className="icon-arrow-down"></i>
-              </div>
+              </div> */}
             </div>
           </div>
         )}

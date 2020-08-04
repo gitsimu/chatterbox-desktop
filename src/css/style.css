@@ -1604,7 +1604,7 @@ div:hover > .tooltip {
   position: absolute;
   bottom: 55px;
   right: 10px;
-  left: 10px;
+  /* left: 10px; */
   cursor: pointer;
   z-index: 10;
 }
@@ -1618,8 +1618,8 @@ div:hover > .tooltip {
   align-items: center;
   justify-content: center;
   color: #fff;
-  width: 100%;
-  font-size: 13px;
+  /* width: 100%; */
+  font-size: 18px;
 }
 .scroll-bottom-button:hover > div {
   background: rgba(0,0,0,0.7);
