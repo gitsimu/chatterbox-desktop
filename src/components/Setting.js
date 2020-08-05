@@ -59,7 +59,7 @@ const Setting = ({ settings, ...props }) => {
     /* by firebase */
     database.ref(`/${settings.key}/config`).once('value', function(snapshot) {
       const data = snapshot.val()
-      let _message = '';
+      let _message = ''
       if (data) {
         setTitle(data.title)
         setSubTitle(data.subTitle)
@@ -68,7 +68,7 @@ const Setting = ({ settings, ...props }) => {
         setThemeColor(data.themeColor)
         setProfileImage(data.profileImage || null)
         setMissedMessage(data.workingDay.message)
-        _message = data.workingDay.message;
+        _message = data.workingDay.message
       } else {
         setTitle(initConfig.title)
         setSubTitle(initConfig.subTitle)
@@ -112,7 +112,7 @@ const Setting = ({ settings, ...props }) => {
       setMainTheme(typeof(data.mainTheme.type) === "undefined" ? 'light' : data.mainTheme.type)
     })
 
-    ipcRenderer.send('app_version');
+    ipcRenderer.send('app_version')
     ipcRenderer.on('app_version', (event, arg) => {
       ipcRenderer.removeAllListeners('app_version')
       setVersion(arg.version)
@@ -233,7 +233,7 @@ const Setting = ({ settings, ...props }) => {
     })    
   }
 
-  let state = {};
+  let state = {}
   React.useEffect(() => {
     if (workingDay.isInit) return
 
@@ -253,7 +253,6 @@ const Setting = ({ settings, ...props }) => {
       week: workingDay.week.join(','),
       state: Object.keys(state).filter(sid=> state[sid].checked).join(',')
     })
-
   }, [database, settings.key, workingDay])
 
   return (

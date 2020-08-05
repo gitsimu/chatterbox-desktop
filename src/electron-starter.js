@@ -4,7 +4,7 @@ const { download } = require('electron-dl')
 
 const url = require('url')
 const path = require('path')
-const menuTemplate = require('./electron-menu');
+const menuTemplate = require('./electron-menu')
 const gotTheLock = app.requestSingleInstanceLock()
 const isMac = process.platform === 'darwin'
 let win
@@ -157,7 +157,7 @@ ipcMain.on('download', (event, info) => {
   download(BrowserWindow.getFocusedWindow(), info.url, {
     saveAs: true,
     onProgress: progress => {
-      event.sender.send("download-progress", { progress, info });
+      event.sender.send("download-progress", { progress, info })
     }
   })
     .then(dl => event.sender.send('download-complete', dl.getSavePath()))

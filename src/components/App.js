@@ -43,13 +43,13 @@ function App({ settings, signIn }) {
 
     ipcRenderer.on('download_complete', (event, file) => {
       ipcRenderer.removeAllListeners('download_complete')
-      console.log('download_complete', file); // Full file path
+      console.log('download_complete', file) // Full file path
     })
 
     ipcRenderer.on("download progress", (event, progress) => {
-      console.log(progress); // Progress in fraction, between 0 and 1
-      const progressInPercentages = progress * 100; // With decimal point and a bunch of numbers
-      const cleanProgressInPercentages = Math.floor(progress * 100); // Without decimal point
+      console.log(progress) // Progress in fraction, between 0 and 1
+      const progressInPercentages = progress * 100 // With decimal point and a bunch of numbers
+      const cleanProgressInPercentages = Math.floor(progress * 100) // Without decimal point
       console.log('progressInPercentages', progressInPercentages) 
       console.log('cleanProgressInPercentages', cleanProgressInPercentages) 
     })
@@ -167,7 +167,7 @@ function App({ settings, signIn }) {
       method: 'POST',
       dataType: 'json',
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+        'Content-Type': 'application/x-www-form-urlencoded charset=UTF-8'
       },
       body: body.slice(0, -1)
     })
@@ -179,9 +179,9 @@ function App({ settings, signIn }) {
   const uuidv4 = () => {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
       // eslint-disable-next-line no-mixed-operators
-      var r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 3 | 8);
-      return v.toString(16);
-    });
+      var r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 3 | 8)
+      return v.toString(16)
+    })
   }
 
   const initSignin = () => {

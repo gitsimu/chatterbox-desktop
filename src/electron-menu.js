@@ -89,7 +89,7 @@ const template = (app) => {
         }
       ]
     }
-  ];
+  ]
 } 
 
-module.exports = template;
+module.exports = template

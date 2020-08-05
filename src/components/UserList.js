@@ -2,7 +2,7 @@ import React from 'react'
 import User from './User'
 import { connect } from 'react-redux'
 
-const { app } = window.require('electron').remote;
+const { app } = window.require('electron').remote
 
 const UserList = ({ users, ...props }) => {
   const tabState = props.tabState
