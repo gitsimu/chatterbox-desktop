@@ -12,7 +12,8 @@ const { shell, ipcRenderer } = require('electron')
 const storage = require('electron-json-storage')
 const initWorkingDay = {
   isInit: true,
-  use: false, 
+  use: false,
+  state : [],
   week: ['mo', 'tu', 'we', 'th', 'fr', 'sa', 'su'], 
   allday: true,
   startWork: '0000', 
@@ -58,6 +59,7 @@ const Setting = ({ settings, ...props }) => {
     /* by firebase */
     database.ref(`/${settings.key}/config`).once('value', function(snapshot) {
       const data = snapshot.val()
+      let _message = '';
       if (data) {
         setTitle(data.title)
         setSubTitle(data.subTitle)
@@ -65,14 +67,26 @@ const Setting = ({ settings, ...props }) => {
         setFirstMessage(data.firstMessage)
         setThemeColor(data.themeColor)
         setProfileImage(data.profileImage || null)
-        setWorkingDay(data.workingDay || initWorkingDay)
         setMissedMessage(data.workingDay.message)
+        _message = data.workingDay.message;
       } else {
         setTitle(initConfig.title)
         setSubTitle(initConfig.subTitle)
         setNickname(initConfig.nickname)
         setFirstMessage(initConfig.firstMessage)
       }
+
+      smlog.API({
+        method: 'get_chat_workingday_desktop'
+      }).then((data) => {
+        if(data){
+          setWorkingDay({
+            isInit : true,
+            message : _message,
+            ...data,
+          })
+        }
+      })
     })
 
     /* use chat */
@@ -214,16 +228,32 @@ const Setting = ({ settings, ...props }) => {
       breaktime: breaktime.checked,
       startBreak: startBreak.value,
       endBreak: endBreak.value,
-      message: message.value.trim().substring(0, 200)
+      message: message.value.trim().substring(0, 200),
+      isInit: null
     })    
   }
 
+  let state = {};
   React.useEffect(() => {
     if (workingDay.isInit) return
 
     database.ref(`/${settings.key}/config`).update({
       workingDay: workingDay
-    })      
+    })
+
+    smlog.API({
+      method: 'update_chat_workingday_desktop',
+      use: workingDay.use ? "1" : "0",
+      allday: workingDay.allday ? "1" : "0",
+      startWork: workingDay.startWork,
+      endWork: workingDay.endWork,
+      breaktime: workingDay.breaktime ? "1" : "0",
+      startBreak: workingDay.startBreak,
+      endBreak: workingDay.endBreak,
+      week: workingDay.week.join(','),
+      state: Object.keys(state).filter(sid=> state[sid].checked).join(',')
+    })
+
   }, [database, settings.key, workingDay])
 
   return (
@@ -294,16 +324,18 @@ const Setting = ({ settings, ...props }) => {
                 style={{paddingTop: 5, paddingBottom: 10}}>
                   채팅기능을 사용할 도메인에 체크해주세요. 체크를 해제하면 채팅 아이콘이 나타나지 않습니다.
               </div>
-              {domains.length > 0 ? 
+              {domains.length > 0 ?
                 (
                   domains.map((item, index) => {
                     return (
                       <div className="domains" key={index}>
                         <label>
-                          <input 
-                            type="checkbox" 
-                            defaultChecked={item.use_chat === '1'}
+                          <input
+                            type="checkbox"
+                            ref={node => state[item.sid] = node}
+                            defaultChecked={workingDay.state[item.sid]}
                             onClick={(e) => {
+                              setWorkingDay({...workingDay, isInit: null})
                               item.sid && updateUseChat(item.sid ,e.target.checked)
                             }}/>
                           <div className="domain-text">{item.s_domain}</div>
