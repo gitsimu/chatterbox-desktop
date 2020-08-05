@@ -239,6 +239,7 @@ function Main({ users, settings, initUsers, clearUsers, selectedUser, signOut, .
           <Setting
             database={database}
             Alert={Alert}
+            setMainTheme={props.setMainTheme}
             isLoading={isLoading}/>
         </div>
       </div>

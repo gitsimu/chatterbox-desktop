@@ -136,6 +136,11 @@ autoUpdater.on('update-available', () => {
   win.webContents.send('update_available')
 })
 
+/* 가능한 업데이트가 없음 */
+autoUpdater.on('update-not-available', () => {
+  win.webContents.send('update_not_available')
+})
+
 /* 업데이트파일 다운로드 완료 */
 autoUpdater.on('update-downloaded', () => {
   win.webContents.send('update_downloaded')
@@ -156,4 +161,16 @@ ipcMain.on('download', (event, info) => {
     }
   })
     .then(dl => event.sender.send('download-complete', dl.getSavePath()))
+})
+
+/* 업데이트 확인 */
+ipcMain.on('check_update', (event) => {
+  autoUpdater.on('update-available', () => {
+    event.sender.send('check_update', { result: 1 })
+  })
+  autoUpdater.on('update-not-available', () => {
+    event.sender.send('check_update', { result: 0 })
+  })
+
+  autoUpdater.emit('update-not-available')
 })

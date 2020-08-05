@@ -44,7 +44,7 @@ function App({ settings, signIn }) {
     ipcRenderer.on('download_complete', (event, file) => {
       ipcRenderer.removeAllListeners('download_complete')
       console.log('download_complete', file); // Full file path
-    });
+    })
 
     ipcRenderer.on("download progress", (event, progress) => {
       console.log(progress); // Progress in fraction, between 0 and 1
@@ -52,7 +52,7 @@ function App({ settings, signIn }) {
       const cleanProgressInPercentages = Math.floor(progress * 100); // Without decimal point
       console.log('progressInPercentages', progressInPercentages) 
       console.log('cleanProgressInPercentages', cleanProgressInPercentages) 
-    });
+    })
   }, [])
 
   const Alert = React.useCallback((message) => {
@@ -86,7 +86,7 @@ function App({ settings, signIn }) {
           const response = {
             pc_id: deviceId,
             userName: data.member_id,
-            loginToken: userToken,
+            userToken: userToken,
             sessionToken: data.member_token,
             sessionKey: data.sskey,
             key: data.chat_id
@@ -121,11 +121,11 @@ function App({ settings, signIn }) {
       .then(async data => {
         if (data.code === '1') {
           const device = `${os.type()} ${os.release()} ${os.platform()}`
-          const loginToken = await initUserInfo(deviceId, data.chat_id, device, data.sskey, data.member_token, data.member_id)
+          const userToken = await initUserInfo(deviceId, data.chat_id, device, data.sskey, data.member_token, data.member_id)
           const response = {
             pc_id: deviceId,
             userName: data.member_id,            
-            loginToken: loginToken,
+            userToken: userToken,
             sessionToken: data.member_token,
             sessionKey: data.sskey,
             key: data.chat_id
@@ -196,8 +196,8 @@ function App({ settings, signIn }) {
   React.useEffect(() => {    
     storage.getMany(['userData', 'autoSignin'], async (err, data) => {    
       const d = data.userData
-      if (data.autoSignin.allowed && d && d.userName && d.loginToken) {                
-        await signInProcessByToken(d.userName, d.loginToken, d.key)
+      if (data.autoSignin.allowed && d && d.userName && d.userToken) {                
+        await signInProcessByToken(d.userName, d.userToken, d.key)
       } else {
         isSignInRequired(true)
       }
@@ -266,7 +266,7 @@ function App({ settings, signIn }) {
     )}
 
     {(settings.key) && (
-      <Main isLoading={isLoading} Alert={Alert} isSignInRequired={isSignInRequired}/>
+      <Main isLoading={isLoading} Alert={Alert} isSignInRequired={isSignInRequired} setMainTheme={setMainTheme}/>
     )}
 
     { loading && (

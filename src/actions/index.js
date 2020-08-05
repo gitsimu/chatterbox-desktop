@@ -48,6 +48,12 @@ export const signOut = () => ({
   type: 'SIGN_OUT'
 })
 
+export const sessionRestore = settings => ({
+  type: 'SESSION_RESTORE',
+  sessionToken: settings.sessionToken,
+  sessionKey: settings.sessionKey
+})
+
 export const selectedUser = user => ({
   type: 'SELECTED_USER',
   user

@@ -30,6 +30,12 @@ const settings = (state = initialState, action) => {
       }
     case 'SIGN_OUT':
       return initialState
+    case 'SESSION_RESTORE':
+      return {
+        ...state,
+        sessionToken: action.sessionToken,
+        sessionKey: action.sessionKey
+      }
     default:
       return state
   }
