@@ -275,13 +275,14 @@ const Setting = ({ settings, ...props }) => {
                   onChange={(e) => {
                     // SET MAIN THEME
                     setMainTheme(e.target.value)
+                    props.setMainTheme(e.target.value)
                     storage.set('mainTheme', { type: e.target.value })
                     console.log('theme change', e.target.value)
                   }}>
                   <option value="chatterbox-theme-light">Light</option>
                   <option value="chatterbox-theme-dark">Dark</option>
                 </select>
-                <div className="setting-checkbox-item-description">앱을 재시작하면 변경된 테마가 적용됩니다.</div>
+                {/* <div className="setting-checkbox-item-description">앱을 재시작하면 변경된 테마가 적용됩니다.</div> */}
               </div>              
             </div>
             {/* Use chat */}
@@ -627,7 +628,16 @@ const Setting = ({ settings, ...props }) => {
             <div>
               <img src="icon01_256.png" alt="setting-logo" />
               <div className="setting-service-info-title">Smartlog Desktop</div>
-              <div className="setting-service-info-text1">Version {version}</div>
+              <div 
+                // onClick={() => {
+                //   console.log('check update start')
+                //   ipcRenderer.send('check_update')
+                //   ipcRenderer.on('check_update', (event, arg) => {
+                //     ipcRenderer.removeAllListeners('check_update')
+                //     console.log('check update', arg)
+                //   })
+                // }}
+                className="setting-service-info-text1">Version {version}</div>
               <div className="setting-service-info-text3">COPYRIGHT (C) Creative Soft. All Rights reserved.</div>
             </div>
           </div>

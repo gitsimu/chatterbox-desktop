@@ -37,7 +37,7 @@ const Chat = ({ users, settings, messagesAll, addMessages, deleteMessages, clear
 
   const firebaseConnect = React.useCallback((userid) => {
     // 최초 1회만 연결
-    if (!userid || CONNECTIONS[userid]) { return }
+    if (!userid || CONNECTIONS[userid]) return
 
     isLoading(true)
     const chat = database.ref(`/${key}/messages/${userid}`)
@@ -254,6 +254,7 @@ const Chat = ({ users, settings, messagesAll, addMessages, deleteMessages, clear
      * 연결되어있는 firebase connection을 모두 off 처리한다
      */
     return () => {
+      clearMessages()
       Object.keys(CONNECTIONS).forEach((u, i) => {
         console.log('[Connection off]', CONNECTIONS[u])
         if (CONNECTIONS[u]) {
