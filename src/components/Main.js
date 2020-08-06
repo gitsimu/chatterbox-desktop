@@ -177,12 +177,12 @@ function Main({ users, settings, initUsers, clearUsers, selectedUser, signOut, .
             <i className="icon-bubble"></i>
             <div className="tooltip">채팅 목록</div>
           </div>
-          <div
+          {/* <div
             className={screenState === 1 ? "chat-lnb-item active" : "chat-lnb-item"}
             onClick={() => { setScreenState(1) }}>
             <i className="icon-user"></i>
             <div className="tooltip">유저 목록</div>
-          </div>
+          </div> */}
           <div
             className={screenState === 2 ? "chat-lnb-item active" : "chat-lnb-item"}
             onClick={() => { setScreenState(2) }}>
@@ -231,9 +231,9 @@ function Main({ users, settings, initUsers, clearUsers, selectedUser, signOut, .
             <Info database={database} Alert={Alert}/>
           </div>
         </div>
-        <div className={ screenState === 1 ? "container-screen-1" : "container-screen-1 hide" }>
+        {/* <div className={ screenState === 1 ? "container-screen-1" : "container-screen-1 hide" }>
           <ChatManager database={database}/>
-        </div>
+        </div> */}
         <div className={ screenState === 2 ? "container-screen-2" : "container-screen-2 hide" }>
           <Setting
             database={database}
