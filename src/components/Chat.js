@@ -41,55 +41,52 @@ const Chat = ({ users, settings, messagesAll, initMessages, addMessages, deleteM
 
     if (!isInit) CONNECTIONS[userid].ref.off()
 
-    const chat = database.ref(`/${key}/messages/${userid}`)
-                         .orderByChild('timestamp')
+    const chat = database.ref(`/${key}/messages/${userid}`).orderByChild('timestamp')
     const page = CONNECTIONS[userid]
-                 ? CONNECTIONS[userid].page + 1
-                 : 1
+                ? CONNECTIONS[userid].page + 1
+                : 1
 
     Promise.resolve()
-           .then(() => isLoading(true))
+      .then(() => isLoading(true))
 
-        // 기존 child_add 이벤트 off
-           .then(()=> {
-             if (!CONNECTIONS[userid]) return
+      // 기존 child_add 이벤트 off
+      .then(()=> {
+        if (!CONNECTIONS[userid]) return
+        CONNECTIONS[userid].ref.off()
+      })
 
-             CONNECTIONS[userid].ref.off()
-           })
+      // message list 가져오기
+      .then(() => {
+        return chat.limitToLast(PAGE_SIZE * page).once('value')
+      })
 
-        // message list 가져오기
-           .then(() => {
-             return chat.limitToLast(PAGE_SIZE * page)
-                        .once('value')
-           })
+      // store에 저장
+        .then((snapshots) => {
+          const arr = []
+          snapshots.forEach(snapshot => {
+            arr.push(snapshot.val())
+          })
 
-        // store에 저장
-           .then((snapshots) => {
-             const arr = []
-             snapshots.forEach(snapshot => {
-               arr.push(snapshot.val())
-             })
+          initMessages({ key: userid, value: arr })
 
-             initMessages({ key: userid, value: arr })
+          const lastMessage = arr[arr.length - 1]
+          return lastMessage.timestamp
+        })
 
-             const lastMessage = arr[arr.length - 1]
-             return lastMessage.timestamp
-           })
+      // child_add 이벤트 on
+        .then((lastTimestamp) => {
+          const ref =  chat.startAt(lastTimestamp + 1)
+          ref.on('child_added', (snapshot) => {
+            const value = snapshot.val()
+            addMessages({ key: userid, value: value })
+          })
 
-        // child_add 이벤트 on
-           .then((lastTimestamp) => {
-             const ref =  chat.startAt(lastTimestamp + 1)
-             ref.on('child_added', (snapshot) => {
-               const value = snapshot.val()
-               addMessages({ key: userid, value: value })
-             })
-
-             return ref
-           })
-           .then((ref) => {
-             CONNECTIONS[userid] = { ref: ref, page: page }
-             isLoading(false)
-           })
+          return ref
+        })
+        .then((ref) => {
+          CONNECTIONS[userid] = { ref: ref, page: page }
+          isLoading(false)
+        })
   }, [database, key, userid, addMessages, initMessages])
 
   const sendMessage = React.useCallback((key, id, message, type, database) => {

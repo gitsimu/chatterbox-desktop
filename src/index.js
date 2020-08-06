@@ -12,7 +12,7 @@ const rootElement = document.getElementById('root')
 export const store = createStore(rootReducer)
 
 // dev only
-store.subscribe(() => { console.log('[store]',store.getState())})
+// store.subscribe(() => { console.log('[store]',store.getState())})
 
 ReactDOM.render(
   <React.StrictMode>
