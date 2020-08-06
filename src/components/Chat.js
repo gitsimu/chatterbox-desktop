@@ -3,14 +3,14 @@ import ChatMessage from './ChatMessage'
 import EmojiContainer from './EmojiContainer'
 import axios from 'axios'
 import { connect } from 'react-redux'
-import { addMessages, clearMessages, deleteMessages, selectedUser } from '../actions'
+import { addMessages, clearMessages, deleteMessages, initMessages, selectedUser } from '../actions'
 import PreviewContainer from './PreviewContainer'
 import useImageFile from '../hooks/useImageFile'
 import useUserInput from '../hooks/useUserInput'
 
 const CONNECTIONS = {}
 const PAGE_SIZE = 50
-const Chat = ({ users, settings, messagesAll, addMessages, deleteMessages, clearMessages, selectedUser, ...props }) => {
+const Chat = ({ users, settings, messagesAll, initMessages, addMessages, deleteMessages, clearMessages, selectedUser, ...props }) => {
   const key = settings.key
   const userid = settings.selectedUser.key
   const database = props.database
@@ -35,48 +35,62 @@ const Chat = ({ users, settings, messagesAll, addMessages, deleteMessages, clear
     body.current.scrollTop = body.current.scrollHeight
   }
 
-  const firebaseConnect = React.useCallback((userid) => {
-    // 최초 1회만 연결
-    if (!userid || CONNECTIONS[userid]) return
+  const paging = React.useCallback((isInit) => {
+    if (!userid) return
+    if (isInit && CONNECTIONS[userid]) return
 
-    isLoading(true)
+    if (!isInit) CONNECTIONS[userid].ref.off()
+
     const chat = database.ref(`/${key}/messages/${userid}`)
-      .orderByChild('timestamp')
-      .limitToLast(PAGE_SIZE)
+                         .orderByChild('timestamp')
+    const page = CONNECTIONS[userid]
+                 ? CONNECTIONS[userid].page + 1
+                 : 1
 
-    chat.on('child_added', (snapshot) => {
-      const value = snapshot.val()
-      addMessages({ key: userid, value: value })
+    Promise.resolve()
+           .then(() => isLoading(true))
 
-      setTimeout(() => {
-        isLoading(false)
-      }, 10)
-    })
-    CONNECTIONS[userid] = {ref: chat, page: 1}
-  }, [database, key, addMessages])
+        // 기존 child_add 이벤트 off
+           .then(()=> {
+             if (!CONNECTIONS[userid]) return
 
-  const paging = React.useCallback(() => {
-    if (!CONNECTIONS[userid]) return
-    CONNECTIONS[userid].ref.off()
-    
-    isLoading(true)
-    deleteMessages({ key: userid })
+             CONNECTIONS[userid].ref.off()
+           })
 
-    const page = CONNECTIONS[userid].page + 1
-    const chat = database.ref(`/${key}/messages/${userid}`)
-      .orderByChild('timestamp')
-      .limitToLast(PAGE_SIZE * page)
+        // message list 가져오기
+           .then(() => {
+             return chat.limitToLast(PAGE_SIZE * page)
+                        .once('value')
+           })
 
-    chat.on('child_added', (snapshot) => {
-      const value = snapshot.val()
-      addMessages({ key: userid, value: value })
-  
-      setTimeout(() => {
-        isLoading(false)
-      }, 10)
-    })
-    CONNECTIONS[userid] = {ref: chat, page: page}
-  }, [addMessages, database, deleteMessages, key, userid])
+        // store에 저장
+           .then((snapshots) => {
+             const arr = []
+             snapshots.forEach(snapshot => {
+               arr.push(snapshot.val())
+             })
+
+             initMessages({ key: userid, value: arr })
+
+             const lastMessage = arr[arr.length - 1]
+             return lastMessage.timestamp
+           })
+
+        // child_add 이벤트 on
+           .then((lastTimestamp) => {
+             const ref =  chat.startAt(lastTimestamp + 1)
+             ref.on('child_added', (snapshot) => {
+               const value = snapshot.val()
+               addMessages({ key: userid, value: value })
+             })
+
+             return ref
+           })
+           .then((ref) => {
+             CONNECTIONS[userid] = { ref: ref, page: page }
+             isLoading(false)
+           })
+  }, [database, key, userid, addMessages, initMessages])
 
   const sendMessage = React.useCallback((key, id, message, type, database) => {
     const messageId = Math.random().toString(36).substr(2, 9)
@@ -168,7 +182,7 @@ const Chat = ({ users, settings, messagesAll, addMessages, deleteMessages, clear
 
   // 채팅방 변경 init
   React.useEffect(() => {
-    firebaseConnect(target.key)
+    paging(true)
     input.current.focus()
 
     showInfoDialog(target.value.state === 2)
@@ -176,7 +190,7 @@ const Chat = ({ users, settings, messagesAll, addMessages, deleteMessages, clear
     setImageFile(null)
     showOptionDialog(false)
     setScrollTop(null)
-  }, [input, target, showEmojiContainer, setImageFile, firebaseConnect])
+  }, [input, target, showEmojiContainer, setImageFile, initMessages])
 
   // file drag&drop
   React.useEffect(() => {
@@ -274,7 +288,7 @@ const Chat = ({ users, settings, messagesAll, addMessages, deleteMessages, clear
         && messages.length >= PAGE_SIZE * CONNECTIONS[userid].page
         && (
           <div className="more-button">
-            <div onClick={paging}>
+            <div onClick={()=> paging(false)}>
               <i className="icon-arrow-up"></i>
               이전 메세지
             </div>
@@ -449,6 +463,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   addMessages: m => dispatch(addMessages(m)),
+  initMessages: m=> dispatch(initMessages(m)),
   deleteMessages: m => dispatch(deleteMessages(m)),
   clearMessages: () => dispatch(clearMessages()),
   selectedUser: u => dispatch(selectedUser(u))
