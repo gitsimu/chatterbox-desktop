@@ -21,7 +21,6 @@ const Info = ({ users, settings, ...props }) => {
 
       const ip = i.value.ip
       const svid = i.value.svid
-      console.log('smlog info', i.value)
       
       if (ip && svid) {
         const req = {
@@ -32,7 +31,6 @@ const Info = ({ users, settings, ...props }) => {
         smlog.API(req)
           .then((data) => {
             if (data.code === "1") {
-              console.log('smlog data', data)
               setSmlogData(data)
             }
           })
