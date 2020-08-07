@@ -1071,6 +1071,7 @@ div, input, textarea {
   align-items: center;
   justify-content: flex-start;
   max-width: 400px;
+  height: 100%;
 }
 .setting-items {
   flex: 1;
@@ -1281,9 +1282,9 @@ div, input, textarea {
 }
 .setting .chat-window {
   position: relative;
+  flex: 1;
   /* background: #fff; */
-  width: 350px;
-  height: 300px;
+  width: 350px;  
   margin: 0 auto;
   overflow: hidden;
   border-radius: 20px;
@@ -1353,7 +1354,7 @@ div, input, textarea {
 
 .setting .chat-screen {
   position: relative;
-  margin-top: 15px;
+  margin: 15px 0;
   width: 350px;
   height: 200px;
   background-color: #fff;
@@ -1375,6 +1376,7 @@ div, input, textarea {
 .setting-menu-column {
   padding: 10px 50px;
   max-width: 900px;
+  min-height: 350px;
 }
 .setting-menu-tab {
   display: flex;
@@ -1394,8 +1396,8 @@ div, input, textarea {
   border-bottom: 3px solid transparent;
 }
 .setting-menu-tab > div.active {
-  border-color: #0080F7;
-  color: #0080F7;
+  border-color: #0080F7 !important;
+  color: #0080F7 !important;
 }
 .setting-menu-device > div {
   font-size: 14px;

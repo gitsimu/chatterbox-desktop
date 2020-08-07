@@ -455,7 +455,7 @@ const Setting = ({ settings, ...props }) => {
                     )
                   })
                 ) : (
-                  <div className="domains-empty">사용 중인 도메인이 없습니다.</div>
+                  <div className="domains-empty" style={{fontSize: 14, paddingLeft: 28}}>사용 중인 도메인이 없습니다.</div>
                 )
               }
             </div>

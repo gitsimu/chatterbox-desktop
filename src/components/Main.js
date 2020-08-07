@@ -122,7 +122,7 @@ function Main({ users, settings, initUsers, clearUsers, selectedUser, signOut, .
           /* notification onClick 시 redux store에 있는 객체 접근을 하면 빈 값으로 나옴
            * USERS 라는 전역변수를 별도로 두어 onClick 시 해당 유저를 찾을 수 있도록 함
            */
-          USERS.push(users)
+          USERS.push(...users)
         })
 
         // https://www.electronjs.org/docs/tutorial/notifications?q=Notification
