@@ -150,6 +150,7 @@ autoUpdater.on('update-downloaded', () => {
 ipcMain.on('restart_app', () => {
   willQuitApp = true
   autoUpdater.quitAndInstall()
+  app.exit()
 })
 
 /* 파일 다운로드 */ 
