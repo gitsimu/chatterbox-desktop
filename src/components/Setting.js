@@ -385,13 +385,13 @@ const Setting = ({ settings, ...props }) => {
         <div className="setting-list-tab"
           onClick={() => {
             if (typeof(shell) === "object") {
-              shell.openExternal('https://smlog.co.kr/member/member_join_check.htm')
+              shell.openExternal('https://smlog.co.kr/notice_list.htm')
             }
           }}>새 소식</div>
         <div className="setting-list-tab"
           onClick={() => {
             if (typeof(shell) === "object") {
-              shell.openExternal('https://smlog.co.kr/member/id_pass.htm')
+              shell.openExternal('https://smlog.co.kr/faq_list.htm')
             }
           }}>고객센터</div>
         <div

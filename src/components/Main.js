@@ -14,7 +14,6 @@ import Chat from './Chat'
 import Memo from './Memo'
 import Info from './Info'
 import Setting from './Setting'
-import ChatManager from './ChatManager'
 import '../css/style.css'
 import '../css/theme.scss'
 import '../js/global.js'
@@ -147,7 +146,7 @@ function Main({ users, settings, initUsers, clearUsers, selectedUser, signOut, .
                 : recentsData.message
               const notification = new Notification('새 메세지', {
                 body: message,
-                silent: data.audioBeep.allowed !== false
+                silent: data.audioBeep.allowed === false
               })
               notification.onclick = () => {
                 const target = USERS.filter(
@@ -158,6 +157,13 @@ function Main({ users, settings, initUsers, clearUsers, selectedUser, signOut, .
                   selectedUser(target[0])
                 }
               }
+
+              // console.log('data.audioBeep.allowed', data.audioBeep.allowed)
+              // play beep (Windows only)
+              // if (process.platform !== 'darwin' && data.audioBeep.allowed === false) {
+              //   const player = new Audio('./beep.mp3')
+              //   player.play()
+              // }
             }
           })
         })

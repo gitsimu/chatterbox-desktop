@@ -110,3 +110,8 @@ https://standardjs.com/rules-kokr.html
     3. `npm run deploy`
     4. go to repository on GitHub, and click the "Releases" tab
     5. click on "Edit", and then "Publish" to finalize the release
+
+
+## Windows notification
+https://github.com/felixrieseberg/electron-windows-notifications
+https://stackoverflow.com/questions/57005561/windows-10-toast-notification-with-scenario-set-to-incomingcall-messes-up-the
