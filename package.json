@@ -1,6 +1,6 @@
 {
   "name": "chatterbox-desktop",
-  "version": "1.0.43",
+  "version": "1.0.44",
   "private": true,
   "dependencies": {
     "@material-ui/core": "^4.11.0",

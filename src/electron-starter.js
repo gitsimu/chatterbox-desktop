@@ -69,16 +69,20 @@ if (!gotTheLock) {
     /* Application User Model ID */
     app.setAppUserModelId('com.smlog.chatterbox')
   
-    /* AutoUpdater logger */
+    /* AutoUpdater logger 
+     * on macOS: ~/Library/Logs/{app name}/{process type}.log
+     * on Windows: %USERPROFILE%\AppData\Roaming\{app name}\logs\{processtype}.log
+     */
     autoUpdater.logger = require("electron-log")
     autoUpdater.logger.transports.file.level = "debug"
-    
+
     autoUpdater.checkForUpdatesAndNotify()
     tray = new Tray(path.join(__dirname, '/../build/icon.png'))
     const contextMenu = Menu.buildFromTemplate([
       {label: `Smartlog Desktop (${app.getVersion()})`,
         click: function() {
           win.show()
+          win.focus()
         } 
       },
       {type: 'separator'},
@@ -92,6 +96,10 @@ if (!gotTheLock) {
     ])
     tray.setToolTip('Smartlog Desktop')
     tray.setContextMenu(contextMenu)
+    tray.on('double-click', () => {
+      win.show()
+      win.focus()
+    })
   })
 }
 
