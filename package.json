@@ -1,6 +1,6 @@
 {
   "name": "chatterbox-desktop",
-  "version": "1.0.42",
+  "version": "1.0.43",
   "private": true,
   "dependencies": {
     "@material-ui/core": "^4.11.0",
@@ -10,6 +10,7 @@
     "axios": "^0.19.2",
     "electron-dl": "^3.0.1",
     "electron-json-storage": "^4.1.8",
+    "electron-log": "^4.2.2",
     "electron-updater": "^4.3.1",
     "firebase": "^7.15.0",
     "foreman": "^3.0.1",
