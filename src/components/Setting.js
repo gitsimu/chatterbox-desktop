@@ -319,12 +319,11 @@ const Setting = ({ settings, ...props }) => {
   }, [database, settings.key, workingDay])
 
   const onChangeIconConfig = (param) => {
-
     let newConfig = {
       ...iconConfig,
       isInit:false,
       position: iconPosition,
-      [selectDevice == '0' ? 'pc' : 'mobile'] : {
+      [selectDevice === 0 ? 'pc' : 'mobile'] : {
         hide: iconHide,
         axisX: iconAxisX,
         axisY: iconAxisY,
@@ -359,7 +358,7 @@ const Setting = ({ settings, ...props }) => {
 
 
   React.useEffect(()=>{
-    const _config = selectDevice == '0' ? iconConfig.pc : iconConfig.mobile
+    const _config = selectDevice === 0 ? iconConfig.pc : iconConfig.mobile
 
     setIconHide(_config.hide)
     setIconAxisX(_config.axisX)

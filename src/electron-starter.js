@@ -7,6 +7,16 @@ const path = require('path')
 const menuTemplate = require('./electron-menu')
 const gotTheLock = app.requestSingleInstanceLock()
 const isMac = process.platform === 'darwin'
+
+/* AutoUpdater logger 
+ * on macOS: ~/Library/Logs/{app name}/{process type}.log
+ * on Windows: %USERPROFILE%\AppData\Roaming\{app name}\logs\{processtype}.log
+ */
+const log = require('electron-log');
+autoUpdater.logger = log
+autoUpdater.logger.transports.file.level = "info"
+log.info('Smartlog Desktop starting...')
+
 let win
 let tray
 let willQuitApp = false
@@ -68,13 +78,8 @@ if (!gotTheLock) {
   app.on('ready', () => {
     /* Application User Model ID */
     app.setAppUserModelId('com.smlog.chatterbox')
-  
-    /* AutoUpdater logger 
-     * on macOS: ~/Library/Logs/{app name}/{process type}.log
-     * on Windows: %USERPROFILE%\AppData\Roaming\{app name}\logs\{processtype}.log
-     */
-    autoUpdater.logger = require("electron-log")
-    autoUpdater.logger.transports.file.level = "debug"
+
+    log.info(`Smartlog Desktop ready (${app.getVersion()})`)
 
     autoUpdater.checkForUpdatesAndNotify()
     tray = new Tray(path.join(__dirname, '/../build/icon.png'))
@@ -145,22 +150,30 @@ ipcMain.on('app_version', (event) => {
 
 /* 업데이트가 가능한 상태인지 확인 */
 autoUpdater.on('update-available', () => {
+  log.info('update available')
   win.webContents.send('update_available')
 })
 
 /* 가능한 업데이트가 없음 */
 autoUpdater.on('update-not-available', () => {
+  log.info('update not available')
   win.webContents.send('update_not_available')
 })
 
 /* 업데이트파일 다운로드 완료 */
 autoUpdater.on('update-downloaded', () => {
+  log.info('update downloaded')
   win.webContents.send('update_downloaded')
 })
 
 /* 앱 재시작 후 설치 */
 ipcMain.on('restart_app', () => {
   willQuitApp = true
+  log.info('restart app')
+  /* 윈도우에서 자동 업데이트 진행 시 정상적으로 동작하지 않는 문제 (업데이트 실패) 
+   * app.exit()를 추가하여 앱 완전종료 후 인스톨되도록 하여 해결
+   * https://github.com/electron-userland/electron-builder/issues/4143
+   */
   autoUpdater.quitAndInstall()
   app.exit()
 })

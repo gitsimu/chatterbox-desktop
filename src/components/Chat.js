@@ -188,7 +188,7 @@ const Chat = ({ users, settings, messagesAll, initMessages, addMessages, deleteM
     setImageFile(null)
     showOptionDialog(false)
     setScrollTop(null)
-  }, [input, target, showEmojiContainer, setImageFile, initMessages])
+  }, [input, target, showEmojiContainer, setImageFile, initMessages, paging])
 
   // file drag&drop
   React.useEffect(() => {
