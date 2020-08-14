@@ -35,7 +35,7 @@ function App({ settings, signIn }) {
         setDeviceId(data.device.id)
       } else {
         const newId = uuidv4()
-        storage.set('device', {id: newId}, () => {              
+        storage.set('device', {id: newId}, () => {
           setDeviceId(newId)
         })
       }
@@ -93,7 +93,7 @@ function App({ settings, signIn }) {
           }    
           signIn(response)
         } else {
-          initSignin()
+          initUserData()
         }
         isLoading(false)
       })
@@ -101,17 +101,17 @@ function App({ settings, signIn }) {
 
   const signInProcess = React.useCallback(async (id, pw) => {
     if (!id || id === '') {
-      initSignin()
+      initUserData()
       Alert('아이디를 입력해주세요.')
       return
     } else if (!pw || pw === '') {
-      initSignin()
+      initUserData()
       Alert('비밀번호를 입력해주세요.')
       return
-    }    
+    }
 
-    isLoading(true)
-
+    isLoading(true)    
+    
     const req = {
       method: 'login_app',
       member_id: id,
@@ -120,61 +120,35 @@ function App({ settings, signIn }) {
     smlog.AUTH(req)
       .then(async data => {
         if (data.code === '1') {
-          const device = `${os.type()} ${os.release()} ${os.platform()}`
-          const userToken = await initUserInfo(deviceId, data.chat_id, device, data.sskey, data.member_token, data.member_id)
           const response = {
             pc_id: deviceId,
-            userName: data.member_id,            
-            userToken: userToken,
+            userName: data.member_id,
             sessionToken: data.member_token,
             sessionKey: data.sskey,
             key: data.chat_id
           }
-          storage.set('userData', response, () => {     
-            console.log('set userData', response)         
-            signIn(response)
-            isLoading(false)
+          signIn(response)
+          response.userToken = await smlog.API({
+            method: 'insert_user_pc_info',
+            pc_id: deviceId,
+            chat_id: data.chat_id,
+            os: `${os.type()} ${os.release()} ${os.platform()}`
           })
+          
+          storage.set('userData', response)
         } else {
           Alert('사용자 정보가 없습니다.\n관리자에게 문의해주세요.')
-          initSignin()
-          isLoading(false)
+          initUserData()
         }
       })
       .catch(err => {
         Alert('로그인에 실패하였습니다.\n관리자에게 문의해주세요.')
-        initSignin()
+        initUserData()
+      })
+      .finally(() => {
         isLoading(false)
       })
   }, [Alert, signIn, deviceId])
-
-  const initUserInfo = async (pc_id, chat_id, os, sskey, member_token, member_id) => {
-    let body = ''
-    const req = {
-      method: 'insert_user_pc_info',
-      pc_id: pc_id,
-      chat_id: chat_id,
-      os: os,
-      sskey: sskey,
-      member_token: member_token,
-      member_id: member_id,
-    }
-    Object.keys(req).forEach((o, i) => {
-      body += `${o}=${Object.values(req)[i]}&`
-    })
-
-    const postResponse = await fetch(`${global.server.api}`, {
-      method: 'POST',
-      dataType: 'json',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded charset=UTF-8'
-      },
-      body: body.slice(0, -1)
-    })
-  
-    const postData = await postResponse.text()
-    return postData
-  }
 
   const uuidv4 = () => {
     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
@@ -184,7 +158,7 @@ function App({ settings, signIn }) {
     })
   }
 
-  const initSignin = () => {
+  const initUserData = () => {
     storage.remove('userData')
     isLoading(false)
     isSignInRequired(true)
