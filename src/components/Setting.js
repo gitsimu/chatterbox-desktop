@@ -522,6 +522,12 @@ const Setting = ({ settings, ...props }) => {
               </div>
               <div className="setting-checkbox-item-description">채팅 가능 요일 및 시간을 지정하면 그 외의 시간대와 브레이크 타임에는 채팅창이 노출되지 않습니다.</div>
               <div className="setting-checkbox-item-description">해당 시간대 이전에 채팅창을 미리 띄워놓은 사용자에게는 부재중 메세지가 전송됩니다.</div>
+              {domains.length > 1 && (
+                <>
+                <div className="setting-checkbox-item-description warning" style={{marginTop: 5}}>여기서 채팅 시간을 설정하면 채팅 기능을 사용하는 모든 사이트에 일괄 적용됩니다.</div>
+                <div className="setting-checkbox-item-description warning">각 사이트의 채팅시간을 별도로 설정하려면 웹으로 접속해서 설정해주세요.</div>
+                </>
+              )}              
               { workingDay.use && (
                 <div className="setting-working-day">
                   <div className="setting-working-week">

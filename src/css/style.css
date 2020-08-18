@@ -1149,6 +1149,9 @@ div, input, textarea {
   font-size: 12px;
   padding-left: 28px;
 }
+.setting-checkbox-item-description.warning {
+  color: #F44336;
+}
 
 .setting-theme {
   display: flex;

@@ -145,7 +145,7 @@ function Main({ users, settings, initUsers, clearUsers, selectedUser, signOut, .
                 : recentsData.message
               const notification = new Notification('새 메세지', {
                 body: message,
-                silent: data.audioBeep.allowed === false
+                silent: true
               })
               notification.onclick = () => {
                 const target = USERS.filter(
@@ -158,11 +158,11 @@ function Main({ users, settings, initUsers, clearUsers, selectedUser, signOut, .
               }
 
               // console.log('data.audioBeep.allowed', data.audioBeep.allowed)
-              // play beep (Windows only)
-              // if (process.platform !== 'darwin' && data.audioBeep.allowed === false) {
-              //   const player = new Audio('./beep.mp3')
-              //   player.play()
-              // }
+              // play beep
+              if (!(data.audioBeep.allowed === false)) {
+                const player = new Audio('./blop_md.mp3')
+                player.play()
+              }
             }
           })
         })
