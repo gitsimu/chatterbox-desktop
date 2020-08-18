@@ -1,6 +1,6 @@
 {
   "name": "chatterbox-desktop",
-  "version": "1.0.44",
+  "version": "1.0.45",
   "private": true,
   "dependencies": {
     "@material-ui/core": "^4.11.0",
@@ -68,7 +68,11 @@
       "target": [
         "nsis"
       ],
-      "icon": "./public/icon01_256.ico"
+      "icon": "./public/icon01_256.ico",
+      "win": {
+        "certificateFile": "./public/CHAIN_smlog_co_kr.pfx",
+        "certificatePassword": "h3em4296"
+      }      
     },
     "linux": {
       "target": [

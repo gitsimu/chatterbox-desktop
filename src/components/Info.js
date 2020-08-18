@@ -15,7 +15,7 @@ const Info = ({ users, settings, ...props }) => {
 
   React.useEffect(() => {
     if (i.value) {
-      setNickname(i.value.nickname || '')
+      setNickname(i.value.nickname || i.guestCode)
       setMobile(i.value.mobile || '')
       setEmail(i.value.email || '')
 

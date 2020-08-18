@@ -153,6 +153,16 @@ div, input, textarea {
   border-top: 3px solid transparent;
   color: rgb(141, 152, 177);
 }
+.chat-list-option {
+  display: flex;
+  border-top: 1px solid rgb(35, 38, 45);
+  color: rgb(141, 152, 177);
+  font-size: 13px;
+}
+.chat-list-option > div {
+  padding: 10px;
+  cursor: pointer;
+}
 
 .chat-users {
   position: relative;
@@ -171,6 +181,7 @@ div, input, textarea {
   color: #ccc;
 }
 .chat-user {
+  position: relative;
   display: flex;
   padding: 10px;
   /* border-bottom: 1px solid #f1f1f1; */
@@ -204,6 +215,7 @@ div, input, textarea {
 }
 .chat-user-info {
   flex: 1;
+  max-width: calc(100% - 50px);
 }
 .chat-user-name {
   font-size: 12px;
@@ -226,12 +238,15 @@ div, input, textarea {
 }
 .chat-user-message {
   color: #84d6ff;
-  max-width: 130px;
+  max-width: 80%;
 }
 .chat-user-datetime {
   position: absolute;
   right: 5px;
   font-size: 11px;
+}
+.chat-user.selected {
+  opacity: 0.5;
 }
 
 .chat-body {

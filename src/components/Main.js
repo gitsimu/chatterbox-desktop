@@ -90,8 +90,7 @@ function Main({ users, settings, initUsers, clearUsers, selectedUser, signOut, .
           .catch(() => { throw new Error('인증에 실패하였습니다.')})
       })
       .then(() => {
-        chat = database.ref(`/${settings.key}/users`)
-          .orderByChild('timestamp')
+        chat = database.ref(`/${settings.key}/users`).orderByChild('timestamp')
         chat.on('value', (snapshot) => {
           clearUsers()
           USERS.length = 0
