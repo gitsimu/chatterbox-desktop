@@ -55,7 +55,7 @@ function App({ settings, signIn }) {
     })
   }, [])
 
-  const Alert = React.useCallback((message) => {
+  const Alert = React.useCallback((message, okCallback, cancelCallback) => {    
     const alertHtml = 
       <div id="Alert">
         <div id="AlertBody" className="alert-dialog">
@@ -64,7 +64,22 @@ function App({ settings, signIn }) {
           </div>
           <div className="alert-bottom">
             <div className="alert-buttons">
-              <div onClick={() => showAlertDialog(null)}>OK</div>
+              <div 
+                onClick={() => {
+                  showAlertDialog(null)
+                  typeof(okCallback) === 'function' && okCallback()
+                }}>
+                예
+              </div>
+              {typeof(cancelCallback) === 'function' && (
+                <div 
+                  onClick={() => {
+                    showAlertDialog(null)
+                    cancelCallback()
+                  }}>
+                  아니오
+                </div>
+              )}              
             </div>
           </div>
         </div>

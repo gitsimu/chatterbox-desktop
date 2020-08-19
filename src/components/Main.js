@@ -216,7 +216,9 @@ function Main({ users, settings, initUsers, clearUsers, selectedUser, signOut, .
               <UserList
                 database={database}
                 tabState={tabState}
-                setTabState={setTabState}/>
+                setTabState={setTabState}
+                isLoading={isLoading}
+                Alert={Alert}/>
             </div>
             <div className="chat-body">
               {(settings.selectedUser && settings.selectedUser.key) && (

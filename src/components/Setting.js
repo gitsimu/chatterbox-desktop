@@ -353,13 +353,12 @@ const Setting = ({ settings, ...props }) => {
         scm_mo_width: iconConfig.mobile.size
       }
     )
-
   }, [iconConfig])
 
 
   React.useEffect(()=>{
     const _config = selectDevice === 0 ? iconConfig.pc : iconConfig.mobile
-
+    
     setIconHide(_config.hide)
     setIconAxisX(_config.axisX)
     setIconAxisY(_config.axisY)

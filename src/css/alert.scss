@@ -40,7 +40,9 @@ div#Alert {
             padding: 5px 10px;
             border-radius: 3px;
             transition: 0.2s ease all;
-            cursor: pointer;            
+            cursor: pointer;
+            min-width: 60px;
+            text-align: center;
         }
         & > div:hover {
             background: rgb(76, 77, 82);

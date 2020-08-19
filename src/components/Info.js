@@ -30,7 +30,7 @@ const Info = ({ users, settings, ...props }) => {
         }
         smlog.API(req)
           .then((data) => {
-            if (data.code === "1") {
+            if (data && data.code === "1") {
               setSmlogData(data)
             }
           })
