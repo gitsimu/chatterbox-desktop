@@ -1,6 +1,6 @@
 {
   "name": "chatterbox-desktop",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "private": true,
   "dependencies": {
     "@material-ui/core": "^4.11.0",
@@ -70,7 +70,7 @@
       ],
       "icon": "./public/icon01_256.ico",
       "certificateFile": "./public/CHAIN_smlog_co_kr.pfx",
-      "certificatePassword": "h3em4296"     
+      "certificatePassword": "h3em4296"
     },
     "linux": {
       "target": [

@@ -182,10 +182,13 @@ function App({ settings, signIn }) {
   /* 첫 렌더링 시 local storage를 확인
    * id/pw/token 값이 존자해면 바로 로그인한다
    */
-  React.useEffect(() => {    
+  React.useEffect(() => {
     storage.getMany(['userData', 'autoSignin'], async (err, data) => {    
       const d = data.userData
-      if (data.autoSignin.allowed && d && d.userName && d.userToken) {                
+      const s = data.autoSignin
+      const autoSigninAllowed = !(s.allowed === false)
+
+      if (autoSigninAllowed && d && d.userName && d.userToken) {
         await signInProcessByToken(d.userName, d.userToken, d.key)
       } else {
         isSignInRequired(true)
