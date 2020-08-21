@@ -12,6 +12,8 @@ const User = ({ users, messages, settings, addMessages, selectedUser, changeUser
   const colorCode = props.data.colorCode
   const state = props.data.state
   const mode = props.mode
+  
+  console.log('props live', userInfo.live)
 
   const userClassName = () => {
     let cn = ''
@@ -38,6 +40,7 @@ const User = ({ users, messages, settings, addMessages, selectedUser, changeUser
       <div className="chat-user-icon">
         <div style={{ backgroundColor: colorCode }}>
           <div className="bubble"></div>
+          <div className={userInfo.live === 1 ? 'live-on' : 'live-off'}></div>
         </div>
       </div>
       <div className="chat-user-info">
