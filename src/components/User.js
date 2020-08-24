@@ -12,8 +12,6 @@ const User = ({ users, messages, settings, addMessages, selectedUser, changeUser
   const colorCode = props.data.colorCode
   const state = props.data.state
   const mode = props.mode
-  
-  console.log('props live', userInfo.live)
 
   const userClassName = () => {
     let cn = ''

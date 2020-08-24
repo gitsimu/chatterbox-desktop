@@ -84,7 +84,6 @@ const Setting = ({ settings, ...props }) => {
   const isLoading = props.isLoading
   
   React.useEffect(() => {
-
     const getFirebase = database.ref(`/${settings.key}/config`)
                                 .once('value')
     const getDb = smlog.API({
@@ -116,6 +115,7 @@ const Setting = ({ settings, ...props }) => {
              }
 
              if (dbData) {
+               console.log('dbData', dbData)
                setWorkingDay({
                  isInit: true,
                  state: dbData.state,
@@ -156,6 +156,8 @@ const Setting = ({ settings, ...props }) => {
                setIconAxisX(+dbData.scm_pc_x)
                setIconAxisY(+dbData.scm_pc_y)
                setIconSize(+dbData.scm_pc_width)
+               setIconText(dbData.scm_icon_text)
+               setIconTextAlign(dbData.scm_icon_text_align)
                setSelectDevice(0)
              }
 
@@ -356,8 +358,8 @@ const Setting = ({ settings, ...props }) => {
         scm_mo_x: iconConfig.mobile.axisX,
         scm_mo_y: iconConfig.mobile.axisY,
         scm_mo_width: iconConfig.mobile.size,
-        scm_text: iconConfig.text || '',
-        scm_text_align: iconConfig.textAlign || ''
+        scm_icon_text: iconConfig.text || '',
+        scm_icon_text_align: iconConfig.textAlign || 'left'
       }
     )
   }, [iconConfig])
