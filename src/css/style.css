@@ -1888,3 +1888,13 @@ div:hover > .tooltip {
 .scroll-bottom-button-icon i {
   font-size: 18px;
 }
+
+
+.fraudclick-item {
+  display: flex;
+  flex-direction: row;
+}
+.fraudclick-item > div {
+  flex: 1;
+  font-size: 13px;
+}

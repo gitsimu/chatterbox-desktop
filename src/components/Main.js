@@ -14,6 +14,7 @@ import Chat from './Chat'
 import Memo from './Memo'
 import Info from './Info'
 import Setting from './Setting'
+// import FraudClick from './FraudClick'
 import '../css/style.css'
 import '../css/theme.scss'
 import '../js/global.js'
@@ -244,7 +245,7 @@ function Main({ users, settings, initUsers, clearUsers, selectedUser, signOut, .
           </div>
         </div>
         {/* <div className={ screenState === 1 ? "container-screen-1" : "container-screen-1 hide" }>
-          <ChatManager database={database}/>
+          <FraudClick />
         </div> */}
         <div className={ screenState === 2 ? "container-screen-2" : "container-screen-2 hide" }>
           <Setting
