@@ -100,7 +100,7 @@ function Main({ users, settings, initUsers, clearUsers, selectedUser, signOut, .
             const k = childSnapshot.key
             const v = childSnapshot.val()
             
-            if (v.lastMessage) {
+            if (v.timestamp) {
               items.push({k: k, v: v})
             } else {
               // invalid user remove
