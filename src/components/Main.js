@@ -73,6 +73,7 @@ function Main({ users, settings, initUsers, clearUsers, selectedUser, signOut, .
 
   React.useEffect(() => {
     let chat
+    let recent
 
     // firebase
     Promise.resolve()
@@ -98,8 +99,7 @@ function Main({ users, settings, initUsers, clearUsers, selectedUser, signOut, .
           let items = []
           snapshot.forEach((childSnapshot) => {
             const k = childSnapshot.key
-            const v = childSnapshot.val()
-            
+            const v = childSnapshot.val()            
             if (v.timestamp) {
               items.push({k: k, v: v})
             } else {
@@ -131,7 +131,7 @@ function Main({ users, settings, initUsers, clearUsers, selectedUser, signOut, .
         // https://www.electronjs.org/docs/tutorial/notifications?q=Notification
         // https://www.electronjs.org/docs/api/notification
         // https://snutiise.github.io/html5-desktop-api/
-        const recent = database.ref(`/${settings.key}/recents`)
+        recent = database.ref(`/${settings.key}/recents`)
         recent.on('value', (snapshot) => {
           if (!snapshot.val()) return
           // GET PUSH ALARM, AUDIO BEEP
@@ -175,6 +175,10 @@ function Main({ users, settings, initUsers, clearUsers, selectedUser, signOut, .
       .catch((error) => error.messages && Alert(error.messages))
       .finally(() => isLoading(false))
 
+    return (() => {      
+      chat.off()
+      recent.off()
+    })
   }, [initUsers, clearUsers, database, isLoading, selectedUser, settings.key, Alert])
 
   return (

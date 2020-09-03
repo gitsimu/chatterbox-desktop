@@ -76,7 +76,7 @@ const Chat = ({ users, settings, messagesAll, initMessages, addMessages, deleteM
 
         // child_add 이벤트 on
            .then((lastTimestamp) => {
-             const ref =  chat.startAt(lastTimestamp + 1)
+             const ref = chat.startAt(lastTimestamp + 1)
              ref.on('child_added', (snapshot) => {
                const value = snapshot.val()
                addMessages({ key: userid, value: value })

@@ -79,7 +79,7 @@ function App({ settings, signIn }) {
                   }}>
                   아니오
                 </div>
-              )}              
+              )}
             </div>
           </div>
         </div>

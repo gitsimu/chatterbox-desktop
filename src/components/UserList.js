@@ -23,7 +23,7 @@ const UserList = ({ users, settings, changeUserState, initUserState, ...props })
    */
   const [mode, setMode] = React.useState(0)
 
-  /* Dock badge (macOS only)*/
+  /* Dock badge (macOS only) */
   React.useEffect(() => {
     if (process.platform !== 'darwin') return
     const badgeText = (countWait && countWait !== 0) ? String(countWait) : ''

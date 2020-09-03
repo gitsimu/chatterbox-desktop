@@ -21,6 +21,7 @@ export const AUTH = async req => {
   return postData
 }
 
+let RESTORE_COUNT = 0
 export const API = async (req, isLoading) => {
   const user = store.getState().settings
 
@@ -53,7 +54,10 @@ export const API = async (req, isLoading) => {
     
     const result = await postResponse.text()
     const postData = IsJsonString(result) ? JSON.parse(result) : result
-    if (postData.code === 1337) {
+    if (postData.code === 1337 && RESTORE_COUNT < 3) {
+      RESTORE_COUNT++;
+      // console.log('API Request rejected[1337] : retry count ', RESTORE_COUNT);
+      
       // session expired
       return Promise.resolve()
         .then(() => {
@@ -75,6 +79,7 @@ export const API = async (req, isLoading) => {
           return API(req, isLoading)
         })
     } else {
+      RESTORE_COUNT = 0;
       // request success
       return postData
     }

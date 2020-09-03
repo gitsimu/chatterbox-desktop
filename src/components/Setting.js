@@ -114,7 +114,7 @@ const Setting = ({ settings, ...props }) => {
                setFirstMessage(initConfig.firstMessage)
              }
 
-             if (dbData) {
+             if (dbData && dbData.code !== 1337) {
                console.log('dbData', dbData)
                setWorkingDay({
                  isInit: true,
@@ -161,7 +161,7 @@ const Setting = ({ settings, ...props }) => {
                setSelectDevice(0)
              }
 
-             setDomains(domains)
+             setDomains(domains || [])
            })
 
   }, [database, settings.key, settings.userName])
