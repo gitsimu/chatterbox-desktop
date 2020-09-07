@@ -93,19 +93,22 @@ const Chat = ({ users, settings, messagesAll, initMessages, addMessages, deleteM
   const sendMessage = React.useCallback((key, id, message, type, database) => {
     const messageId = Math.random().toString(36).substr(2, 9)
     const lastMessage = (type === 2) ? JSON.parse(message).name : message.trim()
-
-    database.ref(`/${key}/users/${id}`).update({
+    
+    const update = {}
+    update[`/${key}/users/${id}`] = {
       state:1,
       lastMessage: lastMessage,
       timestamp: new Date().getTime()
-    })
-    database.ref(`/${key}/messages/${id}/${messageId}`).update({
+    }
+    update[`/${key}/messages/${id}/${messageId}`] = {
       id: messageId,
       userId: key,
       message: message.trim(),
       type: type,
       timestamp: new Date().getTime()
-    })
+    }
+    database.ref().update(update)
+
     setTabState(1)
     showInfoDialog(false)
   }, [setTabState])

@@ -1,5 +1,6 @@
 import {store} from '../index'
 import {sessionRestore} from '../actions'
+import axios from 'axios'
 import './global.js'
 
 export const AUTH = async req => {
@@ -24,39 +25,30 @@ export const AUTH = async req => {
 let RESTORE_COUNT = 0
 export const API = async (req, isLoading) => {
   const user = store.getState().settings
-
+  
   if (!user || !user.sessionKey || !user.sessionToken || !user.userName) {
     return
   } else {
     isLoading && isLoading(true)
+    
+    const request = req
+    request.sskey = user.sessionKey
+    request.member_token = user.sessionToken
+    request.member_id = user.userName
 
-    let body = ''
-    Object.keys(req).forEach((o, i) => {
-      body += `${o}=${Object.values(req)[i]}&`
-    })
-
-    if (user) {
-      body += `sskey=${user.sessionKey}&`
-      body += `member_token=${user.sessionToken}&`
-      body += `member_id=${user.userName}`
+    const formData = new FormData()
+    for ( var key in request ) {
+      formData.append(key, request[key])
     }
 
-    const postResponse = await fetch(`${global.server.api}`, {
-      method: 'POST',
-      dataType: 'json',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
-      },
-      body: body
-    })
+    const config = {headers: {'content-type': 'multipart/form-data'}}
+        
+    const postResponse = await axios.post(global.server.api, formData, config)
+    const postData = postResponse.data
 
-    isLoading && isLoading(false)
-    
-    const result = await postResponse.text()
-    const postData = IsJsonString(result) ? JSON.parse(result) : result
     if (postData.code === 1337 && RESTORE_COUNT < 3) {
       RESTORE_COUNT++;
-      // console.log('API Request rejected[1337] : retry count ', RESTORE_COUNT);
+      console.log('API Request rejected[1337] : retry count ', RESTORE_COUNT, user);
       
       // session expired
       return Promise.resolve()
@@ -68,6 +60,7 @@ export const API = async (req, isLoading) => {
           })
         })
         .then((data) => {
+          console.log('API session restore ', data)
           return store.dispatch(
             sessionRestore({
               sessionKey: data.sskey,
@@ -79,18 +72,7 @@ export const API = async (req, isLoading) => {
           return API(req, isLoading)
         })
     } else {
-      RESTORE_COUNT = 0;
-      // request success
       return postData
-    }
-  }
-}
-
-function IsJsonString(str) {
-  try {
-    var json = JSON.parse(str)
-    return typeof json === 'object'
-  } catch (e) {
-    return false
+    }    
   }
 }

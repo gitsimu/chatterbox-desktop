@@ -109,11 +109,11 @@ if (!gotTheLock) {
 }
 
 /* developer tool을 여는 단축키 지정 (command + P) */
-// app.whenReady().then(() => {
-//   globalShortcut.register('CommandOrControl+P', () => {
-//     win.openDevTools()
-//   })
-// })
+app.whenReady().then(() => {
+  globalShortcut.register('CommandOrControl+P', () => {
+    win.openDevTools()
+  })
+})
 
 if (isMac) {
   const menu = Menu.buildFromTemplate(menuTemplate(app))
