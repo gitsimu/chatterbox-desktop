@@ -4,22 +4,15 @@ import axios from 'axios'
 import './global.js'
 
 export const AUTH = async req => {
-  let body = ''
-  Object.keys(req).forEach((o, i) => {
-    body += `${o}=${Object.values(req)[i]}&`
-  })
+  const formData = new FormData()
+  for ( var key in req ) {
+    formData.append(key, req[key])
+  }
 
-  const postResponse = await fetch(`${global.server.auth}`, {
-    method: 'POST',
-    dataType: 'json',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
-    },
-    body: body
-  })
-
-  const postData = await postResponse.json()
-  return postData
+  const config = {headers: {'content-type': 'multipart/form-data'}}        
+  const postResponse = await axios.post(global.server.auth, formData, config)
+  
+  return postResponse.data
 }
 
 let RESTORE_COUNT = 0
@@ -41,12 +34,18 @@ export const API = async (req, isLoading) => {
       formData.append(key, request[key])
     }
 
-    const config = {headers: {'content-type': 'multipart/form-data'}}
-        
-    const postResponse = await axios.post(global.server.api, formData, config)
-    const postData = postResponse.data
+    try {
+      const config = {headers: {'content-type': 'multipart/form-data'}}        
+      const postResponse = await axios.post(global.server.api, formData, config)
+      const postData = postResponse.data
 
-    if (postData.code === 1337 && RESTORE_COUNT < 3) {
+      if (postData.code === 1337 && RESTORE_COUNT < 3) {
+        throw new Error('session expired')
+      }
+
+      return postData
+    }
+    catch(err) {
       RESTORE_COUNT++;
       console.log('API Request rejected[1337] : retry count ', RESTORE_COUNT, user);
       
@@ -71,8 +70,6 @@ export const API = async (req, isLoading) => {
         .then(() => {
           return API(req, isLoading)
         })
-    } else {
-      return postData
-    }    
+    }      
   }
 }

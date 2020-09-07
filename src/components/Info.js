@@ -41,7 +41,7 @@ const Info = ({ users, settings, ...props }) => {
       }
     }
   }, [i])
-
+  
   const saveInfo = (type) => {
     let data
 
