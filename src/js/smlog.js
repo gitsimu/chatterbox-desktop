@@ -9,7 +9,7 @@ export const AUTH = async req => {
     formData.append(key, req[key])
   }
 
-  const config = {headers: {'content-type': 'multipart/form-data'}}        
+  const config = {headers: {'content-type': 'multipart/form-data'}}
   const postResponse = await axios.post(global.server.auth, formData, config)
   
   return postResponse.data
@@ -43,11 +43,12 @@ export const API = async (req, isLoading) => {
         throw new Error('session expired')
       }
 
+      isLoading && isLoading(false)
       return postData
     }
     catch(err) {
-      RESTORE_COUNT++;
-      console.log('API Request rejected[1337] : retry count ', RESTORE_COUNT, user);
+      RESTORE_COUNT++
+      console.log('API Request rejected[1337] : retry count ', RESTORE_COUNT, user)
       
       // session expired
       return Promise.resolve()
@@ -70,6 +71,6 @@ export const API = async (req, isLoading) => {
         .then(() => {
           return API(req, isLoading)
         })
-    }      
+    }
   }
 }
