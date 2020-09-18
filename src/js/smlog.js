@@ -3,6 +3,8 @@ import {sessionRestore} from '../actions'
 import axios from 'axios'
 import './global.js'
 
+let RESTORE_COUNT = 0
+
 export const AUTH = async req => {
   const formData = new FormData()
   for ( var key in req ) {
@@ -15,7 +17,6 @@ export const AUTH = async req => {
   return postResponse.data
 }
 
-let RESTORE_COUNT = 0
 export const API = async (req, isLoading) => {
   const user = store.getState().settings
   

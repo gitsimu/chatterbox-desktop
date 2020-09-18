@@ -209,7 +209,10 @@
     background: rgba(27, 29, 35, 0.1);
   }
   
-  .dialog,
+  .dialog {
+    color: #fff;
+    background: #494949;
+  }
   .message-option-dialog {
     background: #fff;
     color: #494949;
@@ -334,11 +337,11 @@
   }
 
   .domains {
-    color: #555;
+    color: #555;    
   }
   .domains:hover {
     color: #000;
-  }
+  }  
 
   .more-button > div {
     background: #DFE5F1;
@@ -356,5 +359,71 @@
   .chat-list-option > div.all-complete:hover,
   .chat-list-option > div.all-delete:hover {
     background-color: rgba(0, 0, 0, 0.05);
+  }
+
+  .chat-history-list {
+    border: 1px solid #f1f1f1;
+  }
+
+  .visitor-title {
+    color: #494949;
+    border-color: #f1f1f1;
+  }
+  .domain-list {
+    background: #fff;
+    border-color: #f1f1f1;
+  }
+  .domain-list-title {
+    border-color: #f1f1f1;
+  }
+  .domain-list .domains {
+    background: #fff;
+  }  
+  .domain-list .domains.active:before {
+    background: #0080F7;
+  }
+  
+  .domain-list .domains:hover,
+  .domains.active {
+    color: #0080F7;
+    background: #f3f9ff;
+    // font-weight: bold;
+  }
+  .visitor-item-head {
+    border: none;
+    color: #333;
+    background-color: transparent !important;
+  }
+  .visitor-item:not(.visitor-item-head) {
+    position: relative;
+    color: #333;
+    background: #fff;
+    border-radius: 5px;
+    margin-bottom: 3px;
+    border: 1px solid #f1f1f1;
+  }
+  .visitor-item:not(.visitor-item-head):hover {
+    background: #f3f9ff !important;
+    border-color: #abcfff;
+  }
+  .visitor-empty {
+    color: #7e8698;
+  }
+
+  .connected-user-container {
+    border-color: #eee;
+    background-color: #fff;
+  }
+  .connected-user-container:hover {
+    border-color: #abcfff;
+  }
+  .connected-user:hover {
+    background: #f3f9ff;
+  }
+  .connected-user-name {
+    color: #494949;
+  }
+  .connected-user-message {
+    color: #3eaae0;
   }
 }

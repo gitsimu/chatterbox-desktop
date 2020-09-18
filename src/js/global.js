@@ -8,5 +8,6 @@
 global.server = {
   auth: 'https://smlog.co.kr/api/app_auth.php',
   api: 'https://smlog.co.kr/api/app_api.php',
+  hmis: 'https://smlog.co.kr/hmisNew/hmisApi.php',
   chat: 'https://chat.smlog.co.kr'
 }

@@ -14,6 +14,7 @@ import Chat from './Chat'
 import Memo from './Memo'
 import Info from './Info'
 import Setting from './Setting'
+import Visitor from './Visitor'
 import '../css/style.css'
 import '../css/theme.scss'
 import '../js/global.js'
@@ -91,6 +92,7 @@ function Main({ users, settings, initUsers, clearUsers, selectedUser, signOut, .
           .catch(() => { throw new Error('인증에 실패하였습니다.')})
       })
       .then(() => {
+        isLoading(true)
         chat = database.ref(`/${settings.key}/users`).orderByChild('timestamp')
         chat.on('value', (snapshot) => {
           clearUsers()
@@ -126,6 +128,8 @@ function Main({ users, settings, initUsers, clearUsers, selectedUser, signOut, .
            * USERS 라는 전역변수를 별도로 두어 onClick 시 해당 유저를 찾을 수 있도록 함
            */
           USERS.push(...users)
+          
+          isLoading(false)
         })
 
         // https://www.electronjs.org/docs/tutorial/notifications?q=Notification
@@ -172,8 +176,7 @@ function Main({ users, settings, initUsers, clearUsers, selectedUser, signOut, .
           })
         })
       })
-      .catch((error) => error.messages && Alert(error.messages))
-      .finally(() => isLoading(false))
+      .catch((error) => error.messages && Alert(error.messages))      
 
     return (() => {      
       chat.off()
@@ -191,12 +194,14 @@ function Main({ users, settings, initUsers, clearUsers, selectedUser, signOut, .
             <i className="icon-bubble"></i>
             <div className="tooltip">채팅 목록</div>
           </div>
-          {/* <div
+          {settings.userName === 'smartlog' && (
+          <div
             className={screenState === 1 ? "chat-lnb-item active" : "chat-lnb-item"}
             onClick={() => { setScreenState(1) }}>
-            <i className="icon-user"></i>
-            <div className="tooltip">유저 목록</div>
-          </div> */}
+            <i className="icon-people"></i>
+            <div className="tooltip">실시간 방문자</div>
+          </div>
+          )}
           <div
             className={screenState === 2 ? "chat-lnb-item active" : "chat-lnb-item"}
             onClick={() => { setScreenState(2) }}>
@@ -244,11 +249,22 @@ function Main({ users, settings, initUsers, clearUsers, selectedUser, signOut, .
           </div>
           <div className="container-right">
             <Memo database={database} Alert={Alert}/>
-            <Info database={database} Alert={Alert}/>
+            <Info 
+              database={database}
+              Alert={Alert}              
+              setTabState={setTabState}
+              selectedUser={selectedUser}/>
           </div>
         </div>
-        {/* <div className={ screenState === 1 ? "container-screen-1" : "container-screen-1 hide" }>          
-        </div> */}
+        <div className={ screenState === 1 ? "container-screen-1" : "container-screen-1 hide" }>
+          <Visitor
+            database={database}
+            screenState={screenState}
+            setScreenState={setScreenState}
+            setTabState={setTabState}
+            selectedUser={selectedUser}
+            isLoading={isLoading}/>
+        </div>
         <div className={ screenState === 2 ? "container-screen-2" : "container-screen-2 hide" }>
           <Setting
             database={database}

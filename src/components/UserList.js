@@ -55,10 +55,11 @@ const UserList = ({ users, settings, changeUserState, initUserState, ...props })
   React.useEffect(() => {
     const offlineUser = users.filter(u => {
       const term = 3600 * 3 * 1000
+      // const term = 60 * 5 * 1000 // 5min
       const timeInterval = new Date().getTime() - u.value.timestamp
       return term < timeInterval && u.value.live === 1
-    })
-    
+    })  
+
     offlineUser.forEach(o => {
       if (KICKED.indexOf(o.key) === -1) {
         KICKED.push(o.key)
@@ -124,7 +125,7 @@ const UserList = ({ users, settings, changeUserState, initUserState, ...props })
       <div className="chat-list-tab">
         <div
           className={tabState === 0 ? 'active' : ''}
-          onClick={() => { 
+          onClick={() => {
             setTabState(0)
             initMode()
           }}>
