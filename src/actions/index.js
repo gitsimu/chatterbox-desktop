@@ -20,10 +20,16 @@ export const changeUserState = users => ({
 })
 
 export const initUserState = () => ({
-  type: 'INIT_USER_STATE',  
+  type: 'INIT_USER_STATE',
 })
 
 /* messages */
+export const pagingMessages = messagesList => ({
+  type: 'PAGING_MESSAGES',
+  key: messagesList.key,
+  value: messagesList.value
+})
+
 export const initMessages = messagesList => ({
   type: 'INIT_MESSAGES',
   key: messagesList.key,

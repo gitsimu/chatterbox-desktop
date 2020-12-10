@@ -23,7 +23,7 @@ import * as script from '../js/script.js'
 const storage = require('electron-json-storage')
 const USERS = []
 
-function Main({ users, settings, initUsers, clearUsers, selectedUser, signOut, ...props }) {
+function Main({ settings, initUsers, clearUsers, selectedUser, signOut, ...props }) {
   const [screenState, setScreenState] = React.useState(0)
   const [tabState, setTabState] = React.useState(0)
   const [imageViewer, showImageViewer] = React.useState(null)
@@ -92,10 +92,8 @@ function Main({ users, settings, initUsers, clearUsers, selectedUser, signOut, .
           .catch(() => { throw new Error('인증에 실패하였습니다.')})
       })
       .then(() => {
-        isLoading(true)
         chat = database.ref(`/${settings.key}/users`).orderByChild('timestamp')
         chat.on('value', (snapshot) => {
-          clearUsers()
           USERS.length = 0
 
           let items = []
@@ -176,7 +174,8 @@ function Main({ users, settings, initUsers, clearUsers, selectedUser, signOut, .
           })
         })
       })
-      .catch((error) => error.messages && Alert(error.messages))      
+      .catch((error) => error.messages && Alert(error.messages))
+      .finally(()=> isLoading(false))
 
     return (() => {      
       chat.off()
@@ -296,7 +295,6 @@ const getFirebaseAuthToken = async (uuid) => {
 }
 
 const mapStateToProps = state => ({
-  users: state.users,
   settings: state.settings
 })
 

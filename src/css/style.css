@@ -2186,3 +2186,42 @@ div:hover > .tooltip {
   20% { background-color: #F44336;}
   100% { opacity: 0;}
 }
+
+.message-thumbnail.simple-thumbnail{
+  width: 250px;
+  margin: 0;
+}
+.message-link {
+  width: 250px;
+  font-weight: bold;
+}
+.message-link-text {
+  margin: 5px 0;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.message-link-text i {
+  font-size: 20px;
+  color: blue;
+}
+
+.chatbot-button {
+  font-size: 13px;
+  font-weight: 600;
+  max-width: 280px;
+  margin: 3px 5px;
+  word-break: break-word;
+  background-color: rgb(255, 255, 255);
+  border-radius: 12px;
+  border-color: rgb(228, 228, 229);
+  border-width: 1px;
+  border-style: solid;
+  padding: 10px 15px;
+  cursor: pointer;
+  outline: none;
+}
+.chatbot-button:hover {
+  background-color: #a4bad440;
+}

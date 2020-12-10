@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { selectedUser, addMessages, changeUserState } from '../actions'
 import * as script from '../js/script.js'
 
-const User = ({ users, messages, settings, addMessages, selectedUser, changeUserState, ...props }) => {
+const User = ({ messages, settings, addMessages, selectedUser, changeUserState, ...props }) => {
   const userInfo = props.data.value
   const lastMessage = (userInfo && userInfo.lastMessage) ? userInfo.lastMessage : ''
   const dateTime = (userInfo && userInfo.timestamp) ? userInfo.timestamp : null
@@ -32,7 +32,7 @@ const User = ({ users, messages, settings, addMessages, selectedUser, changeUser
           changeUserState({key: props.data.key, state: value})
         } else {
           selectedUser(props.data)
-        }        
+        }
       }}>
 
       <div className="chat-user-icon">
@@ -57,7 +57,6 @@ const User = ({ users, messages, settings, addMessages, selectedUser, changeUser
 }
 
 const mapStateToProps = state => ({
-  users: state.users,
   messages: state.messages,
   settings: state.settings
 })

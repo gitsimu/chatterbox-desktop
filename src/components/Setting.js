@@ -48,7 +48,7 @@ const initIconConfig = {
 }
 
 
-const Setting = ({ settings, ...props }) => {
+const Setting = ({ _key : key, userName, ...props }) => {
   const database = props.database
   const Alert = props.Alert
 
@@ -84,7 +84,7 @@ const Setting = ({ settings, ...props }) => {
   const isLoading = props.isLoading
   
   React.useEffect(() => {
-    const getFirebase = database.ref(`/${settings.key}/config`)
+    const getFirebase = database.ref(`/${key}/config`)
                                 .once('value')
     const getDb = smlog.API({
       method: 'get_chat_config_desktop'
@@ -92,7 +92,7 @@ const Setting = ({ settings, ...props }) => {
 
     const getDomains = smlog.API({
       method: 'domains_data',
-      username: settings.userName
+      username: userName
     })
 
     Promise.all([getFirebase, getDb, getDomains])
@@ -164,7 +164,7 @@ const Setting = ({ settings, ...props }) => {
              setDomains(domains || [])
            })
 
-  }, [database, settings.key, settings.userName])
+  }, [database, key, userName])
 
   /* by storage */
   React.useEffect(() => {
@@ -207,7 +207,7 @@ const Setting = ({ settings, ...props }) => {
     const config = { headers: { 'content-type': 'multipart/form-data' } }
     const formData = new FormData()
     formData.append('file', e.target.files[0])
-    formData.append('key', settings.key)
+    formData.append('key', key)
     formData.append('tag', 'profile')
 
     return axios.post(`${global.server.chat}/api/upload`, formData, config)
@@ -217,7 +217,7 @@ const Setting = ({ settings, ...props }) => {
 
         if (res.data.result === 'success') {
           const path = JSON.stringify(res.data.file)
-          database.ref(`/${settings.key}/config`).update({ profileImage: path })
+          database.ref(`/${key}/config`).update({ profileImage: path })
           setProfileImage(path)
         }
       })
@@ -231,14 +231,14 @@ const Setting = ({ settings, ...props }) => {
   const handleFileRemove = () => {
     if (profileImage === null) return
 
-    database.ref(`/${settings.key}/config`).update({ profileImage: null })
+    database.ref(`/${key}/config`).update({ profileImage: null })
     setProfileImage(null)
 
     // s3 file remove
     const config = { headers: { 'content-type': 'multipart/form-data' } }
     const formData = new FormData()
     formData.append('filename', JSON.parse(profileImage).name)
-    formData.append('key', settings.key)
+    formData.append('key', key)
 
     return axios.post(`${global.server.chat}/api/remove`, formData, config)
       .then(res => {
@@ -255,7 +255,7 @@ const Setting = ({ settings, ...props }) => {
   }
 
   const updateUserInfo = () => {
-    database.ref(`/${settings.key}/config`).update({
+    database.ref(`/${key}/config`).update({
       title: title.trim(),
       subTitle: subTitle.trim(),
       nickname: nickname.trim(),
@@ -305,7 +305,7 @@ const Setting = ({ settings, ...props }) => {
   React.useEffect(() => {
     if (workingDay.isInit) return
 
-    database.ref(`/${settings.key}/config`).update({
+    database.ref(`/${key}/config`).update({
       workingDay: workingDay
     })
 
@@ -321,7 +321,7 @@ const Setting = ({ settings, ...props }) => {
       week: workingDay.week.join(','),
       state: Object.keys(state).filter(sid=> state[sid].checked).join(',')
     })
-  }, [database, settings.key, workingDay])
+  }, [database, key, workingDay])
 
   const onChangeIconConfig = (param) => {
     let newConfig = {
@@ -945,8 +945,8 @@ const Setting = ({ settings, ...props }) => {
 }
 
 const mapStateToProps = state => ({
-  users: state.users,
-  settings: state.settings
+  userName: state.settings.userName,
+  _key: state.settings.key
 })
 
 // export default Setting

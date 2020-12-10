@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 
-const Memo = ({ users, settings, ...props }) => {
+const Memo = ({ settings, ...props }) => {
   const key = settings.key
   const database = props.database
   const Alert = props.Alert
@@ -45,7 +45,6 @@ const Memo = ({ users, settings, ...props }) => {
 }
 
 const mapStateToProps = state => ({
-  users: state.users,
   settings: state.settings
 })
 

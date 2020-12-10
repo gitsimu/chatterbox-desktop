@@ -4,21 +4,21 @@ import EmojiContainer from './EmojiContainer'
 import axios from 'axios'
 import * as firebase from "firebase/app"
 import { connect } from 'react-redux'
-import { addMessages, clearMessages, deleteMessages, initMessages, selectedUser } from '../actions'
+import { addMessages, clearMessages, deleteMessages, pagingMessages, initMessages, selectedUser } from '../actions'
 import PreviewContainer from './PreviewContainer'
 import useImageFile from '../hooks/useImageFile'
 import useUserInput from '../hooks/useUserInput'
+import useScrollTo from '../hooks/useScrollTo'
+import useMessageGetter from '../hooks/useMessageGetter'
 
-const CONNECTIONS = {}
 const PAGE_SIZE = 50
-const Chat = ({ users, settings, messagesAll, initMessages, addMessages, deleteMessages, clearMessages, selectedUser, ...props }) => {
+const Chat = ({ settings, messages, initMessages, pagingMessages, addMessages, deleteMessages, clearMessages, selectedUser, ...props }) => {
   const key = settings.key
   const userid = settings.selectedUser.key
   const database = props.database
   const setTabState = props.setTabState
   const target = settings.selectedUser
   const Alert = props.Alert
-  const messages = messagesAll[userid]
 
   const [optionDialog, showOptionDialog] = React.useState(false)
   const [infoDialog, showInfoDialog] = React.useState(false)
@@ -26,70 +26,13 @@ const Chat = ({ users, settings, messagesAll, initMessages, addMessages, deleteM
   const [loading, isLoading] = React.useState(false)
   const [fileDropLayer, showFileDropLayer] = React.useState(false)
   const body = React.useRef(null)
+  const [hasScrollToBottom, setHasScrollToBottom] = React.useState(false)
+  const [scrollTo, setScrollToBottom, setScrollToFix] = useScrollTo(body.current, [messages, userid])
+  const [getMessageByDB, onAddedMessage, hasBeforeMessage, listenerOff] = useMessageGetter(database, userid)
   const [imageSrc, imageFile, setImageFile] = useImageFile()
   const input = useUserInput(userid)
   let form
 
-  const [scrollTop, setScrollTop] = React.useState(null)
-
-  const scrollToBottom = () => {
-    body.current.scrollTop = body.current.scrollHeight
-  }
-
-  const paging = React.useCallback((isInit) => {
-    if (!userid) return
-    if (isInit && CONNECTIONS[userid]) return
-
-    const chat = database.ref(`/${key}/messages/${userid}`)
-                         .orderByChild('timestamp')
-    const page = CONNECTIONS[userid]
-                 ? CONNECTIONS[userid].page + 1
-                 : 1
-
-    Promise.resolve()
-           .then(() => isLoading(true))
-
-        // 기존 child_add 이벤트 off
-           .then(()=> {
-             if (!CONNECTIONS[userid]) return
-
-             CONNECTIONS[userid].ref.off()
-           })
-
-        // message list 가져오기
-           .then(() => {
-             return chat.limitToLast(PAGE_SIZE * page)
-                        .once('value')
-           })
-
-        // store에 저장
-           .then((snapshots) => {
-             const arr = []
-             snapshots.forEach(snapshot => {
-               arr.push(snapshot.val())
-             })
-
-             initMessages({ key: userid, value: arr })
-
-             const lastMessage = arr[arr.length - 1]
-             return lastMessage.timestamp
-           })
-
-        // child_add 이벤트 on
-           .then((lastTimestamp) => {
-             const ref = chat.startAt(lastTimestamp + 1)
-             ref.on('child_added', (snapshot) => {
-               const value = snapshot.val()
-               addMessages({ key: userid, value: value })
-             })
-
-             return ref
-           })
-           .then((ref) => {
-             CONNECTIONS[userid] = { ref: ref, page: page }
-             isLoading(false)
-           })
-  }, [database, key, userid, addMessages, initMessages])
 
   const sendMessage = React.useCallback((key, id, message, type, database) => {
     const timestamp = firebase.database.ServerValue.TIMESTAMP
@@ -176,6 +119,25 @@ const Chat = ({ users, settings, messagesAll, initMessages, addMessages, deleteM
     e.target.value = ''
   }
 
+  const addBeforeMessage = (timestamp)=> {
+    isLoading(true)
+
+    return getMessageByDB(PAGE_SIZE, timestamp)
+      .then(beforeMessageList => {
+        pagingMessages({key: userid, value:beforeMessageList})
+        isLoading(false)
+
+        return beforeMessageList
+      })
+  }
+
+  const onMessageListener = React.useCallback((startTimestamp)=> {
+    onAddedMessage(startTimestamp, (addedMessage) => {
+      setScrollToBottom()
+      addMessages({ key: userid, value: addedMessage })
+    })
+  }, [userid])
+
   const handleEmojiInput = React.useCallback((emoji)=>{
     input.current.value += emoji.emoji
     input.current.focus()
@@ -183,15 +145,21 @@ const Chat = ({ users, settings, messagesAll, initMessages, addMessages, deleteM
 
   // 채팅방 변경 init
   React.useEffect(() => {
-    paging(true)
     input.current.focus()
-
     showInfoDialog(target.value.state === 2)
-    showEmojiContainer(false)
-    setImageFile(null)
     showOptionDialog(false)
-    setScrollTop(null)
-  }, [input, target, showEmojiContainer, setImageFile, initMessages, paging])
+    showEmojiContainer(false)
+    setHasScrollToBottom(false)
+    setImageFile(null)
+    setScrollToBottom()
+
+    if (!messages || messages.length === 0) {
+      addBeforeMessage(+new Date())
+        .then((list)=> {
+          onMessageListener(list[list.length - 1].timestamp)
+        })
+    }
+  }, [input, target, showEmojiContainer, setImageFile, initMessages])
 
   // file drag&drop
   React.useEffect(() => {
@@ -226,8 +194,9 @@ const Chat = ({ users, settings, messagesAll, initMessages, addMessages, deleteM
 
     const handleScroll = (e) => {
       const chatBody = body.current
-      setScrollTop(chatBody.scrollHeight - (chatBody.scrollTop + chatBody.clientHeight))
-      // console.log('scroll', chatBody.scrollHeight - (chatBody.scrollTop + chatBody.clientHeight))
+
+      const scrollTop = chatBody.scrollHeight - (chatBody.scrollTop + chatBody.clientHeight)
+      setHasScrollToBottom(scrollTop >= 100)
     }
 
     /* 파일 드래그&드랍 지원 이벤트, 스크롤 이벤트
@@ -258,38 +227,27 @@ const Chat = ({ users, settings, messagesAll, initMessages, addMessages, deleteM
     }
   }, [key, handleFileInput])
 
-  // scroll to bottom
-  React.useEffect(() => {
-    scrollToBottom()
-  }, [messages, userid])
-
-  // chat off
   React.useEffect(() => {
     /* Sign out 등의 이유로 Chat 객체를 내릴 때
      * 연결되어있는 firebase connection을 모두 off 처리한다
      */
     return () => {
+      selectedUser({})
       clearMessages()
-      Object.keys(CONNECTIONS).forEach((u, i) => {
-        console.log('[Connection off]', CONNECTIONS[u])
-        if (CONNECTIONS[u]) {
-          CONNECTIONS[u].ref.off()
-          delete CONNECTIONS[u]
-        }
-      })
+      listenerOff()
     }
-  }, [clearMessages])
+  }, [])
 
   return (
     <>
       <div className='messages card' ref={body}>
         {/* 이전 메세지 (paging) */}
-        {CONNECTIONS[userid] 
-        && messages
-        && messages.length >= PAGE_SIZE * CONNECTIONS[userid].page
-        && (
+        {hasBeforeMessage && (
           <div className="more-button">
-            <div onClick={()=> paging(false)}>
+            <div onClick={()=> {
+              setScrollToFix()
+              addBeforeMessage(messages[0].timestamp)
+            }}>
               <i className="icon-arrow-up"></i>
               이전 메세지
             </div>
@@ -297,31 +255,28 @@ const Chat = ({ users, settings, messagesAll, initMessages, addMessages, deleteM
         )}
         {/* 최하단으로 스크롤 */}
         {messages 
-        && scrollTop >= 100 
+        && hasScrollToBottom
         && (
-          <div className="scroll-bottom-button" onClick={scrollToBottom} style={{bottom: infoDialog ? 100 : 55}}>
+          <div className="scroll-bottom-button" onClick={()=> {
+            setScrollToBottom()
+            scrollTo()
+          }} style={{bottom: infoDialog ? 100 : 55}}>
             <div>
               <i className="icon-arrow-down"></i>
-              {/* <div className="scroll-bottom-button-message">
-                <span>{messages[messages.length - 1].userId !== key ? target.guestCode : '나'} : </span>{messages[messages.length - 1].message}
-              </div>
-              <div className="scroll-bottom-button-icon">
-                <i className="icon-arrow-down"></i>
-              </div> */}
             </div>
           </div>
         )}
         {/* 메세지 */}
         {messages && messages.map((m, i) => {
           return <ChatMessage
-            opponent={userid}
-            onloadImage={scrollToBottom}
-            target={target}
             key={m.id}
+            opponent={userid}
+            target={target}
+            onLoadImage={scrollTo}
             prev={messages[i - 1]}
             next={messages[i + 1]}
-            {...m}
-            {...props}/>
+            showImageViewer={props.showImageViewer}
+            {...m}/>
         })}
         <div id='file-drop-layer' className={fileDropLayer
           ? 'file-drop-layer active'
@@ -370,9 +325,7 @@ const Chat = ({ users, settings, messagesAll, initMessages, addMessages, deleteM
             ref={input}
             className='message-input'
             placeholder='메세지를 입력해주세요.'
-            onBlur={() => {
-              setImageFile(null)
-            }}
+            onBlur={() => setImageFile(null)}
             onPaste={(e) => {
               let item = e.clipboardData.items[0]
               if (!item || !item.type || item.type.indexOf('image') !== 0) return
@@ -426,8 +379,7 @@ const Chat = ({ users, settings, messagesAll, initMessages, addMessages, deleteM
               deleteMessages({ key: userid })
               selectedUser({})
               /* connections */
-              CONNECTIONS[userid].ref.off()
-              delete CONNECTIONS[userid]
+              listenerOff(userid)
 
               Alert('이 대화가 삭제처리 되었습니다.')
             }}>
@@ -457,12 +409,12 @@ const Chat = ({ users, settings, messagesAll, initMessages, addMessages, deleteM
 }
 
 const mapStateToProps = state => ({
-  users: state.users,
-  messagesAll: state.messages,
+  messages: state.messages[state.settings.selectedUser.key],
   settings: state.settings
 })
 
 const mapDispatchToProps = dispatch => ({
+  pagingMessages : m=> dispatch(pagingMessages(m)),
   addMessages: m => dispatch(addMessages(m)),
   initMessages: m=> dispatch(initMessages(m)),
   deleteMessages: m => dispatch(deleteMessages(m)),
