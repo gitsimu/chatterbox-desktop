@@ -16,19 +16,6 @@ const Visitor = ({ users, settings, changeUserState, initUserState, ...props }) 
   const setTabState = props.setTabState
   const selectedUser = props.selectedUser
 
-  const reroll = (x) => {
-    let cost = 0
-    const per = [0.6, 0.5, 0.4, 0.3]
-    
-    const reducer = (accumulator, value, index, array) => {
-      const enchanted = Math.floor(accumulator * value)
-      console.log(enchanted, `${enchanted * 2.5}v`)
-      
-      return enchanted
-    }
-    per.reduce(reducer, x)
-  }
-
   const realtimeVisitors = React.useCallback(() => {
     if (selectedDomain && screenState === 1) {
       smlog.API({
