@@ -142,37 +142,46 @@ function Main({ users, settings, initUsers, clearUsers, selectedUser, signOut, .
           storage.getMany(['pushAlram', 'audioBeep'], (err, data) => {
             if (data.pushAlram.allowed === false) { return }
 
-            const recentsData = snapshot.val()
-            if (recentsData) {
-              const timestamp = recentsData.timestamp
-              const timelimit = new Date().getTime() - (60 * 1000)
+            try {
+              const recentsData = snapshot.val()
+              if (recentsData) {
+                const timestamp = recentsData.timestamp
+                const timelimit = new Date().getTime() - (60 * 1000)
+                console.log('timestamp', timestamp)
+                console.log('timelimit', timelimit)
 
-              if (!timestamp || timelimit > timestamp ) return
+                if (!timestamp || timelimit > timestamp ) return
 
-              const message = recentsData.type === 2
-                ? JSON.parse(recentsData.message).name
-                : recentsData.message
-              const notification = new Notification('새 메세지', {
-                body: message,
-                silent: true
-              })
-              notification.onclick = () => {
-                const target = USERS.filter(
-                  (u) => { return u.key === recentsData.userId})
-                if (target.length > 0) {
-                  setScreenState(0)
-                  setTabState(target[0].value.state || 0)
-                  selectedUser(target[0])
+                const message = recentsData.type === 2
+                  ? JSON.parse(recentsData.message).name
+                  : recentsData.message
+                console.log('message', message)
+
+                const notification = new Notification('새 메세지', {
+                  body: message,
+                  silent: true
+                })
+                notification.onclick = () => {
+                  const target = USERS.filter(
+                    (u) => { return u.key === recentsData.userId})
+                  if (target.length > 0) {
+                    setScreenState(0)
+                    setTabState(target[0].value.state || 0)
+                    selectedUser(target[0])
+                  }
+                }
+
+                // console.log('data.audioBeep.allowed', data.audioBeep.allowed)
+                // play beep
+                if (!(data.audioBeep.allowed === false)) {
+                  const player = new Audio('./blop_md.mp3')
+                  player.play()
                 }
               }
-
-              // console.log('data.audioBeep.allowed', data.audioBeep.allowed)
-              // play beep
-              if (!(data.audioBeep.allowed === false)) {
-                const player = new Audio('./blop_md.mp3')
-                player.play()
-              }
             }
+            catch(err) {
+              console.log('Notification Error', err);
+            }            
           })
         })
       })
