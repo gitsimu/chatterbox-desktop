@@ -30,7 +30,7 @@ function createWindow () {
     minHeight: 720,    
     webPreferences: {
       nodeIntegration: true,
-      enableRemoteModule: true      
+      
     }
   })
   win.removeMenu()

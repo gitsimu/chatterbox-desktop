@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import * as script from '../js/script.js'
 import ChatMessageInner from './ChatMessageInner'
 
+// import {shell} from 'electron'
 const {shell} = require('electron')
 
 const ChatMessage = ({ settings, ...props }) => {
@@ -49,8 +50,8 @@ const ChatMessage = ({ settings, ...props }) => {
             <div className="message-time">{ script.timestampToTime(props.timestamp, true) }</div>
           )}
           <ChatMessageInner
-            onClickLink={url=> {
-              shell.openExternal(url)
+            onClickLink={url=> {              
+              // shell.openExternal(url)
             }}
             onClickImage={showImageViewer}
             onLoadImage={props.onLoadImage}
@@ -77,8 +78,8 @@ const ChatMessage = ({ settings, ...props }) => {
             )}
             <div className="message-bottom">
               <ChatMessageInner
-                onClickLink={url=> {
-                  shell.openExternal(url)
+                onClickLink={url=> {                  
+                  // shell.openExternal(url)
                 }}
                 onClickImage={showImageViewer}
                 onLoadImage={props.onLoadImage}

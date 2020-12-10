@@ -2204,7 +2204,7 @@ div:hover > .tooltip {
 }
 .message-link-text i {
   font-size: 20px;
-  color: blue;
+  color: #fff;
 }
 
 .chatbot-button {
