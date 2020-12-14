@@ -902,6 +902,7 @@ div, input, textarea {
   display: flex;
   align-items: center;
   justify-content: center;
+  text-decoration: none;
 }
 .message-file .message-file-save:hover {
   text-decoration: underline;

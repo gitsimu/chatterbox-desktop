@@ -26,15 +26,7 @@ const ChatMessageImage = ({message, onLoadImage, ...props}) => {
         <div className="message-file-name">{name}</div>
         <div className="message-file-size">파일크기 : {script.bytesToSize(size)}</div>
         <div className="message-file-expire">유효기간 : {expired} 까지</div>
-        <div
-          className="message-file-save"
-          onClick={() => {
-            setTimeout(() => {
-              window.open(location)
-            }, 100)
-          }}>
-          저장하기
-        </div>
+        <a className="message-file-save" href={location} download={name}>저장하기</a>
       </div>
     </div>
   )
