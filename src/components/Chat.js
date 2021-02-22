@@ -10,6 +10,7 @@ import useImageFile from '../hooks/useImageFile'
 import useUserInput from '../hooks/useUserInput'
 import useScrollTo from '../hooks/useScrollTo'
 import useMessageGetter from '../hooks/useMessageGetter'
+import { getTempId } from '../js/script'
 
 const PAGE_SIZE = 50
 const Chat = ({ settings, messages, initMessages, pagingMessages, addMessages, deleteMessages, clearMessages, selectedUser, ...props }) => {
@@ -27,12 +28,13 @@ const Chat = ({ settings, messages, initMessages, pagingMessages, addMessages, d
   const [fileDropLayer, showFileDropLayer] = React.useState(false)
   const body = React.useRef(null)
   const [hasScrollToBottom, setHasScrollToBottom] = React.useState(false)
-  const [scrollTo, setScrollToBottom, setScrollToFix] = useScrollTo(body.current, [messages, userid])
+  const [userTyping, setUserTyping] = React.useState(false)
+  const [adminTyping, setAdminTyping] = React.useState(false)
+  const [scrollTo, setScrollToBottom, setScrollToFix] = useScrollTo(body.current, [messages, userid, adminTyping, userTyping])
   const [getMessageByDB, onAddedMessage, hasBeforeMessage, listenerOff] = useMessageGetter(database, userid)
   const [imageSrc, imageFile, setImageFile] = useImageFile()
   const input = useUserInput(userid)
   let form
-
 
   const sendMessage = React.useCallback((key, id, message, type, database) => {
     const timestamp = firebase.database.ServerValue.TIMESTAMP
@@ -51,7 +53,8 @@ const Chat = ({ settings, messages, initMessages, pagingMessages, addMessages, d
       type: type,
       timestamp: timestamp
     })
-    
+    database.ref(`/${key}/users/${userid}/typingAdmin/${getTempId()}`).remove()
+
     setTabState(1)
     showInfoDialog(false)
   }, [setTabState])
@@ -142,6 +145,79 @@ const Chat = ({ settings, messages, initMessages, pagingMessages, addMessages, d
     input.current.value += emoji.emoji
     input.current.focus()
   }, [input])
+
+  const throttleTyping = (callback, ms) => {
+    let last = 0
+    let _beforeIsEmpty = true
+
+    return function(e) {
+      const beforeIsEmpty = _beforeIsEmpty
+      const isEmpty = !e.target.value
+      _beforeIsEmpty = isEmpty
+      const current = new Date().getTime()
+      if(current < last + ms && beforeIsEmpty === isEmpty) {
+        return
+      }
+
+      last = current
+      callback.call(this, e)
+    }
+  }
+
+  const startTyping = React.useCallback(throttleTyping((e) => {
+    database.ref(`/${key}/users/${userid}/typingAdmin`).update({
+      [getTempId()]: new Date().getTime() + (e.target.value ? 30000 : 3000)
+    })
+  }, 1000), [database, userid]);
+
+  React.useEffect(() => {
+    const tempId = getTempId()
+    let setUserFalseId = null
+    setAdminTyping(false)
+    setUserTyping(false)
+
+    let setAdminFalseId = null
+    const typingAdminRef = database.ref(`/${key}/users/${userid}/typingAdmin`)
+    typingAdminRef.on('value', (snapshot) => {
+      if(setAdminFalseId) clearTimeout(setAdminFalseId)
+
+      const value = snapshot.val() || {}
+      const typingAdmin = Object.keys(value)
+        .filter(t => t !== tempId)
+        .find(t => value[t] > new Date().getTime())
+
+      if(!typingAdmin) {
+        setAdminTyping(false)
+        return
+      }
+
+      setAdminTyping(true)
+      setAdminFalseId = setTimeout(()=> {
+        setAdminTyping(false)
+      }, value[typingAdmin] - new Date().getTime())
+    })
+
+    const typingUserRef = database.ref(`/${key}/users/${userid}/typingUser`)
+    typingUserRef.on('value', (snapshot) => {
+      if(setUserFalseId) clearTimeout(setUserFalseId)
+
+      const value = snapshot.val()
+      if(!value || value.timestamp < new Date().getTime()) {
+        setUserTyping(false)
+        return
+      }
+
+      setUserTyping(true)
+      setUserFalseId = setTimeout(()=> {
+        setUserTyping(false)
+      }, value.timestamp - new Date().getTime())
+    })
+
+    return ()=> {
+      typingAdminRef.off()
+      typingUserRef.off()
+    }
+  }, [userid])
 
   // 채팅방 변경 init
   React.useEffect(() => {
@@ -278,6 +354,36 @@ const Chat = ({ settings, messages, initMessages, pagingMessages, addMessages, d
             showImageViewer={props.showImageViewer}
             {...m}/>
         })}
+        {adminTyping && (
+          <ChatMessage
+            opponent={userid}
+            target={target}
+            onLoadImage={scrollTo}
+            type={-1}
+            skipDate={true}
+            skipTime={true}
+            userId={key}
+            // prev={messages[i - 1]}
+            // next={messages[i + 1]}
+            // showImageViewer={props.showImageViewer}
+          />
+        )}
+
+        {userTyping && (
+          <ChatMessage
+            opponent={userid}
+            target={target}
+            onLoadImage={scrollTo}
+            type={-1}
+            skipDate={true}
+            skipTime={true}
+            userId={userid}
+            // prev={messages[i - 1]}
+            // next={messages[i + 1]}
+            // showImageViewer={props.showImageViewer}
+          />
+        )}
+
         <div id='file-drop-layer' className={fileDropLayer
           ? 'file-drop-layer active'
           : 'file-drop-layer'}>
@@ -340,6 +446,7 @@ const Chat = ({ settings, messages, initMessages, pagingMessages, addMessages, d
                 setImageFile(null)
               }
             }}
+            onChange={startTyping}
             onKeyPress={(e) => {
               if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault()

@@ -266,3 +266,12 @@ export const dot2num = (dot) => {
   const d = dot.split('.')
   return ((((((+d[0])*256)+(+d[1]))*256)+(+d[2]))*256)+(+d[3])
 }
+
+export const genId = () => Math.random().toString(36).substr(2, 9)
+
+export const getTempId = () => {
+  if(!localStorage.getItem("CHAT_ADMIN_ID")) {
+    localStorage.setItem("CHAT_ADMIN_ID", genId())
+  }
+  return localStorage.getItem("CHAT_ADMIN_ID")
+}
