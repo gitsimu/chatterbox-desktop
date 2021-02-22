@@ -10,6 +10,7 @@ import * as smlog from '../js/smlog'
  * https://github.com/electron/electron/blob/master/docs/api/shell.md#shellopenexternalurl
  */
 const { shell, ipcRenderer } = require('electron')
+// import {shell, ipcRenderer} from 'electron'
 const storage = require('electron-json-storage')
 const initWorkingDay = {
   isInit: true,

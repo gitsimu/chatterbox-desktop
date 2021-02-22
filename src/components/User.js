@@ -13,10 +13,13 @@ const User = ({ messages, settings, addMessages, selectedUser, changeUserState, 
   const state = props.data.state
   const mode = props.mode
 
+  const [_refresh, refresh] = React.useState(false)
+
   const userClassName = () => {
     let cn = ''
     if (mode === 1) {
       cn = state
+      console.log('userClassName', cn)
     } else if (settings.selectedUser.key === props.data.key) {
       cn = 'active'
     }
@@ -30,6 +33,7 @@ const User = ({ messages, settings, addMessages, selectedUser, changeUserState, 
         if (mode === 1) {
           const value = state === '' ? 'selected' : ''
           changeUserState({key: props.data.key, state: value})
+          refresh(!_refresh)
         } else {
           selectedUser(props.data)
         }
