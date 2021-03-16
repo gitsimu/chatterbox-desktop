@@ -53,7 +53,7 @@ const Chat = ({ settings, messages, initMessages, pagingMessages, addMessages, d
       type: type,
       timestamp: timestamp
     })
-    database.ref(`/${key}/users/${userid}/typingAdmin/${getTempId()}`).remove()
+    database.ref(`/${key}/users/${id}/typingAdmin/${getTempId()}`).remove()
 
     setTabState(1)
     showInfoDialog(false)
