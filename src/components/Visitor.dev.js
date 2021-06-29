@@ -439,7 +439,7 @@ const Visitor = ({ users, settings, changeUserState, initUserState, ...props }) 
               <div style={{flex: 1}}>키워드</div>
               <div style={{flex: 1}}>체류시간</div>
               <div style={{flex: 1}}>최근방문시간</div>
-              <div style={{width: 60}}>채팅내역</div>
+              <div style={{flex: 1}}>채팅내역</div>
             </div>
           )}
           {visitors.length > 1 && (

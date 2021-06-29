@@ -111,6 +111,10 @@ https://standardjs.com/rules-kokr.html
     4. go to repository on GitHub, and click the "Releases" tab
     5. click on "Edit", and then "Publish" to finalize the release
 
+## Make install file
+    1. change version `package.json`
+    2. `npm run react-build`
+    3. `npm run build`
 
 ## Windows notification
 https://github.com/felixrieseberg/electron-windows-notifications

@@ -1,6 +1,7 @@
 import React from 'react'
 import ChatMessage from './ChatMessage'
 import EmojiContainer from './EmojiContainer'
+import ShortcutMessage from './ShortcutMessage'
 import axios from 'axios'
 import * as firebase from "firebase/app"
 import { connect } from 'react-redux'
@@ -314,6 +315,13 @@ const Chat = ({ settings, messages, initMessages, pagingMessages, addMessages, d
     }
   }, [])
 
+  const onChangeMessage = (text) => {
+    if (input && input.current) {
+      input.current.value = text
+      input.current.focus()
+    }
+  }
+
   return (
     <>
       <div className='messages card' ref={body}>
@@ -336,7 +344,7 @@ const Chat = ({ settings, messages, initMessages, pagingMessages, addMessages, d
           <div className="scroll-bottom-button" onClick={()=> {
             setScrollToBottom()
             scrollTo()
-          }} style={{bottom: infoDialog ? 100 : 55}}>
+          }} style={{bottom: infoDialog ? 160 : 110}}>
             <div>
               <i className="icon-arrow-down"></i>
             </div>
@@ -394,6 +402,7 @@ const Chat = ({ settings, messages, initMessages, pagingMessages, addMessages, d
           </div>
         </div>
       </div>
+      <ShortcutMessage database={database} Alert={Alert} onChangeMessage={onChangeMessage}/>
       <div className='message-form'>
         <EmojiContainer
           getState={emojiContainer}
@@ -415,18 +424,6 @@ const Chat = ({ settings, messages, initMessages, pagingMessages, addMessages, d
             input.current.value = ''
           }
         }}>
-          <div className='message-addon'>
-            <label>
-              <i className='icon-paper-clip'></i>
-              <input type='file'
-                onClick={e => handleFileInputClear(e)}
-                onChange={e => handleFileInput(e)}/>
-            </label>
-            <label>
-              <i className='icon-emotsmile'
-                 onClick={e => handleEmojiContainer(e)}></i>
-            </label>
-          </div>
           <textarea
             ref={input}
             className='message-input'
@@ -453,14 +450,30 @@ const Chat = ({ settings, messages, initMessages, pagingMessages, addMessages, d
                 form.dispatchEvent(new Event('submit'))
               }
             }}/>
-          <button className='message-button-send' type='submit'>
-            <i className='icon-paper-plane'></i>
-          </button>
-          <div className='message-button-more'
-            onClick={() => {
-              showOptionDialog(!optionDialog)
-            }}>
-            <i className='icon-options-vertical'></i>
+          <div>
+            <div className='message-addon'>
+              <label>
+                <i className='icon-paper-clip'></i>
+                <input type='file'
+                  onClick={e => handleFileInputClear(e)}
+                  onChange={e => handleFileInput(e)}/>
+              </label>
+              <label>
+                <i className='icon-emotsmile'
+                  onClick={e => handleEmojiContainer(e)}></i>
+              </label>
+            </div>
+            <div>
+              <button className='message-button-send' type='submit'>
+                <i className='icon-paper-plane'></i>
+              </button>
+              <div className='message-button-more'
+                onClick={() => {
+                  showOptionDialog(!optionDialog)
+                }}>
+                <i className='icon-options-vertical'></i>
+              </div>
+            </div>
           </div>
         </form>
 

@@ -187,8 +187,8 @@ function Main({ settings, initUsers, clearUsers, selectedUser, signOut, ...props
       .finally(()=> isLoading(false))
 
     return (() => {      
-      chat.off()
-      recent.off()
+      chat && chat.off()
+      recent && recent.off()
     })
   }, [initUsers, clearUsers, database, isLoading, selectedUser, settings.key, Alert])
 
