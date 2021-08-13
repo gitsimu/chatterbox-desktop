@@ -1,4 +1,5 @@
 import React from 'react';
+import { shell } from 'electron'
 
 const URL_PATTERN = /(https?:\/\/)?([ㄱ-힣-a-zA-Z0-9_.]{2,256})\.([a-z]{2,4})\b([-a-zA-Z0-9@:%_+.~#?&/=]*)?/
 const ChatMessageText = ({onClick, message, ...props}) => {
@@ -10,7 +11,8 @@ const ChatMessageText = ({onClick, message, ...props}) => {
              ? `https://${text}`
              : text
            event.preventDefault()
-           window.open(url, '_blank');
+           //  window.open(url, '_blank');
+          shell.openExternal(url)
          }}>{text}</a>
   )
 
