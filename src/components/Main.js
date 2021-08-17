@@ -3,6 +3,7 @@ import FirebaseConfig from '../firebase.config'
 import * as firebase from 'firebase/app'
 import 'firebase/auth'
 import 'firebase/database'
+import "firebase/performance";
 import axios from 'axios'
 import { ipcRenderer } from 'electron'
 
@@ -35,7 +36,7 @@ function Main({ settings, initUsers, clearUsers, selectedUser, signOut, ...props
     firebase.initializeApp(FirebaseConfig)
   }
   const database = firebase.database()
-
+  const perf = firebase.performance()
 
   React.useEffect(() => {
     const onImageViewKey = (event) => {
@@ -91,15 +92,20 @@ function Main({ settings, initUsers, clearUsers, selectedUser, signOut, ...props
         return firebase.auth().signInWithCustomToken(data.token)
           .catch(() => { throw new Error('인증에 실패하였습니다.')})
       })
-      .then(() => {
+      .then(() => { 
+        const oneMonthAgo = new Date()
+        oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1)
+        oneMonthAgo.setHours(0, 0, 0, 0)
+
         chat = database.ref(`/${settings.key}/users`).orderByChild('timestamp')
+        // .startAt(oneMonthAgo.getTime())
         chat.on('value', (snapshot) => {
           USERS.length = 0
 
           let items = []
           snapshot.forEach((childSnapshot) => {
             const k = childSnapshot.key
-            const v = childSnapshot.val()            
+            const v = childSnapshot.val()
             if (v.timestamp) {
               items.push({k: k, v: v})
             } else {
@@ -119,6 +125,8 @@ function Main({ settings, initUsers, clearUsers, selectedUser, signOut, ...props
               colorCode: code.colorCode
             }
           })
+
+          console.log('users', users)
 
           initUsers(users)
 
