@@ -116,6 +116,9 @@ https://standardjs.com/rules-kokr.html
     2. `npm run react-build`
     3. `npm run build`
 
+## Test
+    1. `npm run start`
+
 ## Windows notification
 https://github.com/felixrieseberg/electron-windows-notifications
 https://stackoverflow.com/questions/57005561/windows-10-toast-notification-with-scenario-set-to-incomingcall-messes-up-the

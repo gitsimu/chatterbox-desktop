@@ -24,6 +24,7 @@ const Chat = ({ settings, messages, initMessages, pagingMessages, addMessages, d
 
   const [optionDialog, showOptionDialog] = React.useState(false)
   const [infoDialog, showInfoDialog] = React.useState(false)
+  const [shortcutMessageDialog, showShortcutMessageDialog] = React.useState(false)
   const [emojiContainer, showEmojiContainer] = React.useState(false)
   const [loading, isLoading] = React.useState(false)
   const [fileDropLayer, showFileDropLayer] = React.useState(false)
@@ -41,6 +42,8 @@ const Chat = ({ settings, messages, initMessages, pagingMessages, addMessages, d
     const timestamp = firebase.database.ServerValue.TIMESTAMP
     const messageId = Math.random().toString(36).substr(2, 9)
     const lastMessage = (type === 2) ? JSON.parse(message).name : message.trim()    
+
+    console.log('firebase.database.ServerValue.TIMESTAMP', firebase.database.ServerValue.TIMESTAMP)
     
     database.ref(`/${key}/users/${id}`).update({
       state:1,
@@ -322,6 +325,11 @@ const Chat = ({ settings, messages, initMessages, pagingMessages, addMessages, d
     }
   }
 
+  const onChangeShortcutMessageState = (state) => {
+    showShortcutMessageDialog(state)
+    console.log('change shortcut message state', state)
+  }
+
   return (
     <>
       <div className='messages card' ref={body}>
@@ -402,7 +410,11 @@ const Chat = ({ settings, messages, initMessages, pagingMessages, addMessages, d
           </div>
         </div>
       </div>
-      <ShortcutMessage database={database} Alert={Alert} onChangeMessage={onChangeMessage}/>
+      <ShortcutMessage 
+        database={database}
+        Alert={Alert}
+        onChangeMessage={onChangeMessage}
+        onChangeState={onChangeShortcutMessageState}/>
       <div className='message-form'>
         <EmojiContainer
           getState={emojiContainer}
@@ -507,7 +519,7 @@ const Chat = ({ settings, messages, initMessages, pagingMessages, addMessages, d
           </div>
         </div>
 
-        { infoDialog && (
+        { infoDialog && !shortcutMessageDialog && (
           <div className='dialog info'>
             {/* <div className='dialog-header'>
               <i className='icon-exclamation'></i>

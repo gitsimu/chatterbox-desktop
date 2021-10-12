@@ -390,16 +390,16 @@ const Setting = ({ _key : key, userName, ...props }) => {
           <div>채팅설정</div>
         </div>
         <div className="setting-list-title">Etc</div>
-        <div className="setting-list-tab"
+        {/* <div className="setting-list-tab"
           onClick={() => {
             if (typeof(shell) === "object") {
               shell.openExternal('https://smlog.co.kr/notice_list.htm')
             }
-          }}>새 소식</div>
+          }}>새 소식</div> */}
         <div className="setting-list-tab"
           onClick={() => {
             if (typeof(shell) === "object") {
-              shell.openExternal('https://smlog.co.kr/faq_list.htm')
+              shell.openExternal('http://smlog.co.kr/2020/customer_help.html')
             }
           }}>고객센터</div>
         <div
@@ -934,7 +934,7 @@ const Setting = ({ _key : key, userName, ...props }) => {
                 //   })
                 // }}
                 className="setting-service-info-text1">Version {version}</div>
-              <div className="setting-service-info-text3">COPYRIGHT (C) Creative Soft. All Rights reserved.</div>
+              <div className="setting-service-info-text3">COPYRIGHT (C) SQUARES. All Rights reserved.</div>
             </div>
           </div>
         </div>

@@ -35,6 +35,7 @@ const ShortcutMessage = ({settings, ...props}) => {
   const database = props.database
   const Alert = props.Alert
   const onChangeMessage = props.onChangeMessage
+  const onChangeState = props.onChangeState
   const [shortcutData, setShortcutData] = React.useState()
   const [shortcutModifyData, setShortcutModifyData] = React.useState()
   const [shortcutMessage, showShortcutMessage] = React.useState(false)
@@ -72,6 +73,10 @@ const ShortcutMessage = ({settings, ...props}) => {
       }
     })
   }, [])
+
+  React.useEffect(() => {
+    onChangeState(shortcutMessage)
+  }, [shortcutMessage])
 
   const deepCopy = (obj) => {
     return JSON.parse(JSON.stringify(obj))
@@ -337,7 +342,9 @@ const ShortcutMessage = ({settings, ...props}) => {
           <div>
             <div className="shortcut-modify-title">
               <div style={{flex: 1}}>카테고리 ({Object.keys(shortcutModifyData).length})</div>
-              <Add onClick={() => {onAddCategory()}}/>
+              <div className="shortcut-modify-add" onClick={() => {onAddCategory()}}>+ 추가</div>
+              {/* <Add onClick={() => {onAddCategory()}}/> */}
+              
             </div>
             <div className="shortcut-modify-list">
               {shortcutModifyData && Object.keys(shortcutModifyData).map((key, i) => {
@@ -379,7 +386,10 @@ const ShortcutMessage = ({settings, ...props}) => {
                   }
                 }()})
               </div>
-              <Add onClick={() => {onAddShortcut()}}/>
+              {selectedModifyCategory && (
+                <div className="shortcut-modify-add" onClick={() => {onAddShortcut()}}>+ 추가</div>
+              )}
+              {/* <Add onClick={() => {onAddShortcut()}}/> */}
             </div>
             <div className="shortcut-modify-list">
               {shortcutModifyData

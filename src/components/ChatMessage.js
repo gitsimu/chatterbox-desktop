@@ -13,7 +13,7 @@ const ChatMessage = ({ settings, ...props }) => {
 
   const skipDate = () => {
     if(props.skipDate) return true
-    if (!props.prev) {
+    else if (!props.prev || !props.timestamp) {
       return false
     }
 
@@ -24,7 +24,7 @@ const ChatMessage = ({ settings, ...props }) => {
   }
   const skipTime = () => {
     if(props.skipTime) return true
-    if (!props.next || props.next.userId !== props.userId) {
+    else if (!props.next || props.next.userId !== props.userId || !props.timestamp) {
       return false
     }
 

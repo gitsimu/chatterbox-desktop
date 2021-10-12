@@ -28,7 +28,7 @@ export const bytesToSize = (bytes) => {
 }
 
 export const timestampToDay = (timestamp, addMonth=0, addDays=0) => {
-  const date = new Date(timestamp);
+  const date = timestamp ? new Date(timestamp) : new Date();
   let year = date.getFullYear(),
       month = date.getMonth()+1 + addMonth,
       day = date.getDate() + addDays;
@@ -39,7 +39,7 @@ export const timestampToDay = (timestamp, addMonth=0, addDays=0) => {
 }
 
 export const timestampToTime = (timestamp, isSimple) => {
-  const date = new Date(timestamp),
+  const date = timestamp ? new Date(timestamp) : new Date(),
       year = date.getFullYear(),
       month = date.getMonth()+1,
       day = date.getDate(),

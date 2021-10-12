@@ -241,18 +241,18 @@ function App({ settings, signIn }) {
           <div className="app-options">
             <div onClick={() => {
               if (typeof(shell) === "object") {
-                shell.openExternal('https://smlog.co.kr/member/member_join_check.htm')
+                shell.openExternal('http://smlog.co.kr/2020/member/member_join.html')
               }
             }}>회원가입</div>
             <div onClick={() => {
               if (typeof(shell) === "object") {
-                shell.openExternal('https://smlog.co.kr/member/id_pass.htm')
+                shell.openExternal('http://smlog.co.kr/2020/member/login.html')
               }
             }}>아이디/비밀번호 찾기</div>
           </div>
         </div>
         <div className="app-copyright">
-          COPYRIGHT (C) Creative Soft. All Rights reserved.
+          COPYRIGHT (C) SQUARES. All Rights reserved.
         </div>
       </div>    
     )}

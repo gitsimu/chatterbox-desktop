@@ -737,14 +737,17 @@ div, input, textarea {
   left: 50%;
   border-radius: 5px;
   box-shadow: 0 0 15px 5px rgba(0, 0, 0, 0.1);
-  width: 97%;
+  /* width: 100%; */
+  width: auto;
+  padding: 0 10px;
+  white-space: nowrap;
   -webkit-user-select: none;
   user-select: none;
   text-align: center;
   transform: translateX(-50%);
   overflow: hidden;
   z-index: 5;
-  opacity: 0.9;
+  opacity: 0.7;
 }
 .dialog > div.dialog-header {
   background: #303540;
@@ -2369,14 +2372,14 @@ div:hover > .tooltip {
   padding: 6px 12px;
   align-items: center;
   cursor: pointer;
-  transition: 0.3s ease all;
+  /* transition: 0.3s ease all; */
   border: 1px solid rgba(0, 0, 0, 0.3);
   border-radius: 10px;
   vertical-align: middle;
 }
 .shortcut-message-container > div:hover {
   background-color: #006cff;
-  border-color: #006cff;
+  border-color: #006cff !important;
   color: #fff;
 }
 .shortcut-message-container > div .dot {
@@ -2526,7 +2529,7 @@ div:hover > .tooltip {
   align-items: center;
   justify-content: center;
   font-weight: bold;
-  padding: 0 5px;
+  padding: 4px 8px;
 }
 .shortcut-modify-title svg {
   cursor: pointer;
@@ -2544,6 +2547,7 @@ div:hover > .tooltip {
   border: 1px solid #ddd;
   opacity: 0.6;
   transition: 0.2s ease all;
+  cursor: pointer;
 }
 .shortcut-modify-category.active {
   border-color: #006cff;
@@ -2670,6 +2674,15 @@ div:hover > .tooltip {
   padding: 0 5px;
   max-height: 450px;
   overflow-y: auto;
+}
+.shortcut-modify-add {
+  color: #006cff;
+  font-weight: 400;
+  margin-right: 5px;
+  cursor: pointer;
+}
+.shortcut-modify-add:hover {
+  text-decoration: underline;
 }
 .shortcut-message-tooltip {
   position: fixed; 
