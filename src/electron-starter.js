@@ -66,7 +66,17 @@ if (!gotTheLock) {
   willQuitApp = true
   app.quit()
 } else {
-  app.on('second-instance', (event, commandLine, workingDirectory) => {
+  app.on('second-instance', (_, argv) => {
+    // https://newbedev.com/open-app-and-pass-parameters-with-deep-linking-using-electron-macos
+    // https://tobias-sample.co.uk/how-to-get-deep-linking-to-work-in-electron-on-windows
+    if (argv.length > 1) {
+      if (process.platform === "win32") {
+        const response = JSON.parse(decodeURIComponent(argv[argv.length-1].replace('smlog://', '')))
+        win.focus()
+        win.webContents.send('cafe24-login-response', response)
+      }
+    }
+
     // Someone tried to run a second instance, we should focus our window.
     if (win) {
       if (win.isMinimized()) win.restore()
