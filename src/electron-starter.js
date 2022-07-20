@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, globalShortcut, Menu, Tray } = require('electron')
+const { app, BrowserWindow, ipcMain, globalShortcut, Menu, Tray, BrowserView, dialog } = require('electron')
 const { autoUpdater } = require('electron-updater')
 const { download } = require('electron-dl')
 
@@ -20,6 +20,7 @@ log.info('Smartlog Desktop starting...')
 let win
 let tray
 let willQuitApp = false
+let cafe24LoginWindow
 
 function createWindow () {
   /* 브라우저 창을 생성합니다. */
@@ -30,7 +31,7 @@ function createWindow () {
     minHeight: 720,    
     webPreferences: {
       nodeIntegration: true,
-      
+      webviewTag: true
     }
   })
   win.removeMenu()
@@ -52,6 +53,14 @@ function createWindow () {
   win.loadURL(startUrl)
 }
 
+if (process.defaultApp) {
+  if (process.argv.length >= 2) {
+    app.setAsDefaultProtocolClient('smlog', process.execPath, [path.resolve(process.argv[1])])
+  }
+} else {
+  app.setAsDefaultProtocolClient('smlog')
+}
+
 /* 하나의 프로세스만 실행 */
 if (!gotTheLock) {
   willQuitApp = true
@@ -61,7 +70,6 @@ if (!gotTheLock) {
     // Someone tried to run a second instance, we should focus our window.
     if (win) {
       if (win.isMinimized()) win.restore()
-      win.show()
       win.focus()
     }
   })
@@ -106,7 +114,16 @@ if (!gotTheLock) {
       win.focus()
     })
   })
+
+  /* cafe24 로그인을 위해 deeplink 구현 */
+  app.on('open-url', function (event, url) {
+    dialog.showErrorBox('Welcome Back', `You arrived from: ${url}`)
+    const response = JSON.parse(decodeURIComponent(url.replace('smlog://', '')))
+    win.focus()
+    win.webContents.send('cafe24-login-response', response)
+  })
 }
+
 
 /* developer tool을 여는 단축키 지정 (command + P) */
 app.whenReady().then(() => {
@@ -142,6 +159,16 @@ app.on('activate', () => {
     autoUpdater.checkForUpdatesAndNotify()
   }
 })
+
+/* Failed to load resource: net::ERR_CERT_AUTHORITY_INVALID 이슈
+ * https://stackoverflow.com/questions/38986692/how-do-i-trust-a-self-signed-certificate-from-an-electron-app
+ */
+app.on('certificate-error', (event, webContents, url, error, certificate, callback) => {
+  // On certificate error we disable default behaviour (stop loading the page)
+  // and we then say "it is all fine - true" to the callback
+  event.preventDefault();
+  callback(true);
+});
 
 /* 앱 버전 확인 */
 ipcMain.on('app_version', (event) => {
@@ -199,4 +226,31 @@ ipcMain.on('check_update', (event) => {
   })
 
   autoUpdater.emit('update-not-available')
+})
+
+// ipcMain.on('cafe24-login', (event, mallId) => {
+//   app.whenReady().then(() => {
+//     cafe24LoginWindow = new BrowserWindow({
+//       width: 600,
+//       height: 600,
+//       webPreferences: {
+//         nodeIntegration: true,
+//       }
+//     })
+//     const view = new BrowserView({
+//       webPreferences: {
+//         nodeIntegration: true,
+//       }
+//     })
+//     cafe24LoginWindow.setBrowserView(view)
+//     view.setBounds({ x: 0, y: 0, width: 600, height: 600 })
+//     view.webContents.loadURL(`https://smlog.co.kr/cafe24/app_auth.html?mall_id=${mallId}&login_type=desktop`)
+//     // cafe24LoginWindow.loadURL('http://quv.kr/test/apptest.html')
+//     view.webContents.openDevTools()
+//   })
+// })
+
+ipcMain.on('cafe24-login-response', (event, info) => {
+  cafe24LoginWindow.destroy()
+  win.webContents.send('cafe24-login-response', {info: info})
 })

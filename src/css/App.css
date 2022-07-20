@@ -132,6 +132,75 @@ div, input, textarea {
   background: #01c9e2;
 }
 
+.or {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+  text-align: center;
+  color: #999;
+  margin-top: 20px;
+}
+.or > div {
+  width: 40px;
+  background-color: #fff;
+  z-index: 1;
+}
+.or::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 90%;
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+  transform: translate(-50%, -50%);
+}
+
+.cafe24-button-login {
+  padding: 0 20px;
+  margin-top: 25px;
+}
+.cafe24-button-login > div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px;
+  height: 42px;
+  background: #f1f2f3;
+  color: #666;
+  font-size: 14px;
+  font-weight: bold;
+  text-align: center;
+  border-radius: 5px;
+  border: 1px solid #e2e2e2;
+  cursor: pointer;
+  transition: 0.2s ease all;
+}
+.cafe24-button-login > div > img {
+  padding: 0 15px;
+}
+.cafe24-button-login > div > span {
+  border-left: 1px solid #ddd;
+  padding-left: 15px;
+}
+
+.cafe24-login-webview {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1
+}
+.cafe24-login-webview iframe,
+.cafe24-login-webview webview {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
 .app-options {
   margin: 15px;
   font-size: 12px;

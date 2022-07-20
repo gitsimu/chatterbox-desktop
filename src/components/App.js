@@ -25,6 +25,9 @@ function App({ settings, signIn }) {
   const [alertDialog, showAlertDialog] = React.useState(null)
   const [signInRequired, isSignInRequired] = React.useState(null)
   
+  const [loginPlatform, setLoginPlatform] = React.useState('smartlog')
+  const [mallId, setMallId] = React.useState('')
+
   React.useEffect(() => {
     /* Main theme / device */
     storage.getMany(['mainTheme', 'device'], (err, data) => {           
@@ -52,6 +55,33 @@ function App({ settings, signIn }) {
       const cleanProgressInPercentages = Math.floor(progress * 100) // Without decimal point
       console.log('progressInPercentages', progressInPercentages) 
       console.log('cleanProgressInPercentages', cleanProgressInPercentages) 
+    })
+
+    ipcRenderer.on('cafe24-login-response', async (event, data) => {      
+      ipcRenderer.removeAllListeners('cafe24-login-response')
+      console.log('cafe24-login-response', data)
+
+      if (data.code === '1') {
+        const response = {
+          pc_id: deviceId,
+          userName: data.member_id,
+          sessionToken: data.member_token,
+          sessionKey: data.sskey,
+          key: data.chat_id
+        }
+        signIn(response)
+        response.userToken = await smlog.API({
+          method: 'insert_user_pc_info',
+          pc_id: deviceId,
+          chat_id: data.chat_id,
+          os: `${os.type()} ${os.release()} ${os.platform()}`
+        })
+        
+        storage.set('userData', response)
+      } else {
+        Alert(`로그인에 실패하였습니다.\n${data.message}`)
+        initUserData()
+      }
     })
   }, [])
 
@@ -125,7 +155,7 @@ function App({ settings, signIn }) {
       return
     }
 
-    isLoading(true)    
+    isLoading(true)
     
     const req = {
       method: 'login_app',
@@ -209,46 +239,84 @@ function App({ settings, signIn }) {
           <img src="/logo_smlog.png" alt="logo_smlog"></img>
         </div> */}
         <div className="app-container card">
-          {/* <div className="app-title">
-            로그인
-          </div> */}
-          <img src="./logo_smlog.png" alt="logo_smlog" style={{height: 50, marginTop: 20, marginBottom: 20}}></img>
-          <div className="app-input">
-            <div className="app-input-item">
-              <span>아이디</span>
-              <input type="text" value={id} onChange={e => setId(e.target.value)}/>
+          {loginPlatform === 'smartlog' && (<>
+            <img src="./logo_smlog.png" alt="logo_smlog" style={{height: 50, marginTop: 20, marginBottom: 20}}></img>
+            <div className="app-input">
+              <div className="app-input-item">
+                <span>아이디</span>
+                <input type="text" value={id} onChange={e => setId(e.target.value)}/>
+              </div>
+              <div className="app-input-item">
+                <span>비밀번호</span>
+                <input type="password"
+                  value={pw} 
+                  onChange={e => setPw(e.target.value)}
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault()
+                      signInProcess(id, pw)
+                    }
+                  }}/>
+              </div>
             </div>
-            <div className="app-input-item">
-              <span>비밀번호</span>
-              <input type="password"
-                value={pw} 
-                onChange={e => setPw(e.target.value)}
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault()
-                    signInProcess(id, pw)
-                  }
-                }}/>
+            <div
+              className={(id !== '' && pw !== '') ? "app-button-login active" : "app-button-login"}
+              onClick={() => {
+                signInProcess(id, pw)
+              }}>
+              <div>로그인</div>
             </div>
+            <div className="app-options">
+              <div onClick={() => {
+                if (typeof(shell) === "object") {
+                  shell.openExternal('http://smlog.co.kr/2020/member/member_join.html')
+                }
+              }}>회원가입</div>
+              <div onClick={() => {
+                if (typeof(shell) === "object") {
+                  shell.openExternal('http://smlog.co.kr/2020/member/login.html')
+                }
+              }}>아이디/비밀번호 찾기</div>
+            </div>
+          </>)}
+          {loginPlatform === 'cafe24' && (<>
+            <img src="./logo_smlog.png" alt="logo_smlog" style={{height: 50, marginTop: 20, marginBottom: 20}}></img>
+            <div style={{width: 170, borderBottom: '1px solid #D9DADB'}}></div>
+            <img src="./cafe24.png" alt="logo_smlog" style={{height: 40, marginTop: 10, marginBottom: 20}}></img>
+            <div className="app-input">
+              <div className="app-input-item">
+                <span>카페24 상점 ID</span>
+                <input type="text" value={mallId} onChange={e => setMallId(e.target.value)}/>
+              </div>
+            </div>
+            <div
+              className={(mallId !== '') ? "app-button-login active" : "app-button-login"}
+              onClick={() => {
+                shell.openExternal(`https://smlog.co.kr/cafe24/app_auth.html?mall_id=${mallId}&login_type=desktop`)
+                // shell.openExternal(`http://quv.kr/test/apptest.html`)
+              }}>
+              <div>로그인</div>
+            </div>
+          </>)}
+          <div className="or">
+            <div>또는</div>
           </div>
-          <div
-            className={(id !== '' && pw !== '') ? "app-button-login active" : "app-button-login"}
-            onClick={() => {
-              signInProcess(id, pw)
+          <div className="cafe24-button-login">
+            <div onClick={() => {
+              setLoginPlatform(old => {
+                if (old === 'smartlog') return 'cafe24'
+                else if (old === 'cafe24') return 'smartlog'
+              })
             }}>
-            <div>로그인</div>
-          </div>
-          <div className="app-options">
-            <div onClick={() => {
-              if (typeof(shell) === "object") {
-                shell.openExternal('http://smlog.co.kr/2020/member/member_join.html')
-              }
-            }}>회원가입</div>
-            <div onClick={() => {
-              if (typeof(shell) === "object") {
-                shell.openExternal('http://smlog.co.kr/2020/member/login.html')
-              }
-            }}>아이디/비밀번호 찾기</div>
+              {loginPlatform === 'smartlog' && (<>
+                <img src="./cafe24.png" alt="logo_cafe24" style={{height: 24}}></img>
+                <span>카페24로 로그인</span>
+              </>)}
+              {loginPlatform === 'cafe24' && (<>
+                <img src="./smartlog.png" alt="logo_cafe24" style={{height: 12}}></img>
+                <span>스마트로그로 로그인</span>
+              </>)}
+            </div>
           </div>
         </div>
         <div className="app-copyright">
