@@ -286,14 +286,21 @@ function App({ settings, signIn }) {
             <div className="app-input">
               <div className="app-input-item">
                 <span>카페24 상점 ID</span>
-                <input type="text" value={mallId} onChange={e => setMallId(e.target.value)}/>
+                <input type="text" 
+                  value={mallId}
+                  onChange={e => setMallId(e.target.value)}
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault()
+                      shell.openExternal(`https://smlog.co.kr/cafe24/app_auth.html?mall_id=${mallId}&login_type=desktop`)
+                    }
+                  }}/>
               </div>
             </div>
             <div
               className={(mallId !== '') ? "app-button-login active" : "app-button-login"}
               onClick={() => {
                 shell.openExternal(`https://smlog.co.kr/cafe24/app_auth.html?mall_id=${mallId}&login_type=desktop`)
-                // shell.openExternal(`http://quv.kr/test/apptest.html`)
               }}>
               <div>로그인</div>
             </div>

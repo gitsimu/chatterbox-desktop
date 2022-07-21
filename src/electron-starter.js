@@ -133,7 +133,7 @@ if (!gotTheLock) {
 
   /* cafe24 로그인을 위해 deeplink 구현 (for macOS) */
   app.on('open-url', function (event, url) {
-    dialog.showErrorBox('Welcome Back', `You arrived from: ${url}`)
+    // dialog.showErrorBox('Welcome Back', `You arrived from: ${url}`)
     const response = JSON.parse(decodeURIComponent(url.replace('smlog://', '')))
     win.focus()
     win.webContents.send('cafe24-login-response', response)
