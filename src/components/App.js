@@ -58,7 +58,6 @@ function App({ settings, signIn }) {
     })
 
     ipcRenderer.on('cafe24-login-response', async (event, data) => {      
-      ipcRenderer.removeAllListeners('cafe24-login-response')
       console.log('cafe24-login-response', data)
 
       if (data.code === '1') {
