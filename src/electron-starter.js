@@ -67,11 +67,17 @@ if (!gotTheLock) {
   app.quit()
 } else {
   app.on('second-instance', (_, argv) => {
+    /* cafe24 로그인을 위해 deeplink 구현 (for windows) */
     // https://newbedev.com/open-app-and-pass-parameters-with-deep-linking-using-electron-macos
     // https://tobias-sample.co.uk/how-to-get-deep-linking-to-work-in-electron-on-windows
     if (argv.length > 1) {
       if (process.platform === "win32") {
-        const response = JSON.parse(decodeURIComponent(argv[argv.length-1].replace('smlog://', '')))
+        let decodeJSON = decodeURIComponent(argv[argv.length-1].replace('smlog://', ''))
+        // response 값 끝에 /가 포함되어 와서 제거처리
+        if (decodeJSON.slice(-1) === '/') {
+          decodeJSON = decodeJSON.slice(0, -1)
+        }
+        const response = JSON.parse(decodeJSON)
         win.focus()
         win.webContents.send('cafe24-login-response', response)
       }
@@ -125,7 +131,7 @@ if (!gotTheLock) {
     })
   })
 
-  /* cafe24 로그인을 위해 deeplink 구현 */
+  /* cafe24 로그인을 위해 deeplink 구현 (for macOS) */
   app.on('open-url', function (event, url) {
     dialog.showErrorBox('Welcome Back', `You arrived from: ${url}`)
     const response = JSON.parse(decodeURIComponent(url.replace('smlog://', '')))
@@ -136,11 +142,11 @@ if (!gotTheLock) {
 
 
 /* developer tool을 여는 단축키 지정 (command + P) */
-app.whenReady().then(() => {
-  globalShortcut.register('CommandOrControl+P', () => {
-    win.openDevTools()
-  })
-})
+// app.whenReady().then(() => {
+//   globalShortcut.register('CommandOrControl+P', () => {
+//     win.openDevTools()
+//   })
+// })
 
 if (isMac) {
   const menu = Menu.buildFromTemplate(menuTemplate(app))
